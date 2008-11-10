@@ -1,0 +1,702 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<title>IM Gateway Changelog</title>
+<style type="text/css">
+/* global font and body settings */
+body {
+	font-size : 100%;
+	background-color : #d3d6d9;
+	padding: 0;
+	margin: 0 0 30px 0;
+}
+body, td, th {
+	font-family : arial, helvetica, sans-serif;
+	font-size : 10pt;
+}
+pre, tt, code {
+	font-family : courier new, monospace;
+	font-size : 9pt;
+}
+#pageContainer {
+	display: block;
+	position: relative;
+	clear: both;
+	background-color: #fff;
+	border: 1px solid #999;
+	padding: 40px;
+	margin: 30px;
+}
+#pageHeader {
+	display: block;
+	position: relative;
+	height: 80px;
+	background-color: #e7eaee;
+	border: 1px solid #cccccc;
+	border-bottom: none;
+	margin: 10px 0 0 0;
+}
+#pageBody {
+	margin: 0 18px 0 20px;
+}
+
+
+
+/* anchors */
+a:link {
+	color: #11568c;
+}
+a:visited {
+	color: #571c8d;
+}
+a:hover {
+	color: #7a1d42;
+	text-decoration : underline;
+}
+a:active {
+	color: #7a1d42;
+}
+
+
+
+/* headings */
+h1 {
+	display: block;
+	position: relative;
+	font-size : 1.7em;
+	font-weight : bold;
+	color: #670e15;
+	padding: 0;
+	margin: 30px 0 0 20px;
+}
+h2 {
+	font-size : 1.3em;
+	font-weight : bold;
+	margin: 40px 0 6px 0;
+	padding: 0;
+	color: #335588;
+}
+h3 {
+	font-size : 1.0em;
+	font-weight : bold;
+	margin: 25px 0 3px 0;
+	padding: 0;
+	color: #334466;
+}
+
+
+
+/* general elements */
+p {
+	margin: 0 0 15px 0;
+}
+
+ul {
+	margin: 5px 0 15px 35px;
+}
+li {
+	padding-bottom : 4px;
+}
+tt {
+	font-family : courier new, monospace;
+	font-weight : bold;
+	color : #060;
+}
+hr {
+	display: block;
+	height: 1px;
+	background-color: #999999;
+	border: none;
+	margin: 40px 0 20px 0;
+}
+
+.footer {
+	font-size : 8pt;
+	color : #666;
+	text-align : center;
+	margin-top : 2em;
+	padding-top : 0.5em;
+	border-top : 1px #CCC solid;
+}
+</style>
+</head>
+<body>
+
+<div id="pageContainer">
+
+	<div id="pageHeader">
+		<h1>IM Gateway Changelog</h1>
+	</div>
+
+	<div id="pageBody">
+
+    
+<h2>Major Known Issues</h2>
+<ul>
+<li>SIMPLE support is only tested with OpenSER, may work with others</li>
+<li>No buddy icon support for Yahoo.</li>
+</ul>
+
+<h2>1.2.4d -- <span style="font-weight: normal;">September 2, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>JML library updates for protocol 15 are causing problems for a lot of people.  Reverted to previous JML version.</li>
+</ul>
+
+<h2>1.2.4c -- <span style="font-weight: normal;">August 28, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>Fixed JML library and updated to repair buddy list issues some folk were seeing.</li>
+</ul>
+
+<h2>1.2.4b -- <span style="font-weight: normal;">August 27, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>Fixed db upgrade scripts.</li>
+</ul>
+
+<h2>1.2.4a -- <span style="font-weight: normal;">August 27, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>Fixed pseudo roster db references to new table name.</li>
+<li>Fixed db upgrade scripts.</li>
+</ul>
+
+<h2>1.2.4 -- <span style="font-weight: normal;">August 26, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-426'>GATE-426</a>] - DB2 (and others) BLOB column types are now CLOB.</li>
+<li>Fixed google mail packet handling so not get stuck and kill a user's session.</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-391'>GATE-391</a>] - Renamed sip to simple for default name of SIMPLE transport.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-411'>GATE-411</a>] - Sped up database query by removing unused ordering.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-424'>GATE-424</a>] - Updated disco info responses to meet spec.</li>
+<li>Updated JML library to embrace newer MSNP15 protocol, remove cindy (which was causing problems for some), and include a wealth of updates.</li>
+</ul>
+
+<h2>1.2.3 -- <span style="font-weight: normal;">March 11, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-423'>GATE-423</a>] - Incoming messages will now route to all resources if route.all-resources set on server.</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-420'>GATE-420</a>] - XMPP transport can now allow end user to specific any server if admin puts * for connect hostname.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-415'>GATE-415</a>] - Experimental QQ transport support added.</li>
+</ul>
+
+<h2>1.2.2a -- <span style="font-weight: normal;">January 20, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-412'>GATE-412</a>] - MSN nickname changes are now an option.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-413'>GATE-413</a>] - Adding/updating MSN contacts should not trigger a NPE anymore.</li>
+</ul>
+
+<h2>1.2.2 -- <span style="font-weight: normal;">January 3, 2008</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-352'>GATE-352</a>] - Yahoo mail notifications now occuring regularly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-374'>GATE-374</a>] - MSN Contact's name now gets updated if no custom name set</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-375'>GATE-375</a>] - Manual permissions no longer prevent existing registrations from seeing transport</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-389'>GATE-389</a>] - Silenced Gadu-Gadu properties warning</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-399'>GATE-399</a>] - Fixed case issue causing some users to not be able to send messages through Yahoo</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-400'>GATE-400</a>] - Can now add Yahoo contacts to existing groups</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-402'>GATE-402</a>] - Fixed database settings for Postgres</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-404'>GATE-404</a>] - MSN avatar support is no longer leaving leftover file descriptors</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-405'>GATE-405</a>] - XMPP registered account is now being handled correctly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-409'>GATE-409</a>] - java.lang.NoClassDefFoundError: sun/security/pkcs11/SunPKCS11 not found warning fixed</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-351'>GATE-351</a>] - Mail notifications (and any headlines) now include something about where they came from</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-369'>GATE-369</a>] - Added initial amount of mail notification for MSN</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-398'>GATE-398</a>] - Added support for uploading OSCAR buddy icons</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-410'>GATE-410</a>] - Sped up registration page display</li>
+</ul>
+
+<h2>1.2.1 -- <span style="font-weight: normal;">December 6, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-392'>GATE-392</a>] - When not-in-your-list contacts IM you, they are no longer added to your list.  (AIM/ICQ)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-393'>GATE-393</a>] - Database conversion errors while storing avatar data with embedded db have been fixed.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-396'>GATE-396</a>] - Avatars should no longer be triggering duplicate key errors.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-397'>GATE-397</a>] - The gateway registration information is now transmitted along the nodes in the cluster.</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-361'>GATE-361</a>] - Now sharing information about active sessions across cluster nodes.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-387'>GATE-387</a>] - Now setting upstream buddy icons for MSN and XMPP/GTalk.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-388'>GATE-388</a>] - Plugin now works properly in a clustered environment.</li>
+</ul>
+
+<h2>1.2.0 -- <span style="font-weight: normal;">October 31, 2007</span></h2>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-10'>GATE-10</a>] - Buddy icons are now retrieved from AIM/ICQ, XMPP/GTalk, and MSN</li>
+</ul>
+
+<h2>1.1.4 -- <span style="font-weight: normal;">October 31, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-350'>GATE-350</a>] - GMail notifications now work if you registered without a full JID</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-354'>GATE-354</a>] - NPE fixed during contact removal for MSN</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-364'>GATE-364</a>] - New contact handling fixed, adds were not working at all</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-377'>GATE-377</a>] - XMPP gateway now performing presence probes upon login, initial states now showing up correctly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-383'>GATE-383</a>] - NPE fixed during OSCAR buddy removal</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-384'>GATE-384</a>] - NPE fixed during packet interception</li>
+<li>Security issue in XMLRPC functionality fixed</li>
+</ul>
+        
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-381'>GATE-381</a>] - XMLRPC function added to request list of transports a user is registered to</li>
+</ul>
+
+<h2>1.1.3a -- <span style="font-weight: normal;">September 17, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-347'>GATE-347</a>] - Registrations interface no longer throwing java error</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-348'>GATE-348</a>] - Problem starting transports fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-349'>GATE-349</a>] - GTalk mail notifications no longer tell you when there are 0 messages.</li>
+</ul>
+
+<h2>1.1.3 -- <span style="font-weight: normal;">September 16, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-219'>GATE-219</a>] - MSN "nicknames" no longer being lost upon group moves</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-262'>GATE-262</a>] - Yahoo is no longer triggering a ridiculous amount of conversation when modding roster</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-273'>GATE-273</a>] - ICQ authorization steps now being handled correctly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-321'>GATE-321</a>] - MSN personal status messages with ' in them no longer show up as &apos;</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-333'>GATE-333</a>] - Adding contact support improved</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-336'>GATE-336</a>] - No longer unable to edit AIM buddies with spaces in their screen names</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-337'>GATE-337</a>] - ICQ automatic auth reply is now working correctly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-338'>GATE-338</a>] - Adding contacts no longer leaves them in a pending state</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-339'>GATE-339</a>] - Add and delete should work for Gadu-Gadu</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-342'>GATE-342</a>] - IRC special characters now filtered out</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-343'>GATE-343</a>] - MSN initial personal message is now being set</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-344'>GATE-344</a>] - Silenced Yahoo session reset exception that's not important</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-346'>GATE-346</a>] - OSCAR support is now doing keepalive pings</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-268'>GATE-268</a>] - OSCAR now handling "you are logged in from another location" w/o attempting to reconnect</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>Promoted ICQ and Gadu-Gadu to stable.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-287'>GATE-287</a>] - Added "strict" option for permissions (don't let log in)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-289'>GATE-289</a>] - Made AIM/ICQ cross chat an option</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-332'>GATE-332</a>] - Improved handling of group settings in Yahoo transport</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-334'>GATE-334</a>] - Checking for online users before sending presence probes</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-340'>GATE-340</a>] - Added note in README about not needing to make the DNS names resolve for transports</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-311'>GATE-311</a>] - Handling new mail notifications from services that offer them</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-229'>GATE-229</a>] - JWCHAT (and JWCHAT5 via red5) should no longer screw up rosters</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-345'>GATE-345</a>] - Cleaned up use of error logging</li>
+</ul>
+
+<h2>1.1.2 -- <span style="font-weight: normal;">August 27, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-195'>GATE-195</a>] - Messages from ICQ 2003b (not a) are now coming through</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-325'>GATE-325</a>] - Contact deletions from Yahoo do not appear to be working</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-328'>GATE-328</a>] - Now carrying authorization/etc along with OSCAR group moves</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-330'>GATE-330</a>] - Renaming a group in AIM/ICQ will no longer cause all contacts inside of it to be flat out deleted</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-318'>GATE-318</a>] - ICQ offline messages are now really treated like offline messages</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-326'>GATE-326</a>] - Now answering jabber:iq:roster directed to contact as a simple success</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-320'>GATE-320</a>] - Added option to store roster items -for real- in XMPP roster</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-322'>GATE-322</a>] - Added ability to custom name gateway.xmpp.name and gateway.xmpp.service </li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-324'>GATE-324</a>] - Added ability to enable or disable mail notifications</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-331'>GATE-331</a>] - Added options to disable auto-probe on startup attempt</li>
+</ul>
+
+<h2>1.1.1 -- <span style="font-weight: normal;">August 19, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-186'>GATE-186</a>] - Offline ICQ messages now abide by encoding</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-196'>GATE-196</a>] - ICQ offline messages now working properly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-300'>GATE-300</a>] - Group moves now work for XMPP transports</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-304'>GATE-304</a>] - NPE no longer fired on logouts</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-306'>GATE-306</a>] - NPE no longer fired during session removal</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-310'>GATE-310</a>] - MSN no longer crashing on incoming file transfer attempt</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-313'>GATE-313</a>] - IRC has buddy list support once again</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-314'>GATE-314</a>] - Registrations page no longer showing sessions as always online</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-316'>GATE-316</a>] - Now able to send offline mesages to ICQ users</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-309'>GATE-309</a>] - Fixed major issues with group changes coming from openfire</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-265'>GATE-265</a>] - List of rooms from IRC are populated into disco</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-308'>GATE-308</a>] - Storing status changes before contact list is filled out</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-301'>GATE-301</a>] - Added XMLRPC command to get list of available transports</li>
+</ul>
+
+<h2>1.1.0 -- <span style="font-weight: normal;">August 6, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-94'>GATE-94</a>] - Incorrect Yahoo Statuses problems fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-101'>GATE-101</a>] - ICQ buddies in 'awaiting authorization' list are now shown as "ask" presence</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-104'>GATE-104</a>] - Yahoo no longer getting 'infinite' InputError's</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-112'>GATE-112</a>] - Bad friend parse in Yahoo transport no longer occurs</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-123'>GATE-123</a>] - Yahoo 'Magic' message no longer shows up in console</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-124'>GATE-124</a>] - Yahoo no longer deletes contact upon group move</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-127'>GATE-127</a>] - ICQ authorization steps are now handled (some issues still exist)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-188'>GATE-188</a>] - ICQ contact list handling is improved</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-201'>GATE-201</a>] - Switched to using proper roster "directional indicators" in roster items so that "you have been added" type messages get through</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-214'>GATE-214</a>] - Oversized messages shouldn't be lost or truncated anymore</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-221'>GATE-221</a>] - Typo in plugin.xml Registrations description was fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-224'>GATE-224</a>] - Disco items response is now returning query element</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-226'>GATE-226</a>] - MSN listener timer tasks now going away after session logout</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-227'>GATE-227</a>] - Auto-reconnect settings now sticking/saving</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-228'>GATE-228</a>] - AIM empty away messages now functioning</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-230'>GATE-230</a>] - MSN no longer leaves status message around after I log out</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-234'>GATE-234</a>] - ICQ authorization steps were added</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-235'>GATE-235</a>] - Cut down on number of presence notifications from transports</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-239'>GATE-239</a>] - Contact has added me messages no longer popping up for odd contacts in Yahoo</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-240'>GATE-240</a>] - Repaired groups match check in basetransport</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-241'>GATE-241</a>] - Transports no longer generating two roster item pushes for every create</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-243'>GATE-243</a>] - Multiple copies of messages from transports no longer occuring</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-249'>GATE-249</a>] - Pseudo roster implementation is now properly removing contacts after delete</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-250'>GATE-250</a>] - IRC transport roster handling now pulling/populating roster on connect</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-251'>GATE-251</a>] - If IRC connection isn't possible, NPE no longer triggers</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-253'>GATE-253</a>] - Concurrency issue with TransportSessionManager fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-254'>GATE-254</a>] - Major concurrency issue with multiple sessions logging in at same time fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-255'>GATE-255</a>] - Redirected InputError's to debug log in Yahoo transport</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-256'>GATE-256</a>] - When a Yahoo contact comes online while you are logged in, you should probably see it change status</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-258'>GATE-258</a>] - IRC join/part notices now being sent through</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-261'>GATE-261</a>] - MSN is no longer indicating that your account is already logged in when it's not</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-263'>GATE-263</a>] - GTalk/XMPP account no longer stayed online after attached XMPP client logged off</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-264'>GATE-264</a>] - Serious memory leaks fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-267'>GATE-267</a>] - Now returning success after successful registration</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-271'>GATE-271</a>] - Error type presence packets now go to highest priority</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-282'>GATE-282</a>] - MSN may be leaving "hidden" sessions around in the background</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-283'>GATE-283</a>] - Multiple resources are once again working</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-285'>GATE-285</a>] - IRC support appears to now be thread safe</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-292'>GATE-292</a>] - XMPP transport no longer fires password/registration error every time any failure to connect occurs</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-294'>GATE-294</a>] - SIMPLE is now appear to be matching account names properly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-297'>GATE-297</a>] - Yahoo statuses are now syncing up with roster items properly</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-118'>GATE-118</a>] - OSCAR is now reporting "user added me"</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-199'>GATE-199</a>] - Set proper ICQ status (not just away or not away)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-212'>GATE-212</a>] - Auto-authorize ICQ authorization requests</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-223'>GATE-223</a>] - Add support for MSN statuses (longer form, not simple away)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-236'>GATE-236</a>] - Worked out centralized mechanism for handling contacts</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-237'>GATE-237</a>] - Redirected all openymsg yammerings to debug log</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-257'>GATE-257</a>] - Added little indicator as to what the jid of each service is</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-260'>GATE-260</a>] - Handling IRC nickserv/etc notices better</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-275'>GATE-275</a>] - Automatically kill s2s connections upon transport startup</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-290'>GATE-290</a>] - Stopped exceptions upon IRC logout</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-291'>GATE-291</a>] - Improved xmpp client side of MUC support for IRC</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-295'>GATE-295</a>] - Switched to log4j for logging</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-298'>GATE-298</a>] - Abstracted contact list handling</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-299'>GATE-299</a>] - Added support for a "warning" for changing particular options</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-12'>GATE-12</a>] - MUC/Groupchat support added (for IRC at least)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-39'>GATE-39</a>] - SIP/SIMPLE Support added</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-74'>GATE-74</a>] - XMPP/Google Talk Gateway added</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-102'>GATE-102</a>] - XMLRPC interface added for registrations</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-141'>GATE-141</a>] - Added outgoing typing notification support for Yahoo</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-179'>GATE-179</a>] - Filtering transport disco response based on ACLs</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-207'>GATE-207</a>] - Gadu-Gadu Support added</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-218'>GATE-218</a>] - Added search feature to registrations page</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-222'>GATE-222</a>] - Migrated to OpenYMSG</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-238'>GATE-238</a>] - Switched to martyr instead of irclib for IRC support</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-248'>GATE-248</a>] - Implemented actual roster storage (pseudo roster) for SIMPLE transport</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-277'>GATE-277</a>] - Internationalized more strings</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-281'>GATE-281</a>] - Handling XMPP asynchronous mechanisms inside plugin itself and go back to using stock Smack</li>
+</ul>
+
+<h2>1.0.2 -- <span style="font-weight: normal;">May 15, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-153'>GATE-153</a>] - OSCAR now handling forced disconnect from server</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-198'>GATE-198</a>] - MSN "you have been disconnected" now actually causing session close</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-200'>GATE-200</a>] - MSN is now sending offline messages when a forced disconnect occurs</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-204'>GATE-204</a>] - Multiple resource handling is no longer busted</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-211'>GATE-211</a>] - Auto-disconnects and such are now triggering roster cleanup</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-217'>GATE-217</a>] - Multi-line messages now handled properly through MSN transport</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-23'>GATE-23</a>] - Auto-reconnection support</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-203'>GATE-203</a>] - We now catch Delete User from Openfire and clean up gateway tables.</li>
+</ul>
+
+<h2>1.0.1 -- <span style="font-weight: normal;">April 12, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-160'>GATE-160</a>] - Now automatically logged out upon unregister</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-202'>GATE-202</a>] - Migrated to openfire layout</li>
+<li>Now requires Openfire 3.3.0.</li>
+</ul>
+
+<h2>1.0 -- <span style="font-weight: normal;">March 15, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-180'>GATE-180</a>] - ICQ encoding re-fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-185'>GATE-185</a>] - If MSN client connects with same account, transport now picks up the auto-disconnect</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-189'>GATE-189</a>] - Yahoo accounts of the e-mail address variety can now be registered</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-190'>GATE-190</a>] - MSN Typing notifcation now handled inactive state</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-191'>GATE-191</a>] - Unregistering and Reregistering now triggers a proper legacy service login</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-192'>GATE-192</a>] - Registering with new password now triggers a logout/login</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-157'>GATE-157</a>] - Yahoo usernames now allow a . (period)</li>
+</ul>
+
+<b>Removals</b>
+<ul>
+<li>Required to remove SIP/SIMPLE support due to lack of license agreement.  =(</li>
+</ul>
+
+<h2>1.0 Beta 8 -- <span style="font-weight: normal;">February 26, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-122'>GATE-122</a>] - XMPP away/whatever statuses were not being reflected in OSCAR service</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-142'>GATE-142</a>] - MSN did not properly set logged out state when connection closed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-166'>GATE-166</a>] - ICQ contacts were being auto-removed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-175'>GATE-175</a>] - MSN was not letting some users log in, I could not reproduce, but a change I made likely fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-176'>GATE-176</a>] - AIM HTML entites were not translated properly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-181'>GATE-181</a>] - Gateway "list of users or groups" permissions check fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-182'>GATE-182</a>] - Properly handling multiple resources with same priority</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-183'>GATE-183</a>] - MSN version update was causing failed logins</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-135'>GATE-135</a>] - Registration failed in web interface now actually indicates -why- it failed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-144'>GATE-144</a>] - MSN Winks and Nudges are now relayed to XMPP user via headlines</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-147'>GATE-147</a>] - Registrations page ajax-ified</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-39'>GATE-39</a>] - EXPERIMENTAL SIP/SIMPLE Support added</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-113'>GATE-113</a>] - Retrieval of ICQ offline messages now occurs upon login</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-140'>GATE-140</a>] - Typing notification support added for MSN</li>
+<li>Silenced annoying Session X idle messages in debug log.</li>
+</ul>
+
+<h2>1.0 Beta 7 -- <span style="font-weight: normal;">February 6, 2007</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-106'>GATE-106</a>] - Messages from ICQ 2003 clients are now handled properly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-154'>GATE-154</a>] - Chat state notifications are now sent with type "chat"</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-169'>GATE-169</a>] - MsSQL issues with long vs integer resolved (may need to redo/fix your database)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-170'>GATE-170</a>] - PostgresQL issue with numeric representation of time resolved (may need to redo/fix your database)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-171'>GATE-171</a>] - Fixed composing bug that upsets ichat</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-172'>GATE-172</a>] - Web interface is no longer showing up blank under 3.2.0</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-173'>GATE-173</a>] - Full JIDs are now acceptabled in gateway permissions</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-148'>GATE-148</a>] - If some users/groups are ignored during permissions setting, now reflected after save</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-156'>GATE-156</a>] - Messages sent to remote users trying to register</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-158'>GATE-158</a>] - Killing spaces in AIM screen names automatically</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-164'>GATE-164</a>] - Messages coming in from ICQ through gateway to XMPP user are now logged (via fix in openfire 3.2.0)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-168'>GATE-168</a>] - Added ability to turn on 'percent hack' for @ translation in JIDs</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-174'>GATE-174</a>] - Separated stable transports from unstable ones in web interface</li>
+</ul>
+
+<h2>1.0 Beta 6b -- <span style="font-weight: normal;">December 20, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-152'>GATE-152</a>] - Fixed ICQ login issues</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-151'>GATE-151</a>] - Reevaluated database scripts and repaired</li>
+</ul>
+
+<h2>1.0 Beta 6a -- <span style="font-weight: normal;">December 18, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>Restored OSCAR work that IntelliJ undid for some reason.</li>
+</ul>
+
+<h2>1.0 Beta 6 -- <span style="font-weight: normal;">December 18, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-51'>GATE-51</a>] - Groupless contacts are respected as best I can</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-125'>GATE-125</a>] - AIM/ICQ group moves now work</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-128'>GATE-128</a>] - Upon unregistering from transport, roster items are now removed from roster</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-129'>GATE-129</a>] - Yahoo is now reporting bad username/password attempts</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-136'>GATE-136</a>] - MSN user add responds with subscribed message to xmpp client</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-7'>GATE-7</a>] - Access restriction support added</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-8'>GATE-8</a>] - Options can now be set from web interface</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-82'>GATE-82</a>] - Can now set default ICQ encoding</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-92'>GATE-92</a>] - Can now set ICQ encoding from admin interface</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-119'>GATE-119</a>] - OSCAR contact deletes now working</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-126'>GATE-126</a>] - Real contact list support added for IRC</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-132'>GATE-132</a>] - Now using JID escaping instead of @ -> % shrouding</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-134'>GATE-134</a>] - Admin interface now 'pings' regularly to keep session active</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-145'>GATE-145</a>] - Access controls now work from web interface</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-13'>GATE-13</a>] - Partial typing notification support added (full support in aim and icq, partial in yahoo and msn)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-86'>GATE-86</a>] - Port/hostname check added to admin interface (test connection)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-143'>GATE-143</a>] - Localization strings added for hard coded english strings</li>
+</ul>
+
+<h2>1.0 Beta 5a -- <span style="font-weight: normal;">November 10, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-121'>GATE-121</a>] - IQ Register no longer causes NPE when registration does not include x namespace uri.</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>MSN minor protocol errors silenced for now.</li>
+</ul>
+
+<h2>1.0 Beta 5 -- <span style="font-weight: normal;">November 10, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-47'>GATE-47</a>] - Delete functionality fixed for all but OSCAR</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-71'>GATE-71</a>] - NullPointerException during registration fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-91'>GATE-91</a>] - Postgres/Other DBs duplicate key error fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-96'>GATE-96</a>] - Weird entries are no longer showing up in actual real roster in openfire</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-98'>GATE-98</a>] - MSN errors off and on while connecting fixed</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-99'>GATE-99</a>] - AIM/ICQ was not reflecting offline status when logged off</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-105'>GATE-105</a>] - Registration was not causing automatic login</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-109'>GATE-109</a>] - Could not change nicknames of MSN contacts</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-110'>GATE-110</a>] - Could not change group that MSN contacts are in</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-111'>GATE-111</a>] - CPU usage no longer hitting 100% on some systems</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-37'>GATE-37</a>] - Add/remove support fixed for MSN.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-64'>GATE-64</a>] - IRC server and port now adjustable (via server properties)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-75'>GATE-75</a>] - Legacy service contacts adding user not detected and passed on</li>
+</ul>
+
+<h2>1.0 Beta 4 -- <span style="font-weight: normal;">October 20, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-54'>GATE-54</a>] - Buddies that are in "main"/default groups were possibly being deleted</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-59'>GATE-59</a>] - Yahoo transport no longer throws error when not available/invisible as initial state</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-62'>GATE-62</a>] - Fixed joscar library conflict</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-67'>GATE-67</a>] - Now catching a forced AIM/ICQ signoff/disconnect</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-79'>GATE-79</a>] - Status icon is now changing for icq/aim transport</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-81'>GATE-81</a>] - AIM/ICQ network connection sever is detected now</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-83'>GATE-83</a>] - Status change no longer killing gateway sessions</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-85'>GATE-85</a>] - Now send an error presence when probing non-existent user</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-87'>GATE-87</a>] - Multiple resources were not working correctly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-95'>GATE-95</a>] - Current login status was getting confused</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-77'>GATE-77</a>] - Fixed misc bugs with MSN</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-58'>GATE-58</a>] - Messages sent when not logged in now say "you aren't logged in"</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-84'>GATE-84</a>] - Added list of ports you need to have open</li>
+<li>Enabled "not functional" web interface so folk can ooh and aah over Ryan's work.  =)</li>
+<li>Upgraded joscar libraries.</li>
+<li>Lots more debug logging.</li>
+<li>Upgraded to latest JML libraries.</li>
+<li>Small web interface improvements.</li>
+</ul>
+
+<h2>1.0 Beta 3a -- <span style="font-weight: normal;">October 2, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-76'>GATE-76</a>] - AIM appears to be leaving sessions logged in sometimes</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-78'>GATE-78</a>] - Valid username check is calling valid usernames invalid</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-80'>GATE-80</a>] - Oracle db schema is not working.</li>
+</ul>
+
+<h2>1.0 Beta 3 -- <span style="font-weight: normal;">September 28, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-48'>GATE-48</a>] - Password defaults to "something else" in edit dialogs (******)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-50'>GATE-50</a>] - MSN contacts being lumped together into one group (MSN Contacts)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-57'>GATE-57</a>] - Blank message content causes crashes</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-61'>GATE-61</a>] - Null email address in MSN contact list causes null pointer exception.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-63'>GATE-63</a>] - MSN contacts should only be pulled from forward list (or treat others different)</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-65'>GATE-65</a>] - Yahoo statuses are not placed with the correct contact</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-66'>GATE-66</a>] - Should actually check for valid username entered before accepting it.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-68'>GATE-68</a>] - Not rejecting registrations from external XMPP users</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-69'>GATE-69</a>] - Yahoo is not reporting failed logins</li>
+</ul>
+
+<b>Improvements</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-60'>GATE-60</a>] - Upgraded JML to latest version</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-70'>GATE-70</a>] - Update all Log exception calls to actually pass the exception for printing</li>
+</ul>
+
+<h2>1.0 Beta 2 -- <span style="font-weight: normal;">September 19, 2006</span></h2>
+
+<b>Bug Fixes</b>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-36'>GATE-36</a>] - Locale pieces from openfire don't carry into plugin admin interface</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-40'>GATE-40</a>] - Pseudo roster not updating properly</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-41'>GATE-41</a>] - SQLServer script should use BIGINT</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-43'>GATE-43</a>] - IRC filter button does not stay checked</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-45'>GATE-45</a>] - Removed registration does not clean up pseudo roster</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/GATE-46'>GATE-46</a>] - Migrating from other transport to gateway plugin can wipe buddy list</li>
+</ul>
+
+<h2>1.0 Beta 1a -- <span style="font-weight: normal;">September 18, 2006</span></h2>
+
+<ul>
+    <li>Emergency bugfix for beta 1 to fix partial wipe of AIM/ICQ contact list.</li>
+</ul>
+
+<h2>1.0 Beta 1 -- <span style="font-weight: normal;">September 18, 2006</span></h2>
+
+<ul>
+     <li>Initial beta release.</li>
+</ul>
+
+
+    <div class="footer">
+    Copyright &copy; Jive Software, 2006
+    </div>
+
+
+    </div>
+</div>
+
+</body>
+</html>
