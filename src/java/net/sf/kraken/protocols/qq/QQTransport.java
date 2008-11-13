@@ -25,14 +25,14 @@ public class QQTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
     public String getTerminologyUsername() {
-        return LocaleUtils.getLocalizedString("gateway.qq.username", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.qq.username", "kraken");
     }
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
     public String getTerminologyPassword() {
-        return LocaleUtils.getLocalizedString("gateway.qq.password", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.qq.password", "kraken");
     }
 
     /**
@@ -47,7 +47,7 @@ public class QQTransport extends BaseTransport {
      */
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway.qq.registration",
-                                              "gateway");
+                                              "kraken");
     }
 
     /**

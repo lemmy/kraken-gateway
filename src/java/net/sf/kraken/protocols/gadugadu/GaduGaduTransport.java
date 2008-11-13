@@ -34,14 +34,14 @@ public class GaduGaduTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
     public String getTerminologyUsername() {
-        return LocaleUtils.getLocalizedString("gateway.gadugadu.username", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.gadugadu.username", "kraken");
     }
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
     public String getTerminologyPassword() {
-        return LocaleUtils.getLocalizedString("gateway.gadugadu.password", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.gadugadu.password", "kraken");
     }
 
     /**
@@ -55,7 +55,7 @@ public class GaduGaduTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
     public String getTerminologyRegistration() {
-        return LocaleUtils.getLocalizedString("gateway.gadugadu.registration", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.gadugadu.registration", "kraken");
     }
 
     /**

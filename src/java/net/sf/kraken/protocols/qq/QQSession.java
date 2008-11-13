@@ -155,13 +155,13 @@ public class QQSession extends TransportSession implements IQQListener {
         case QQEvent.LOGIN_NEED_VERIFY:
         case QQEvent.LOGIN_UNKNOWN_ERROR:
         case QQEvent.LOGIN_GET_TOKEN_FAIL:
-            logOut();
+            sessionDisconnectedNoReconnect(null);
             break;
         case QQEvent.USER_STATUS_CHANGE_OK:
             processStatusChangeOK(e);
             break;
         case QQEvent.USER_STATUS_CHANGE_FAIL:
-            logOut();
+            sessionDisconnected(null);
             break;
         case QQEvent.FRIEND_DOWNLOAD_GROUPS_OK:
             processGroupFriend(e);
@@ -170,7 +170,7 @@ public class QQSession extends TransportSession implements IQQListener {
             processGroupNames(e);
             break;
         case QQEvent.FRIEND_DOWNLOAD_GROUPS_FAIL:
-            logOut();
+            sessionDisconnected(null);
             break;
         case QQEvent.CLUSTER_GET_INFO_OK:
             processClusterInfo(e);
@@ -187,8 +187,7 @@ public class QQSession extends TransportSession implements IQQListener {
         case QQEvent.ERROR_CONNECTION_BROKEN:
         case QQEvent.ERROR_NETWORK:
         case QQEvent.SYS_TIMEOUT:
-            logOut();
-            logIn(PresenceType.away, "");
+            sessionDisconnected(null);
             break;
         case QQEvent.FRIEND_GET_ONLINE_OK:
             processFriendOnline(e);
@@ -220,7 +219,7 @@ public class QQSession extends TransportSession implements IQQListener {
                 syncContactGroups();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+        	Log.error("Failed to process friend list: ", ex);
         }
     }
 
@@ -258,7 +257,7 @@ public class QQSession extends TransportSession implements IQQListener {
                 qqclient.cluster_GetOnlineMember(p.beginFrom);
             }
         } catch (Exception ex) {
-            Log.error(ex);
+            Log.error("Failed to process group friend: ", ex);
         }
     }
 
@@ -270,7 +269,7 @@ public class QQSession extends TransportSession implements IQQListener {
                     (GroupDataOpReplyPacket) e.getSource();
             groupNames.addAll(p.groupNames);
         } catch (Exception ex) {
-            Log.error(ex);
+            Log.error("Failed to process group names: ", ex);
         }
     }
 
@@ -296,7 +295,7 @@ public class QQSession extends TransportSession implements IQQListener {
             getTransport().sendPacket(pp);
             qqclient.cluster_GetMemberInfo(info.clusterId, p.members);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.error("Failed to process cluster info: ", ex);
         }
     }
 
@@ -317,7 +316,7 @@ public class QQSession extends TransportSession implements IQQListener {
             }
             clusterMembers.put(clusterId, cmm);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.error("Failed to process cluster member info: ", ex);
         }
     }
 
@@ -347,11 +346,13 @@ public class QQSession extends TransportSession implements IQQListener {
             try {
                 clusterName = clusters.get(im.externalId).name;
             } catch (Exception ex) {
+            	Log.debug("Failed to get cluster name: ", ex);
             }
             String senderName = " ";
             try {
                 senderName = clusterMembers.get(im.externalId).get(im.sender);
             } catch (Exception ex) {
+            	Log.debug("Failed to get sender name: ", ex);
             }
             String msg = clusterName + "[" + im.externalId + "]"
                          + senderName + "(" + im.sender + ") "
@@ -365,11 +366,12 @@ public class QQSession extends TransportSession implements IQQListener {
             try {
                 b = new String(msg);
             } catch (Exception ex) {
+            	Log.debug("Failed to string-ify message: ", ex);
             }
             m.setBody(b);
             getTransport().sendPacket(m);
         } catch (Exception ex) {
-            ex.printStackTrace();
+        	Log.error("Failed to handle cluster IM: ", ex);
         }
     }
 
@@ -386,11 +388,12 @@ public class QQSession extends TransportSession implements IQQListener {
             try {
                 b = new String(im.messageBytes);
             } catch (Exception ex) {
+            	Log.debug("Failed to string-ify message: ", ex);
             }
             m.setBody(b);
             getTransport().sendPacket(m);
         } catch (Exception ex) {
-            Log.error(ex);
+            Log.error("Failed to handle normal IM: ", ex);
         }
     }
 
@@ -410,7 +413,7 @@ public class QQSession extends TransportSession implements IQQListener {
                 qqclient.user_GetOnline(p.position);
             }
         } catch (Exception ex) {
-            Log.error(ex);
+            Log.error("Failed to handle friend online event: ", ex);
         }
     }
 
@@ -425,7 +428,7 @@ public class QQSession extends TransportSession implements IQQListener {
                     p.status);
             getTransport().sendPacket(presence);
         } catch (Exception ex) {
-            Log.error(ex);
+            Log.error("Failed to handle friend status change event: ", ex);
         }
     }
 

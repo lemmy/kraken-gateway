@@ -34,14 +34,14 @@ public class YahooTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
     public String getTerminologyUsername() {
-        return LocaleUtils.getLocalizedString("gateway.yahoo.username", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.yahoo.username", "kraken");
     }
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
     public String getTerminologyPassword() {
-        return LocaleUtils.getLocalizedString("gateway.yahoo.password", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.yahoo.password", "kraken");
     }
 
     /**
@@ -55,7 +55,7 @@ public class YahooTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
     public String getTerminologyRegistration() {
-        return LocaleUtils.getLocalizedString("gateway.yahoo.registration", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.yahoo.registration", "kraken");
     }
 
     /**

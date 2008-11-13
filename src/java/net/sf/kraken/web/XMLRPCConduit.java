@@ -178,7 +178,7 @@ public class XMLRPCConduit {
             return Arrays.asList("Authorization failed!");
         }
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("gateway");
+        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
         List<String> activeTransports = new ArrayList<String>();
         for (String transport : plugin.getTransports()) {
             if (plugin.serviceEnabled(transport)) {

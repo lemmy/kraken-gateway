@@ -102,21 +102,21 @@ public class YahooSession extends TransportSession {
                     }
                     catch (LoginRefusedException e) {
                         yahooSession.reset();
-                        String reason = LocaleUtils.getLocalizedString("gateway.yahoo.loginrefused", "gateway");
+                        String reason = LocaleUtils.getLocalizedString("gateway.yahoo.loginrefused", "kraken");
                         AuthenticationState state = e.getStatus();
                         if (state.equals(AuthenticationState.BADUSERNAME)) {
-                            reason = LocaleUtils.getLocalizedString("gateway.yahoo.unknownuser", "gateway");
+                            reason = LocaleUtils.getLocalizedString("gateway.yahoo.unknownuser", "kraken");
                         }
                         else if (state.equals(AuthenticationState.BAD)) {
-                            reason = LocaleUtils.getLocalizedString("gateway.yahoo.badpassword", "gateway");
+                            reason = LocaleUtils.getLocalizedString("gateway.yahoo.badpassword", "kraken");
                         }
                         else if (state.equals(AuthenticationState.LOCKED)) {
                             AccountLockedException e2 = (AccountLockedException)e;
                             if(e2.getWebPage() != null) {
-                                reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlockedwithurl", "gateway", Arrays.asList(e2.getWebPage().toString()));
+                                reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlockedwithurl", "kraken", Arrays.asList(e2.getWebPage().toString()));
                             }
                             else {
-                                reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "gateway");
+                                reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "kraken");
                             }
                         }
 
@@ -136,7 +136,7 @@ public class YahooSession extends TransportSession {
                         getTransport().sendMessage(
                                 getJID(),
                                 getTransport().getJID(),
-                                LocaleUtils.getLocalizedString("gateway.yahoo.unknownerror", "gateway"),
+                                LocaleUtils.getLocalizedString("gateway.yahoo.unknownerror", "kraken"),
                                 Message.Type.error
                         );
                         setLoginStatus(TransportLoginStatus.LOGGED_OUT);

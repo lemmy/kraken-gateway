@@ -324,7 +324,7 @@ public abstract class BaseMUCTransport implements Component {
                 m.setError(Condition.service_unavailable);
                 m.setTo(from);
                 m.setFrom(getJID());
-                m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "gateway", Arrays.asList(getTransport().getType().toString().toUpperCase())));
+                m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "kraken", Arrays.asList(getTransport().getType().toString().toUpperCase())));
                 reply.add(m);
             }
             else if (to.getNode() == null) {
@@ -356,7 +356,7 @@ public abstract class BaseMUCTransport implements Component {
             m.setError(Condition.service_unavailable);
             m.setTo(from);
             m.setFrom(getJID());
-            m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "gateway", Arrays.asList(getTransport().getType().toString().toUpperCase())));
+            m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "kraken", Arrays.asList(getTransport().getType().toString().toUpperCase())));
             reply.add(m);
         }
 
@@ -387,7 +387,7 @@ public abstract class BaseMUCTransport implements Component {
                 m.setError(Condition.service_unavailable);
                 m.setTo(from);
                 m.setFrom(getJID());
-                m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "gateway", Arrays.asList(getTransport().getType().toString().toUpperCase())));
+                m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "kraken", Arrays.asList(getTransport().getType().toString().toUpperCase())));
                 reply.add(m);
             }
             else if (to.getNode() == null) {
@@ -438,7 +438,7 @@ public abstract class BaseMUCTransport implements Component {
             m.setError(Condition.service_unavailable);
             m.setTo(from);
             m.setFrom(getJID());
-            m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "gateway", Arrays.asList(getTransport().getType().toString().toUpperCase())));
+            m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "kraken", Arrays.asList(getTransport().getType().toString().toUpperCase())));
             reply.add(m);
         }
 

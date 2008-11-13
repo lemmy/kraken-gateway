@@ -60,12 +60,12 @@ public class MSNSessionListener extends SessionAdapter {
         if (message.toString().startsWith("OUT OTH")) {
             // Forced disconnect because account logged in elsewhere
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.otherloggedin", "gateway"));
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.otherloggedin", "kraken"));
         }
         else if (message.toString().startsWith("OUT SDH")) {
             // Forced disconnect from server for maintenance
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "gateway"));
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "kraken"));
         }
     }
 

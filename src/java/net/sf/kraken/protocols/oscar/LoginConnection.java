@@ -62,7 +62,7 @@ public class LoginConnection extends AbstractFlapConnection {
 //            }
         }
         else if (e.getNewState() == ClientFlapConn.STATE_FAILED) {
-            getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.connectionfailed", "gateway")+" " + e.getReason());
+            getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.connectionfailed", "kraken")+" " + e.getReason());
         }
         else if (e.getNewState() == ClientFlapConn.STATE_NOT_CONNECTED) {
             //TODO: Do we need to catch these?
@@ -116,44 +116,44 @@ public class LoginConnection extends AbstractFlapConnection {
                 String errormsg;
                 switch (error) {
                     case (AuthResponse.ERROR_ACCOUNT_DELETED): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.accountdeleted", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.accountdeleted", "kraken");
                         break;
                     }
 
                     case (AuthResponse.ERROR_BAD_INPUT): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.badinput", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.badinput", "kraken");
                         break;
                     }
 
                     case (AuthResponse.ERROR_BAD_PASSWORD): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.badpassword", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.badpassword", "kraken");
                         break;
                     }
 
                     case (AuthResponse.ERROR_CLIENT_TOO_OLD): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.oldclient", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.oldclient", "kraken");
                         break;
                     }
 
                     case (AuthResponse.ERROR_CONNECTING_TOO_MUCH_A):
                     case (AuthResponse.ERROR_CONNECTING_TOO_MUCH_B): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.connectedtoomuch", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.connectedtoomuch", "kraken");
                         break;
                     }
 
                     case (AuthResponse.ERROR_INVALID_SN_OR_PASS_A):
                     case (AuthResponse.ERROR_INVALID_SN_OR_PASS_B): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.baduserorpass", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.baduserorpass", "kraken");
                         break;
                     }
 
                     case (AuthResponse.ERROR_SIGNON_BLOCKED): {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.accountsuspended", "gateway");
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.accountsuspended", "kraken");
                         break;
                     }
 
                     default: {
-                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.unknownerror", "gateway", Arrays.asList(error, ar.getErrorUrl()));
+                        errormsg = LocaleUtils.getLocalizedString("gateway.oscar.unknownerror", "kraken", Arrays.asList(error, ar.getErrorUrl()));
                     }
                 }
 

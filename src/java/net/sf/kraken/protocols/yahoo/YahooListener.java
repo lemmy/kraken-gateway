@@ -101,7 +101,7 @@ public class YahooListener extends SessionAdapter {
                 getSession().getTransport().sendMessage(
                         getSession().getJID(),
                         getSession().getTransport().getJID(),
-                        LocaleUtils.getLocalizedString("gateway.yahoo.mail", "gateway", Arrays.asList(Integer.toString(event.getMailCount()))),
+                        LocaleUtils.getLocalizedString("gateway.yahoo.mail", "kraken", Arrays.asList(Integer.toString(event.getMailCount()))),
                         Message.Type.headline
                 );
             }
@@ -109,7 +109,7 @@ public class YahooListener extends SessionAdapter {
                 getSession().getTransport().sendMessage(
                         getSession().getJID(),
                         getSession().getTransport().getJID(),
-                        LocaleUtils.getLocalizedString("gateway.yahoo.newmail", "gateway"),
+                        LocaleUtils.getLocalizedString("gateway.yahoo.newmail", "kraken"),
                         Message.Type.headline
                 );
             }
@@ -227,7 +227,7 @@ public class YahooListener extends SessionAdapter {
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
                 getSession().getTransport().getJID(),
-                LocaleUtils.getLocalizedString("gateway.yahoo.error", "gateway")+" "+event.getMessage(),
+                LocaleUtils.getLocalizedString("gateway.yahoo.error", "kraken")+" "+event.getMessage(),
                 Message.Type.error
         );
     }

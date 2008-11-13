@@ -68,43 +68,43 @@ public class GatewayPlugin implements Plugin {
         sessionRouter = new TransportSessionRouter(this);
 
         /* Set up AIM transport. */
-        transports.put("aim", new TransportInstance(TransportType.aim, LocaleUtils.getLocalizedString("gateway.aim.name", "gateway"), "net.sf.kraken.protocols.oscar.OSCARTransport", componentManager, sessionRouter));
+        transports.put("aim", new TransportInstance(TransportType.aim, LocaleUtils.getLocalizedString("gateway.aim.name", "kraken"), "net.sf.kraken.protocols.oscar.OSCARTransport", componentManager, sessionRouter));
         maybeStartService("aim");
 
         /* Set up ICQ transport. */
-        transports.put("icq", new TransportInstance(TransportType.icq, LocaleUtils.getLocalizedString("gateway.icq.name", "gateway"), "net.sf.kraken.protocols.oscar.OSCARTransport", componentManager, sessionRouter));
+        transports.put("icq", new TransportInstance(TransportType.icq, LocaleUtils.getLocalizedString("gateway.icq.name", "kraken"), "net.sf.kraken.protocols.oscar.OSCARTransport", componentManager, sessionRouter));
         maybeStartService("icq");
 
         /* Set up IRC transport. */
-        transports.put("irc", new TransportInstance(TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.name", "gateway"), "net.sf.kraken.protocols.irc.IRCTransport", componentManager, sessionRouter));
+        transports.put("irc", new TransportInstance(TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.name", "kraken"), "net.sf.kraken.protocols.irc.IRCTransport", componentManager, sessionRouter));
         maybeStartService("irc");
 
         /* Set up MSN transport. */
-        transports.put("msn", new TransportInstance(TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.name", "gateway"), "net.sf.kraken.protocols.msn.MSNTransport", componentManager, sessionRouter));
+        transports.put("msn", new TransportInstance(TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.name", "kraken"), "net.sf.kraken.protocols.msn.MSNTransport", componentManager, sessionRouter));
         maybeStartService("msn");
 
         /* Set up Yahoo transport. */
-        transports.put("yahoo", new TransportInstance(TransportType.yahoo, LocaleUtils.getLocalizedString("gateway.yahoo.name", "gateway"), "net.sf.kraken.protocols.yahoo.YahooTransport", componentManager, sessionRouter));
+        transports.put("yahoo", new TransportInstance(TransportType.yahoo, LocaleUtils.getLocalizedString("gateway.yahoo.name", "kraken"), "net.sf.kraken.protocols.yahoo.YahooTransport", componentManager, sessionRouter));
         maybeStartService("yahoo");
 
         /* Set up XMPP transport. */
-        transports.put("xmpp", new TransportInstance(TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.name", "gateway"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
+        transports.put("xmpp", new TransportInstance(TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.name", "kraken"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
         maybeStartService("xmpp");
 
         /* Set up GTalk transport. */
-        transports.put("gtalk", new TransportInstance(TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.name", "gateway"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
+        transports.put("gtalk", new TransportInstance(TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.name", "kraken"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
         maybeStartService("gtalk");
 
         /* Set up SIMPLE transport. */
-        transports.put("simple", new TransportInstance(TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.name", "gateway"), "net.sf.kraken.protocols.simple.SimpleTransport", componentManager, sessionRouter));
+        transports.put("simple", new TransportInstance(TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.name", "kraken"), "net.sf.kraken.protocols.simple.SimpleTransport", componentManager, sessionRouter));
         maybeStartService("simple");
 
         /* Set up Gadu-Gadu transport. */
-        transports.put("gadugadu", new TransportInstance(TransportType.gadugadu, LocaleUtils.getLocalizedString("gateway.gadugadu.name", "gateway"), "net.sf.kraken.protocols.gadugadu.GaduGaduTransport", componentManager, sessionRouter));
+        transports.put("gadugadu", new TransportInstance(TransportType.gadugadu, LocaleUtils.getLocalizedString("gateway.gadugadu.name", "kraken"), "net.sf.kraken.protocols.gadugadu.GaduGaduTransport", componentManager, sessionRouter));
         maybeStartService("gadugadu");
         
         /* Set up QQ transport. */
-        transports.put("qq", new TransportInstance(TransportType.qq , LocaleUtils.getLocalizedString("gateway.qq.name", "gateway"), "net.sf.kraken.protocols.qq.QQTransport", componentManager, sessionRouter));
+        transports.put("qq", new TransportInstance(TransportType.qq , LocaleUtils.getLocalizedString("gateway.qq.name", "kraken"), "net.sf.kraken.protocols.qq.QQTransport", componentManager, sessionRouter));
         maybeStartService("qq");
     }
 

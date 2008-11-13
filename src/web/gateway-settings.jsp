@@ -21,7 +21,7 @@
 
 <%
     final GatewayPlugin plugin =
-            (GatewayPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("gateway");
+            (GatewayPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
 
     final ArrayList<String> optionTypes = new ArrayList<String>();
 
@@ -37,8 +37,8 @@
         Integer jsID = 0; // Javascript incrementable id
         String connectHost = null;
         String connectPort = null;
-        String userPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.settings.noneselected", "gateway") + "]";
-        String groupPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.settings.noneselected", "gateway") + "]";
+        String userPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.settings.noneselected", "kraken") + "]";
+        String groupPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.settings.noneselected", "kraken") + "]";
         String userPermEntry = "";
         String groupPermEntry = "";
         Integer globalPermSetting = 1;
@@ -174,7 +174,7 @@
                         defStr = def.getText();
                     }
 
-                    String descStr = LocaleUtils.getLocalizedString(desckey.getText(), "gateway");
+                    String descStr = LocaleUtils.getLocalizedString(desckey.getText(), "kraken");
                     String setting = JiveGlobals.getProperty(sysprop.getText(), defStr);
 
                     String inputId = gatewayType.toString() + var.getText();
@@ -216,10 +216,10 @@
                         defBool = true;
                     }
 
-                    String descStr = LocaleUtils.getLocalizedString(desckey.getText(), "gateway");
+                    String descStr = LocaleUtils.getLocalizedString(desckey.getText(), "kraken");
                     String alertStr = null;
                     if (alert != null && alert.getText() != null && alert.getText().length() > 0) {
-                        alertStr = LocaleUtils.getLocalizedString(alert.getText(), "gateway");
+                        alertStr = LocaleUtils.getLocalizedString(alert.getText(), "kraken");
                     }
                     boolean setting = JiveGlobals.getBooleanProperty(sysprop.getText(), defBool);
 
@@ -333,14 +333,14 @@
 	<!-- BEGIN gateway - <%= this.gatewayType.toString().toUpperCase() %> -->
     <div <%= ((!this.gwEnabled) ? " class='jive-gateway jive-gatewayDisabled'" : "class='jive-gateway'") %> id="jive<%= this.gatewayType.toString().toUpperCase() %>">
 		<label for="jive<%= this.gatewayType.toString().toUpperCase() %>checkbox">
-			<input type="checkbox" name="gateway" value="<%= this.gatewayType.toString().toLowerCase() %>" id="jive<%= this.gatewayType.toString().toUpperCase() %>checkbox" <%= ((this.gwEnabled) ? "checked" : "") %> onClick="ConfigManager.toggleTransport('<%= this.gatewayType.toString().toLowerCase() %>'); checkToggle(jive<%= this.gatewayType.toString().toUpperCase() %>); return true">
+			<input type="checkbox" name="kraken" value="<%= this.gatewayType.toString().toLowerCase() %>" id="jive<%= this.gatewayType.toString().toUpperCase() %>checkbox" <%= ((this.gwEnabled) ? "checked" : "") %> onClick="ConfigManager.toggleTransport('<%= this.gatewayType.toString().toLowerCase() %>'); checkToggle(jive<%= this.gatewayType.toString().toUpperCase() %>); return true">
 			<img src="images/<%= this.gatewayType.toString().toLowerCase() %>.gif" alt="" border="0">
 			<strong><%= this.description %></strong>
 		</label>
 		<div class="jive-gatewayButtons">
-            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>tests); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>testsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.tests", "gateway") %></a>
-            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>options); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>optionsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.options", "gateway") %></a>
-			<a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>perms); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>permsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.permissions", "gateway") %></a>
+            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>tests); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>testsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.tests", "kraken") %></a>
+            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>options); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>optionsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.options", "kraken") %></a>
+			<a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>perms); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>permsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.permissions", "kraken") %></a>
 		</div>
 	</div>
     <!-- JID display -->
@@ -353,11 +353,11 @@
     <div class="jive-gatewayPanel" id="jive<%= this.gatewayType.toString().toUpperCase() %>tests" style="display: none;">
         <div>
             <form id="jive<%= this.gatewayType.toString().toUpperCase() %>testsform" action="" onSubmit="return false">
-                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttohost", "gateway") %>:</span> <span id="<%= this.gatewayType.toString() %>testhost"><%= connectHost %></span><br />
-                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttoport", "gateway") %>:</span> <span id="<%= this.gatewayType.toString() %>testport"><%= connectPort %></span><br />
+                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttohost", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testhost"><%= connectHost %></span><br />
+                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttoport", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testport"><%= connectPort %></span><br />
 
                 <span id="<%= this.gatewayType.toString() %>testsresults" class="saveResultsMsg"></span>
-                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.testconnection", "gateway") %>" onclick="testConnect('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
+                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.testconnection", "kraken") %>" onclick="testConnect('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
             </form>
         </div>
     </div>
@@ -401,8 +401,8 @@
                 </table>
 
                 <span id="<%= this.gatewayType.toString() %>optionsresults" class="saveResultsMsg"></span>
-                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.saveoptions", "gateway") %>" onclick="saveOptions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
-                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "gateway") %>" onclick="cancelOptions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
+                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.saveoptions", "kraken") %>" onclick="saveOptions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
+                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "kraken") %>" onclick="cancelOptions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
             </form>
 		</div>
 	</div>
@@ -410,31 +410,31 @@
     <div class="jive-gatewayPanel" id="jive<%= this.gatewayType.toString().toUpperCase() %>perms" style="display: none;">
 		<div>
             <form id="jive<%= this.gatewayType.toString().toUpperCase() %>permsform" action=""  onSubmit="return false">
-                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="all" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 1 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registerall", "gateway") %><br>
-                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="specific" onClick="showSpecificChoices('<%= this.gatewayType.toString() %>')"  <%= (this.globalPermSetting == 2 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registersome", "gateway") %><br>
+                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="all" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 1 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registerall", "kraken") %><br>
+                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="specific" onClick="showSpecificChoices('<%= this.gatewayType.toString() %>')"  <%= (this.globalPermSetting == 2 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registersome", "kraken") %><br>
                 <div id="<%= this.gatewayType.toString() %>userreg_specific" style="<%= (this.globalPermSetting == 2 ? "" : "display: none; ") %>margin: 0; padding: 0; font-size: 80%">
                     <table border="0" cellpadding="0" cellspacing="0" style="margin-left: 30.0px" width='100%'>
                         <tr valign="top">
                             <td align="left" style="padding-right: 15.0px" width='50%'>
-                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.users", "gateway") %></span> <a href="javascript:noop()" onClick="activateModifyUsers('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.settings.modifyusers", "gateway") %>)</a><br />
+                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.users", "kraken") %></span> <a href="javascript:noop()" onClick="activateModifyUsers('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.settings.modifyusers", "kraken") %>)</a><br />
                                 <div id="<%= this.gatewayType.toString() %>userpermtextdiv" style="margin: 0; padding: 0" class='permissionListDiv'><span id="<%= this.gatewayType.toString() %>userpermtext"><%= this.userPermText %></span></div>
                                 <div id="<%= this.gatewayType.toString() %>userpermentrydiv" style="margin: 0; padding: 0; display:none" class='permissionListDiv'><textarea style="margin: 0" class='permissionListTextArea' rows="5" cols="20" id="<%= this.gatewayType.toString() %>userpermentry" name="<%= this.gatewayType.toString() %>userpermentry"><%= this.userPermEntry %></textarea></div>
                             </td>
                             <td align="left" style="margin-left: 15.0px" width='50%'>
-                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.groups", "gateway") %></span> <a href="javascript:noop()" onClick="activateModifyGroups('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.settings.modifygroups", "gateway") %>)</a><br />
+                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.groups", "kraken") %></span> <a href="javascript:noop()" onClick="activateModifyGroups('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.settings.modifygroups", "kraken") %>)</a><br />
                                 <div id="<%= this.gatewayType.toString() %>grouppermtextdiv" style="margin: 0; padding: 0" class='permissionListDiv'><span id="<%= this.gatewayType.toString() %>grouppermtext"><%= this.groupPermText %></span></div>
                                 <div id="<%= this.gatewayType.toString() %>grouppermentrydiv" style="margin: 0; padding: 0; display:none" class='permissionListDiv'><textarea style="margin: 0" class='permissionListTextArea' rows="5" cols="20" id="<%= this.gatewayType.toString() %>grouppermentry" name="<%= this.gatewayType.toString() %>grouppermentry"><%= this.groupPermEntry %></textarea></div>
                             </td>
                         </tr>
                     </table>
                 </div>
-                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="manual" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 3 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registernone", "gateway") %><br>
+                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="manual" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 3 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registernone", "kraken") %><br>
                 <br>
-                <input type="checkbox" name="<%= this.gatewayType.toString() %>strictperms" value="true" <%= (this.globalPermStrict ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.permsstrict", "gateway") %><br>
+                <input type="checkbox" name="<%= this.gatewayType.toString() %>strictperms" value="true" <%= (this.globalPermStrict ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.permsstrict", "kraken") %><br>
 
                 <span id="<%= this.gatewayType.toString() %>permsresults" class="saveResultsMsg"></span>
-                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.savepermissions", "gateway") %>" onclick="savePermissions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
-                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "gateway") %>" onclick="cancelPermissions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
+                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.savepermissions", "kraken") %>" onclick="savePermissions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
+                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "kraken") %>" onclick="cancelPermissions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
             </form>
 		</div>
 	</div>
@@ -449,16 +449,16 @@
         }
     }
 
-    GatewaySettings aimSettings = new GatewaySettings(out, plugin, TransportType.aim, LocaleUtils.getLocalizedString("gateway.aim.service", "gateway"));
-    GatewaySettings gadugaduSettings = new GatewaySettings(out, plugin, TransportType.gadugadu, LocaleUtils.getLocalizedString("gateway.gadugadu.service", "gateway"));
-    GatewaySettings gtalkSettings = new GatewaySettings(out, plugin, TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.service", "gateway"));
-    GatewaySettings icqSettings = new GatewaySettings(out, plugin, TransportType.icq, LocaleUtils.getLocalizedString("gateway.icq.service", "gateway"));
-    GatewaySettings ircSettings = new GatewaySettings(out, plugin, TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.service", "gateway"));
-    GatewaySettings msnSettings = new GatewaySettings(out, plugin, TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.service", "gateway"));
-    GatewaySettings qqSettings = new GatewaySettings(out, plugin, TransportType.qq, LocaleUtils.getLocalizedString("gateway.qq.service", "gateway"));
-    GatewaySettings simpleSettings = new GatewaySettings(out, plugin, TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.service", "gateway"));
-    GatewaySettings xmppSettings = new GatewaySettings(out, plugin, TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.service", "gateway"));
-    GatewaySettings yahooSettings = new GatewaySettings(out, plugin, TransportType.yahoo, LocaleUtils.getLocalizedString("gateway.yahoo.service", "gateway"));
+    GatewaySettings aimSettings = new GatewaySettings(out, plugin, TransportType.aim, LocaleUtils.getLocalizedString("gateway.aim.service", "kraken"));
+    GatewaySettings gadugaduSettings = new GatewaySettings(out, plugin, TransportType.gadugadu, LocaleUtils.getLocalizedString("gateway.gadugadu.service", "kraken"));
+    GatewaySettings gtalkSettings = new GatewaySettings(out, plugin, TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.service", "kraken"));
+    GatewaySettings icqSettings = new GatewaySettings(out, plugin, TransportType.icq, LocaleUtils.getLocalizedString("gateway.icq.service", "kraken"));
+    GatewaySettings ircSettings = new GatewaySettings(out, plugin, TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.service", "kraken"));
+    GatewaySettings msnSettings = new GatewaySettings(out, plugin, TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.service", "kraken"));
+    GatewaySettings qqSettings = new GatewaySettings(out, plugin, TransportType.qq, LocaleUtils.getLocalizedString("gateway.qq.service", "kraken"));
+    GatewaySettings simpleSettings = new GatewaySettings(out, plugin, TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.service", "kraken"));
+    GatewaySettings xmppSettings = new GatewaySettings(out, plugin, TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.service", "kraken"));
+    GatewaySettings yahooSettings = new GatewaySettings(out, plugin, TransportType.yahoo, LocaleUtils.getLocalizedString("gateway.yahoo.service", "kraken"));
 %>
 
 

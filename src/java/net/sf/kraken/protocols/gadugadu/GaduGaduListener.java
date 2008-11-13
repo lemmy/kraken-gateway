@@ -47,7 +47,7 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         }
         catch (GGException e) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.gadugadu.unabletoconnect", "gateway"));
+            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.gadugadu.unabletoconnect", "kraken"));
         }
     }
 
@@ -59,7 +59,7 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
     public void connectionError(Exception exception) {
         Log.debug("GaduGadu: Connection error:", exception);
         getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-        getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.gadugadu.connectionlost", "gateway"));
+        getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.gadugadu.connectionlost", "kraken"));
 
     }
 
@@ -78,11 +78,11 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         Log.debug("GaduGadu: Login failed: "+event);
         if (event.getReason() == LoginFailedEvent.INCORRECT_PASSWORD) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.gadugadu.passwordincorrect", "gateway"));
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.gadugadu.passwordincorrect", "kraken"));
         }
         else {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.gadugadu.loginfailed", "gateway"));
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.gadugadu.loginfailed", "kraken"));
         }
 
     }

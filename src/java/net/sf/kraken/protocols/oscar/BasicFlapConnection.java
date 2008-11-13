@@ -145,7 +145,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                 getMainSession().getTransport().sendMessage(
                         getMainSession().getJID(),
                         getMainSession().getTransport().getJID(),
-                        LocaleUtils.getLocalizedString("gateway.aim.warninganon", "gateway", Arrays.asList(wn.getNewLevel().toString())),
+                        LocaleUtils.getLocalizedString("gateway.aim.warninganon", "kraken", Arrays.asList(wn.getNewLevel().toString())),
                         Message.Type.headline
                 );
             }
@@ -155,7 +155,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                 getMainSession().getTransport().sendMessage(
                         getMainSession().getJID(),
                         getMainSession().getTransport().getJID(),
-                        LocaleUtils.getLocalizedString("gateway.aim.warningdirect", "gateway", Arrays.asList(warner.getScreenname(), wn.getNewLevel().toString())),
+                        LocaleUtils.getLocalizedString("gateway.aim.warningdirect", "kraken", Arrays.asList(warner.getScreenname(), wn.getNewLevel().toString())),
                         Message.Type.headline
                 );
             }

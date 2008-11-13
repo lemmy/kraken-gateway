@@ -394,7 +394,7 @@ public class IRCListener extends GenericAutoService {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().convertIDToJID(ar.getNick()),
-                    LocaleUtils.getLocalizedString("gateway.irc.autoreply", "gateway")+" "+ar.getMessage()
+                    LocaleUtils.getLocalizedString("gateway.irc.autoreply", "kraken")+" "+ar.getMessage()
             );
 
         }

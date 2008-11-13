@@ -33,28 +33,28 @@ public class IRCTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
     public String getTerminologyUsername() {
-        return LocaleUtils.getLocalizedString("gateway.irc.username", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.irc.username", "kraken");
     }
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
     public String getTerminologyPassword() {
-        return LocaleUtils.getLocalizedString("gateway.irc.password", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.irc.password", "kraken");
     }
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
     public String getTerminologyNickname() {
-        return LocaleUtils.getLocalizedString("gateway.irc.nickname", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.irc.nickname", "kraken");
     }
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
     public String getTerminologyRegistration() {
-        return LocaleUtils.getLocalizedString("gateway.irc.registration", "gateway");
+        return LocaleUtils.getLocalizedString("gateway.irc.registration", "kraken");
     }
 
     /**
@@ -111,13 +111,13 @@ public class IRCTransport extends BaseTransport {
             return null;
         }
         else if (jabStatus == PresenceType.away) {
-            return (verboseStatus == null || verboseStatus.equals("")) ? LocaleUtils.getLocalizedString("gateway.irc.away", "gateway") : LocaleUtils.getLocalizedString("gateway.irc.away", "gateway")+": "+verboseStatus;
+            return (verboseStatus == null || verboseStatus.equals("")) ? LocaleUtils.getLocalizedString("gateway.irc.away", "kraken") : LocaleUtils.getLocalizedString("gateway.irc.away", "kraken")+": "+verboseStatus;
         }
         else if (jabStatus == PresenceType.xa) {
-            return (verboseStatus == null || verboseStatus.equals("")) ? LocaleUtils.getLocalizedString("gateway.irc.extendedaway", "gateway") : LocaleUtils.getLocalizedString("gateway.irc.extendedaway", "gateway")+": "+verboseStatus;
+            return (verboseStatus == null || verboseStatus.equals("")) ? LocaleUtils.getLocalizedString("gateway.irc.extendedaway", "kraken") : LocaleUtils.getLocalizedString("gateway.irc.extendedaway", "kraken")+": "+verboseStatus;
         }
         else if (jabStatus == PresenceType.dnd) {
-            return (verboseStatus == null || verboseStatus.equals("")) ? LocaleUtils.getLocalizedString("gateway.irc.donotdisturb", "gateway") : LocaleUtils.getLocalizedString("gateway.irc.donotdisturb", "gateway")+": "+verboseStatus;
+            return (verboseStatus == null || verboseStatus.equals("")) ? LocaleUtils.getLocalizedString("gateway.irc.donotdisturb", "kraken") : LocaleUtils.getLocalizedString("gateway.irc.donotdisturb", "kraken")+": "+verboseStatus;
         }
         else if (jabStatus == PresenceType.chat) {
             return null;

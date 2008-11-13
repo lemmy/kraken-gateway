@@ -798,7 +798,7 @@ public class OSCARSession extends TransportSession {
             request(new SetExtraInfoCmd(((OSCARTransport)getTransport()).convertXMPPStatusToICQ(presenceType)));
         }
         if (presenceType != PresenceType.available && presenceType != PresenceType.chat) {
-            String awayMsg = LocaleUtils.getLocalizedString("gateway.oscar.away", "gateway");
+            String awayMsg = LocaleUtils.getLocalizedString("gateway.oscar.away", "kraken");
             if (verboseStatus != null && verboseStatus.length() > 0) {
                 awayMsg = verboseStatus;
             }

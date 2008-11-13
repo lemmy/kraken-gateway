@@ -225,7 +225,7 @@ public class XMPPListener implements MessageListener, RosterListener, Connection
                     getSession().getTransport().sendMessage(
                             getSession().getJID(),
                             getSession().getTransport().getJID(),
-                            LocaleUtils.getLocalizedString("gateway.gtalk.mail", "gateway", Arrays.asList(newMailCount))+mailList,
+                            LocaleUtils.getLocalizedString("gateway.gtalk.mail", "kraken", Arrays.asList(newMailCount))+mailList,
                             Message.Type.headline
                     );
                 }

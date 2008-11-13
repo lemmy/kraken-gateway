@@ -67,11 +67,11 @@ public class SimpleTransport extends BaseTransport {
 	/**
 	 */
 	public String getTerminologyUsername() {
-		return LocaleUtils.getLocalizedString("gateway.simple.username", "gateway");
+		return LocaleUtils.getLocalizedString("gateway.simple.username", "kraken");
 	}
 
 	public String getTerminologyPassword() {
-		return LocaleUtils.getLocalizedString("gateway.simple.password", "gateway");
+		return LocaleUtils.getLocalizedString("gateway.simple.password", "kraken");
 	}
 	
 	/**
@@ -87,7 +87,7 @@ public class SimpleTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
 	public String getTerminologyRegistration() {
-		return LocaleUtils.getLocalizedString("gateway.simple.registration", "gateway");
+		return LocaleUtils.getLocalizedString("gateway.simple.registration", "kraken");
 	}
 	
 	/**

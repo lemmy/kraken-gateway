@@ -63,7 +63,7 @@ public class BOSConnection extends BasicFlapConnection {
     protected void handleStateChange(ClientConnEvent e) {
         Log.debug("OSCAR bos service state change from "+e.getOldState()+" to "+e.getNewState()+" Reason: "+e.getReason());
 //        if (e.getNewState() == ClientFlapConn.STATE_NOT_CONNECTED && e.getOldState() == ClientFlapConn.STATE_CONNECTED && getMainSession().isLoggedIn()) {
-//            getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.disconnected", "gateway"));
+//            getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.disconnected", "kraken"));
 //        }
     }
 
@@ -74,10 +74,10 @@ public class BOSConnection extends BasicFlapConnection {
         if (cmd instanceof CloseFlapCmd) {
             CloseFlapCmd cfc = (CloseFlapCmd)cmd;
             if (cfc.getCode() == CloseFlapCmd.CODE_LOGGED_IN_ELSEWHERE) {
-                getMainSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.oscar.multilogin", "gateway"));
+                getMainSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.oscar.multilogin", "kraken"));
             }
             else {
-                getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.disconnected", "gateway"));
+                getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.disconnected", "kraken"));
             }
         }
         super.handleFlapPacket(e);
@@ -297,7 +297,7 @@ public class BOSConnection extends BasicFlapConnection {
                 getMainSession().getTransport().sendMessage(
                         getMainSession().getJID(),
                         getMainSession().getTransport().getJID(),
-                        LocaleUtils.getLocalizedString("gateway.aim.msgrefused","gateway")
+                        LocaleUtils.getLocalizedString("gateway.aim.msgrefused","kraken")
                 );
             }
             //TODO: Tons more errors that can be caught.  Gotta catch 'em all!  =)  (please don't sue me Nintendo)

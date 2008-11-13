@@ -139,7 +139,7 @@ public class MSNListener extends MsnAdapter {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().convertIDToJID(friend.getEmail().toString()),
-                    LocaleUtils.getLocalizedString("gateway.msn.nudge", "gateway"),
+                    LocaleUtils.getLocalizedString("gateway.msn.nudge", "kraken"),
                     Message.Type.headline
             );
         }
@@ -147,7 +147,7 @@ public class MSNListener extends MsnAdapter {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().convertIDToJID(friend.getEmail().toString()),
-                    LocaleUtils.getLocalizedString("gateway.msn.wink", "gateway"),
+                    LocaleUtils.getLocalizedString("gateway.msn.wink", "kraken"),
                     Message.Type.headline
             );
         }
@@ -169,7 +169,7 @@ public class MSNListener extends MsnAdapter {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().getJID(),
-                    LocaleUtils.getLocalizedString("gateway.msn.initialmail", "gateway", Arrays.asList(message.getInboxUnread())),
+                    LocaleUtils.getLocalizedString("gateway.msn.initialmail", "kraken", Arrays.asList(message.getInboxUnread())),
                     Message.Type.headline
             );
         }
@@ -181,7 +181,7 @@ public class MSNListener extends MsnAdapter {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().getJID(),
-                    LocaleUtils.getLocalizedString("gateway.msn.initialmail", "gateway", Arrays.asList(message.getInboxUnread())),
+                    LocaleUtils.getLocalizedString("gateway.msn.initialmail", "kraken", Arrays.asList(message.getInboxUnread())),
                     Message.Type.headline
             );
         }
@@ -193,7 +193,7 @@ public class MSNListener extends MsnAdapter {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().getJID(),
-                    LocaleUtils.getLocalizedString("gateway.msn.mail", "gateway", Arrays.asList(message.getFrom(), message.getFromAddr(), message.getSubject())),
+                    LocaleUtils.getLocalizedString("gateway.msn.mail", "kraken", Arrays.asList(message.getFrom(), message.getFromAddr(), message.getSubject())),
                     Message.Type.headline
             );
         }
@@ -420,7 +420,7 @@ public class MSNListener extends MsnAdapter {
         Log.debug("MSN: Exception occurred for "+messenger.getOwner().getEmail()+" : "+throwable);        
         if (throwable instanceof IncorrectPasswordException) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "gateway"));
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
         }
         else if (throwable instanceof MsnProtocolException) {
             Log.debug("MSN: Protocol exception: "+throwable.toString());
@@ -429,7 +429,7 @@ public class MSNListener extends MsnAdapter {
             getSession().getTransport().sendMessage(
                     getSession().getJID(),
                     getSession().getTransport().getJID(),
-                    LocaleUtils.getLocalizedString("gateway.msn.sendmsgfailed", "gateway")+" "+throwable.toString(),
+                    LocaleUtils.getLocalizedString("gateway.msn.sendmsgfailed", "kraken")+" "+throwable.toString(),
                     Message.Type.error
             );
         }
@@ -442,7 +442,7 @@ public class MSNListener extends MsnAdapter {
         else if (throwable instanceof IOException) {
             Log.debug("MSN: IO error: "+throwable.toString());
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "gateway"));
+            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "kraken"));
         }
         else {
             Log.debug("MSN: Unknown error: "+throwable.toString(), throwable);

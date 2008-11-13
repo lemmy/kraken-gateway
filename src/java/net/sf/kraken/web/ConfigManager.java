@@ -56,7 +56,7 @@ public class ConfigManager {
      */
     public boolean toggleTransport(String transportName) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("gateway");
+        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
         if (!plugin.serviceEnabled(transportName)) {
             plugin.enableService(transportName);
             return true;
@@ -75,7 +75,7 @@ public class ConfigManager {
      */
     public void saveSettings(String transportName, HashMap<String,String> options) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("gateway");
+        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
         Document optConfig = plugin.getOptionsConfig(TransportType.valueOf(transportName));
 
         Element leftPanel = optConfig.getRootElement().element("leftpanel");
@@ -211,7 +211,7 @@ public class ConfigManager {
      */
     public String addRegistration(String user, String transportType, String legacyUsername, String legacyPassword, String legacyNickname) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("gateway");
+        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
         JID jid;
         if (user.contains("@")) {
             jid = new JID(user);
@@ -220,7 +220,7 @@ public class ConfigManager {
             jid = new JID(user, XMPPServer.getInstance().getServerInfo().getXMPPDomain(), null);
         }
         if (!plugin.getTransportInstance(transportType).isEnabled()) {
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "kraken");
         }
         try {
             plugin.getTransportInstance(transportType).getTransport().addNewRegistration(jid, legacyUsername, legacyPassword, legacyNickname, false);
@@ -228,15 +228,15 @@ public class ConfigManager {
         }
         catch (UserNotFoundException e) {
             Log.error("Not found while adding account for "+jid.toString());
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.xmppnotfound", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.xmppnotfound", "kraken");
         }
         catch (IllegalAccessException e) {
             Log.error("Domain of JID specified for registration is not on this server: "+jid.toString());
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.illegaldomain", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.illegaldomain", "kraken");
         }
         catch (IllegalArgumentException e) {
             Log.error("Username specified for registration is not valid.");
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.invaliduser", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.invaliduser", "kraken");
         }
     }
 
@@ -248,11 +248,11 @@ public class ConfigManager {
      */
     public String deleteRegistration(Integer registrationID) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("gateway");
+        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
         try {
             Registration reg = new Registration(registrationID);
             if (!plugin.getTransportInstance(reg.getTransportType().toString()).isEnabled()) {
-                return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "gateway");
+                return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "kraken");
             }
             plugin.getTransportInstance(reg.getTransportType().toString()).getTransport().deleteRegistration(reg.getJID());
             return null;
@@ -260,12 +260,12 @@ public class ConfigManager {
         catch (NotFoundException e) {
             // Ok, nevermind.
             Log.error("Not found while deleting id "+registrationID, e);
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.xmppnotfound", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.xmppnotfound", "kraken");
         }
         catch (UserNotFoundException e) {
             // Ok, nevermind.
             Log.error("Not found while deleting id "+registrationID, e);
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.regnotfound", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.regnotfound", "kraken");
         }
     }
 
@@ -281,11 +281,11 @@ public class ConfigManager {
      */
     public String updateRegistration(Integer registrationID, String legacyUsername, String legacyPassword, String legacyNickname) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("gateway");
+        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
         try {
             Registration reg = new Registration(registrationID);
             if (!plugin.getTransportInstance(reg.getTransportType().toString()).isEnabled()) {
-                return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "gateway");
+                return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "kraken");
             }
             reg.setUsername(legacyUsername);
             if (legacyPassword != null) {
@@ -297,7 +297,7 @@ public class ConfigManager {
         catch (NotFoundException e) {
             // Ok, nevermind.
             Log.error("Not found while editing id "+registrationID, e);
-            return LocaleUtils.getLocalizedString("gateway.web.registrations.regnotfound", "gateway");
+            return LocaleUtils.getLocalizedString("gateway.web.registrations.regnotfound", "kraken");
         }
     }
 

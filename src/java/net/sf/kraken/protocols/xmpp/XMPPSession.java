@@ -245,12 +245,12 @@ public class XMPPSession extends TransportSession {
                         }
                         catch (XMPPException e) {
                             Log.debug(getTransport().getType()+" user's login/password does not appear to be correct: "+getRegistration().getUsername(), e);
-                            sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.xmpp.passwordincorrect", "gateway"));
+                            sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.xmpp.passwordincorrect", "kraken"));
                         }
                     }
                     catch (XMPPException e) {
                         Log.debug(getTransport().getType()+" user is not able to connect: "+getRegistration().getUsername(), e);
-                        sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionfailed", "gateway"));
+                        sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionfailed", "kraken"));
                     }
                 }
             }.start();

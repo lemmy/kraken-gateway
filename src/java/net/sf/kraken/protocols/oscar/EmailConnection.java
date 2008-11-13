@@ -86,7 +86,7 @@ public class EmailConnection extends ServiceConnection {
                     getMainSession().getTransport().sendMessage(
                             getMainSession().getJID(),
                             getMainSession().getTransport().getJID(),
-                            LocaleUtils.getLocalizedString("gateway.oscar.mail", "gateway", Arrays.asList(Integer.toString(diff), mu.getDomain(), mu.getUrl())),
+                            LocaleUtils.getLocalizedString("gateway.oscar.mail", "kraken", Arrays.asList(Integer.toString(diff), mu.getDomain(), mu.getUrl())),
                             Message.Type.headline
                     );
                 }

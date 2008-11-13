@@ -27,7 +27,7 @@
 
 <%
     final GatewayPlugin plugin =
-            (GatewayPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("gateway");
+            (GatewayPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
     HashMap<String, Boolean> trEnabled = new HashMap<String, Boolean>();
     trEnabled.put("aim", plugin.getTransportInstance("aim").isEnabled());
     trEnabled.put("gadugadu", plugin.getTransportInstance("gadugadu").isEnabled());
@@ -169,7 +169,7 @@
                             res.linestatus = "online";
 
                             Date lastLogin = registration.getLastLogin();
-                            res.lastLogin = ((lastLogin != null) ? lastLogin.toString() : "<i>" + LocaleUtils.getLocalizedString("gateway.web.registrations.never", "gateway") + "</i>");                            res.username = registration.getUsername();
+                            res.lastLogin = ((lastLogin != null) ? lastLogin.toString() : "<i>" + LocaleUtils.getLocalizedString("gateway.web.registrations.never", "kraken") + "</i>");                            res.username = registration.getUsername();
                             resCount++;
                             regResults.add(res);
                         }
@@ -201,7 +201,7 @@
             byte[] nodeID = sessionRouter.getSession(res.type, res.jid.toBareJID());
             if (nodeID != null) {
                 if (Arrays.equals(thisNode, nodeID)) {
-                    res.clusterNode = LocaleUtils.getLocalizedString("gateway.web.registrations.local", "gateway");
+                    res.clusterNode = LocaleUtils.getLocalizedString("gateway.web.registrations.local", "kraken");
                 }
                 else {
                     res.clusterNode = nodeIDToName.get(NodeID.getInstance(nodeID));
@@ -245,7 +245,7 @@
             }
 
             Date lastLogin = registration.getLastLogin();
-            res.lastLogin = ((lastLogin != null) ? lastLogin.toString() : "<i>" + LocaleUtils.getLocalizedString("gateway.web.registrations.never", "gateway") + "</i>");
+            res.lastLogin = ((lastLogin != null) ? lastLogin.toString() : "<i>" + LocaleUtils.getLocalizedString("gateway.web.registrations.never", "kraken") + "</i>");
 
             resCount++;
             regResults.add(res);

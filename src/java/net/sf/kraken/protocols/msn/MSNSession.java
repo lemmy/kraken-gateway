@@ -63,7 +63,7 @@ public class MSNSession extends TransportSession {
             m.setType(Message.Type.error);
             m.setTo(getJID());
             m.setFrom(getTransport().getJID());
-            m.setBody(LocaleUtils.getLocalizedString("gateway.msn.illegalaccount", "gateway")+" "+registration.getUsername());
+            m.setBody(LocaleUtils.getLocalizedString("gateway.msn.illegalaccount", "kraken")+" "+registration.getUsername());
             getTransport().sendPacket(m);
             // TODO: this should probably be generic and done within base transport for -all- transports
             // TODO: Also, ths Email.parseStr could be used in the "is this a valid username" check

@@ -240,7 +240,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 m.setError(Condition.service_unavailable);
                 m.setTo(from);
                 m.setFrom(getJID());
-                m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "gateway", Arrays.asList(transportType.toString().toUpperCase())));
+                m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "kraken", Arrays.asList(transportType.toString().toUpperCase())));
                 reply.add(m);
             }
             else if (to.getNode() == null) {
@@ -249,7 +249,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                     Message m = new Message();
                     m.setTo(from);
                     m.setFrom(getJID());
-                    m.setBody(LocaleUtils.getLocalizedString("gateway.base.msgtotransport", "gateway"));
+                    m.setBody(LocaleUtils.getLocalizedString("gateway.base.msgtotransport", "kraken"));
                     reply.add(m);
 
                 }
@@ -304,7 +304,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             m.setError(Condition.service_unavailable);
             m.setTo(from);
             m.setFrom(getJID());
-            m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "gateway", Arrays.asList(transportType.toString().toUpperCase())));
+            m.setBody(LocaleUtils.getLocalizedString("gateway.base.notloggedin", "kraken", Arrays.asList(transportType.toString().toUpperCase())));
             reply.add(m);
         }
 
@@ -598,7 +598,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             if (from.getNode() == null || RegistrationManager.getInstance().isRegistered(from, this.transportType) || permissionManager.hasAccess(from)) {
                 Element response = DocumentHelper.createElement(QName.get("query", NameSpace.DISCO_INFO));
                 response.addElement("identity")
-                        .addAttribute("category", "gateway")
+                        .addAttribute("category", "kraken")
                         .addAttribute("type", this.transportType.discoIdentity())
                         .addAttribute("name", this.description);
                 response.addElement("feature")
@@ -655,7 +655,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         if (packet.getType() == IQ.Type.get) {
             IQ result = IQ.createResultIQ(packet);
             Element query = DocumentHelper.createElement(QName.get("query", NameSpace.IQ_GATEWAY));
-            query.addElement("desc").addText(LocaleUtils.getLocalizedString("gateway.base.enterusername", "gateway", Arrays.asList(transportType.toString().toUpperCase())));
+            query.addElement("desc").addText(LocaleUtils.getLocalizedString("gateway.base.enterusername", "kraken", Arrays.asList(transportType.toString().toUpperCase())));
             query.addElement("prompt");
             result.setChildElement(query);
             reply.add(result);
@@ -806,7 +806,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                     em.setType(Message.Type.error);
                     em.setTo(packet.getFrom());
                     em.setFrom(packet.getTo());
-                    em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyacls", "gateway"));
+                    em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyacls", "kraken"));
                     reply.add(em);
                     return reply;
                 }
@@ -867,7 +867,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         em.setType(Message.Type.error);
                         em.setTo(packet.getFrom());
                         em.setFrom(packet.getTo());
-                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniednoacct", "gateway"));
+                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniednoacct", "kraken"));
                         reply.add(em);
                     }
                     catch (IllegalAccessException e) {
@@ -879,7 +879,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         em.setType(Message.Type.error);
                         em.setTo(packet.getFrom());
                         em.setFrom(packet.getTo());
-                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyhost", "gateway"));
+                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyhost", "kraken"));
                         reply.add(em);
                     }
                     catch (IllegalArgumentException e) {
@@ -891,7 +891,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         em.setType(Message.Type.error);
                         em.setTo(packet.getFrom());
                         em.setFrom(packet.getTo());
-                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbadusername", "gateway"));
+                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbadusername", "kraken"));
                         reply.add(em);
                     }
                 }
@@ -922,7 +922,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                     em.setType(Message.Type.error);
                     em.setTo(packet.getFrom());
                     em.setFrom(packet.getTo());
-                    em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyacls", "gateway"));
+                    em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyacls", "kraken"));
                     reply.add(em);
                     return reply;
                 }
@@ -1236,7 +1236,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
     public String getVersionString() {
         if (versionString == null) {
             PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-            versionString = pluginManager.getVersion(pluginManager.getPlugin("gateway"));
+            versionString = pluginManager.getVersion(pluginManager.getPlugin("kraken"));
         }
         return versionString;
     }
