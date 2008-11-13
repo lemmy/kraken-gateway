@@ -127,17 +127,13 @@ public class QQSession extends TransportSession implements IQQListener {
     }
 
     public void logOut() {
-        setLoginStatus(TransportLoginStatus.LOGGING_OUT);
-        qqclient.logout();
-        setLoginStatus(TransportLoginStatus.LOGGED_OUT);
-        Presence p = new Presence(Presence.Type.unavailable);
-        p.setTo(getJID()); //qq图标显示为离线状态
-        p.setFrom(getTransport().getJID());
-        getTransport().sendPacket(p);
-
+        cleanUp();
+        sessionDisconnectedNoReconnect(null);
     }
 
     public void cleanUp() {
+        qqclient.logout();
+        qqclient = null;
     }
 
     public void updateLegacyAvatar(String string, byte[] byteArray) {

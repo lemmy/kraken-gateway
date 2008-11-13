@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="IM Gateway" default="release" basedir="..">
-    <description>IM Gateway Build</description>
+<project name="Kraken" default="release" basedir="..">
+    <description>Kraken Build</description>
 
     <!-- ======================================================================================= -->
     <!-- GLOBAL TASKDEFs                                                                         -->
