@@ -3,22 +3,22 @@
                  org.jivesoftware.openfire.cluster.ClusterManager,
                  org.jivesoftware.openfire.cluster.ClusterNodeInfo,
                  org.jivesoftware.openfire.cluster.NodeID,
-                 org.jivesoftware.openfire.gateway.GatewayPlugin,
-                 org.jivesoftware.openfire.gateway.registration.Registration,
-                 org.jivesoftware.openfire.gateway.registration.RegistrationManager"
+                 net.sf.kraken.GatewayPlugin,
+                 net.sf.kraken.registration.Registration,
+                 net.sf.kraken.registration.RegistrationManager"
     errorPage="error.jsp"
 %>
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="org.jivesoftware.openfire.gateway.session.cluster.TransportSessionRouter" %>
+<%@ page import="net.sf.kraken.session.cluster.TransportSessionRouter" %>
 <%@ page import="org.jivesoftware.openfire.session.ClientSession" %>
 <%@ page import="org.jivesoftware.util.LocaleUtils" %>
 <%@ page import="org.jivesoftware.util.ParamUtils" %>
 <%@ page import="org.xmpp.packet.JID" %>
 <%@ page import="org.xmpp.packet.Presence" %>
 <%@ page import="java.util.*" %>
-<%@ page import="org.jivesoftware.openfire.gateway.TransportInstance" %>
-<%@ page import="org.jivesoftware.openfire.gateway.session.TransportSession" %>
-<%@ page import="org.jivesoftware.openfire.gateway.BaseTransport" %>
+<%@ page import="net.sf.kraken.TransportInstance" %>
+<%@ page import="net.sf.kraken.session.TransportSession" %>
+<%@ page import="net.sf.kraken.BaseTransport" %>
 
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jstl/fmt_rt" prefix="fmt" %>

@@ -2,7 +2,7 @@
 <plugin>
 
     <!-- Main plugin class -->
-    <class>org.jivesoftware.openfire.gateway.GatewayPlugin</class>
+    <class>net.sf.kraken.GatewayPlugin</class>
     
     <!-- Plugin meta-data -->
     <name>${gateway.name}</name>

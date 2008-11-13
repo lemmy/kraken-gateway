@@ -10,12 +10,13 @@
 
 package org.jivesoftware.util;
 
-import org.jivesoftware.openfire.gateway.type.PresenceType;
-import org.jivesoftware.openfire.gateway.registration.Registration;
-import org.jivesoftware.openfire.gateway.session.TransportSession;
-import org.jivesoftware.openfire.gateway.type.TransportType;
+import net.sf.kraken.protocols.msn.MSNTransport;
+import net.sf.kraken.registration.Registration;
+import net.sf.kraken.session.TransportSession;
+import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.TransportType;
+
 import org.xmpp.packet.JID;
-import org.jivesoftware.openfire.gateway.protocols.msn.MSNTransport;
 
 public class MSNTransportTest
 {

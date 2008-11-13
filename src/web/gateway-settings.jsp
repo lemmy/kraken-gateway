@@ -1,7 +1,7 @@
 <%@ page import="javax.servlet.jsp.JspWriter,
                  org.jivesoftware.openfire.XMPPServer,
-                 org.jivesoftware.openfire.gateway.GatewayPlugin,
-                 org.jivesoftware.openfire.gateway.type.TransportType"
+                 net.sf.kraken.GatewayPlugin,
+                 net.sf.kraken.type.TransportType"
     errorPage="error.jsp"
 %>
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -11,7 +11,7 @@
 <%@ page import="org.dom4j.Document" %>
 <%@ page import="org.jivesoftware.util.JiveGlobals" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.jivesoftware.openfire.gateway.permissions.PermissionManager" %>
+<%@ page import="net.sf.kraken.permissions.PermissionManager" %>
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="org.apache.log4j.Logger" %>

@@ -8,7 +8,7 @@
         <servlet-name>dwr-invoker</servlet-name>
         <display-name>DWR Servlet</display-name>
         <description>Direct Web Remoter Servlet</description>
-        <servlet-class>org.jivesoftware.openfire.gateway.web.GatewayDWR</servlet-class>
+        <servlet-class>net.sf.kraken.web.GatewayDWR</servlet-class>
         <init-param>
             <param-name>LogLevel</param-name>
             <param-value>FATAL</param-value>
@@ -21,7 +21,7 @@
 
     <servlet>
         <servlet-name>xml-rpc</servlet-name>
-        <servlet-class>org.jivesoftware.openfire.gateway.web.GatewayXMLRPC</servlet-class>
+        <servlet-class>net.sf.kraken.web.GatewayXMLRPC</servlet-class>
         <init-param>
             <param-name>streamMessages</param-name>
             <param-value>1</param-value>
