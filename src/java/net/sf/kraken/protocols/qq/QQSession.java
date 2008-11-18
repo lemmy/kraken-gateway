@@ -41,6 +41,8 @@ public class QQSession extends TransportSession implements IQQListener {
 
     static Logger Log = Logger.getLogger(QQSession.class);
 
+    private List<String> tcpServerList = new ArrayList<String>();
+    private List<String> udpServerList = new ArrayList<String>();
     private static String defaultGroupName = JiveGlobals.getProperty(
             "plugin.gateway.qq.defaultRosterName", "Friends");
     public static final SimpleDateFormat sdf = new SimpleDateFormat(
@@ -55,6 +57,34 @@ public class QQSession extends TransportSession implements IQQListener {
     private Map<Integer,
                 Map<Integer, String>> clusterMembers = new Hashtable<Integer,
             Map<Integer, String>>(); //group members
+    
+    private void setupDefaultServerList() {
+        // set up default tcp server list
+        Collections.addAll(tcpServerList,
+    		"tcpconn.tencent.com",
+    		"tcpconn2.tencent.com",
+    		"tcpconn3.tencent.com",
+    		"tcpconn4.tencent.com",
+    		"tcpconn5.tencent.com",
+    		"tcpconn6.tencent.com"
+		);
+        Collections.shuffle(tcpServerList);
+        // set up default udp server list
+        Collections.addAll(udpServerList,
+    		"sz.tencent.com",
+    		"sz2.tencent.com",
+    		"sz3.tencent.com",
+    		"sz4.tencent.com",
+    		"sz5.tencent.com",
+    		"sz6.tencent.com",
+    		"sz7.tencent.com",
+    		"sz8.tencent.com",
+    		"sz9.tencent.com"
+		);
+        Collections.shuffle(udpServerList);
+        // TODO: Add preferred server to top of list, and add checkbox for udp vs tcp
+    }
+    
     public QQSession(Registration registration, JID jid,
                      QQTransport transport, Integer priority) {
         super(registration, jid, transport, priority);
@@ -63,11 +93,12 @@ public class QQSession extends TransportSession implements IQQListener {
         qquser.setStatus(QQ.QQ_LOGIN_MODE_NORMAL);
         qquser.setUdp(true);
         qquser.setShowFakeCam(false);
+        setupDefaultServerList();
     }
 
     public void updateStatus(PresenceType presenceType, String string) {
         if (isLoggedIn()) {
-            try {
+            try { 
                 qquser.setStatus(((QQTransport) getTransport()).
                                  convertJabStatusToQQ(presenceType));
             } catch (IllegalStateException e) {
@@ -78,12 +109,15 @@ public class QQSession extends TransportSession implements IQQListener {
     }
 
     public void addContact(JID jID, String string, ArrayList arrayList) {
+    	// TODO: Implement this
     }
 
     public void removeContact(TransportBuddy transportBuddy) {
+    	// TODO: Implement this
     }
 
     public void updateContact(TransportBuddy transportBuddy) {
+    	// TODO: Implement this
     }
 
     public void sendMessage(JID jID, String message) {
@@ -109,22 +143,25 @@ public class QQSession extends TransportSession implements IQQListener {
     }
 
     public void logIn(PresenceType presenceType, String string) {
+    	if (udpServerList.isEmpty()) {
+    		// Ran out of servers to try to log in to.  Dooh.
+    		sessionDisconnectedNoReconnect("Unable to log into any QQ servers.");
+    		return;
+    	}
+    	String qqserver = udpServerList.remove(0); // pull a server to connect to from the end of the list
+        setLoginStatus(TransportLoginStatus.LOGGING_IN);
+        qqclient = new QQClient();
+        qqclient.setUser(qquser);
+        qqclient.setConnectionPoolFactory(new PortGateFactory());
+        //qqclient.setTcpLoginPort(8000);
+        qqclient.addQQListener(this);
+        qqclient.setLoginServer(qqserver);
         try {
-            setLoginStatus(TransportLoginStatus.LOGGING_IN);
-            qqclient = new QQClient();
-            qqclient.setUser(qquser);
-            qqclient.setConnectionPoolFactory(new PortGateFactory());
-            qqclient.addQQListener(this);
-            String qqserver =
-                    JiveGlobals.getProperty("plugin.gateway.qq.connecthost",
-                                            "sz.tencent.com");
-            qqclient.setLoginServer(qqserver);
-            qqclient.login();
-
-        } catch (Exception e) {
-            Log.error(e);
-        }
-
+			qqclient.login();
+		}
+        catch (Exception e) {
+			Log.debug("Login attempt at server "+qqserver+" failed, trying next.");
+		}
     }
 
     public void logOut() {
@@ -152,10 +189,12 @@ public class QQSession extends TransportSession implements IQQListener {
                            " " + e.getSource());
         switch (e.type) {
         case QQEvent.LOGIN_FAIL:
+            sessionDisconnectedNoReconnect(null);
+            break;
         case QQEvent.LOGIN_NEED_VERIFY:
         case QQEvent.LOGIN_UNKNOWN_ERROR:
         case QQEvent.LOGIN_GET_TOKEN_FAIL:
-            sessionDisconnectedNoReconnect(null);
+            sessionDisconnected(null);
             break;
         case QQEvent.USER_STATUS_CHANGE_OK:
             processStatusChangeOK(e);

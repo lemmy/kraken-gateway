@@ -10,11 +10,17 @@
 
 package net.sf.kraken.web;
 
+import java.io.IOException;
+
 import uk.ltd.getahead.dwr.DWRServlet;
 import uk.ltd.getahead.dwr.Configuration;
+import uk.ltd.getahead.dwr.impl.DefaultInterfaceProcessor;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -55,6 +61,13 @@ public class GatewayDWR extends DWRServlet {
         }
 
         configuration.addConfig(document);
+        
+        // Specify the path for the js files 
+        Object bean = container.getBean("interface");
+        if (bean instanceof DefaultInterfaceProcessor) {
+            DefaultInterfaceProcessor processor = (DefaultInterfaceProcessor)bean;
+            processor.setOverridePath("/plugins/kraken/dwr");
+        }
     }
 
     /**
@@ -73,6 +86,26 @@ public class GatewayDWR extends DWRServlet {
         element.appendChild(parameter);
 
         return element;
+    }
+    
+    protected void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+	    throws IOException, ServletException {
+
+		super.doPost(new MyServletRequestWrapper(httpServletRequest), httpServletResponse);
+	}
+    
+    /**
+     * Custom HTTP request wrapper that overrides the path to use
+     */
+    private static class MyServletRequestWrapper extends HttpServletRequestWrapper {
+        public MyServletRequestWrapper(HttpServletRequest httpServletRequest) {
+            super(httpServletRequest);
+        }
+
+        public String getPathInfo() {
+            String pathInfo = super.getPathInfo();
+            return pathInfo.replaceAll("/kraken/dwr", "");
+        }
     }
 
 }
