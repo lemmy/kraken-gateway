@@ -7,6 +7,7 @@ import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.jivesoftware.util.LocaleUtils;
+import org.openymsg.network.Status;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
 import edu.tsinghua.lumaqq.qq.QQ;
@@ -132,28 +133,23 @@ public class QQTransport extends BaseTransport {
     }
 
     /**
-     * Sets up a presence packet according to QQ status.
+     * Converts a QQ status to an XMPP status.
      *
-     * @param qqStatus QQ ContactStatus constant.
-     * @param packet Presence packet to set up.
+     * @param qqStatus QQ status constant.
+     * @return XMPP presence type matching the QQ status.
      */
-    public void setUpPresencePacket(Presence packet, byte qqStatus) {
+    public PresenceType convertQQStatusToXMPP(byte qqStatus) {
         switch (qqStatus) {
-        case QQ.QQ_STATUS_AWAY:
-            packet.setShow(Presence.Show.away);
-            break;
-        case QQ.QQ_STATUS_HIDDEN:
-            packet.setShow(Presence.Show.xa);
-            break;
-        case QQ.QQ_STATUS_OFFLINE:
-            packet.setType(Presence.Type.unavailable);
-            break;
-        case QQ.QQ_STATUS_ONLINE:
-            packet.setShow(Presence.Show.chat);
-            break;
-        default:
-            packet.setShow(Presence.Show.chat);
-            break;
+	        case QQ.QQ_STATUS_AWAY:
+	            return PresenceType.away;
+	        case QQ.QQ_STATUS_HIDDEN:
+	            return PresenceType.xa;
+	        case QQ.QQ_STATUS_OFFLINE:
+	            return PresenceType.unavailable;
+	        case QQ.QQ_STATUS_ONLINE:
+	            return PresenceType.chat;
+	        default:
+	            return PresenceType.unknown;
         }
     }
 

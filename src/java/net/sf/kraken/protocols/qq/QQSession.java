@@ -1,5 +1,7 @@
 package net.sf.kraken.protocols.qq;
 
+import net.sf.kraken.protocols.yahoo.YahooBuddy;
+import net.sf.kraken.protocols.yahoo.YahooTransport;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
@@ -7,7 +9,10 @@ import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
+import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.JiveGlobals;
+import org.jivesoftware.util.NotFoundException;
+import org.openymsg.network.YahooUser;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
@@ -259,6 +264,15 @@ public class QQSession extends TransportSession implements IQQListener {
         } catch (Exception ex) {
         	Log.error("Failed to process friend list: ", ex);
         }
+        
+        // Lets try the actual sync.
+        try {
+            getTransport().syncLegacyRoster(getJID(), getBuddyManager().getBuddies());
+        }
+        catch (UserNotFoundException ex) {
+            Log.debug("Unable to sync yahoo contact list for " + getJID());
+        }
+        
         getBuddyManager().activate();
     }
 
@@ -439,11 +453,19 @@ public class QQSession extends TransportSession implements IQQListener {
             GetOnlineOpReplyPacket p =
                     (GetOnlineOpReplyPacket) e.getSource();
             for (FriendOnlineEntry f : p.onlineFriends) {
-                Presence pp = new Presence();
-                pp.setFrom(getTransport().convertIDToJID(String.valueOf(f.status.qqNum)));
-                pp.setTo(getJID());
-                pp.setShow(Presence.Show.chat);
-                getTransport().sendPacket(pp);
+                if (getBuddyManager().isActivated()) {
+                    try {
+                        TransportBuddy trBuddy = getBuddyManager().getBuddy(getTransport().convertIDToJID(String.valueOf(f.status.qqNum)));
+                        trBuddy.setPresenceAndStatus(((QQTransport)getTransport()).convertQQStatusToXMPP(f.status.status), null);
+                    }
+                    catch (NotFoundException ee) {
+                        // Not in our list.
+                        Log.debug("QQ: Received presense notification for contact we don't care about: "+String.valueOf(f.status.qqNum));
+                    }
+                }
+                else {
+                	getBuddyManager().storePendingStatus(getTransport().convertIDToJID(String.valueOf(f.status.qqNum)), ((QQTransport)getTransport()).convertQQStatusToXMPP(f.status.status), null);
+                }
             }
             if (!p.finished) {
                 qqclient.user_GetOnline(p.position);
@@ -457,12 +479,19 @@ public class QQSession extends TransportSession implements IQQListener {
         try {
             FriendChangeStatusPacket p =
                     (FriendChangeStatusPacket) e.getSource();
-            Presence presence = new Presence();
-            presence.setFrom(getTransport().convertIDToJID(String.valueOf(p.friendQQ)));
-            presence.setTo(getJID());
-            ((QQTransport) getTransport()).setUpPresencePacket(presence,
-                    p.status);
-            getTransport().sendPacket(presence);
+            if (getBuddyManager().isActivated()) {
+                try {
+                    TransportBuddy trBuddy = getBuddyManager().getBuddy(getTransport().convertIDToJID(String.valueOf(p.friendQQ)));
+                    trBuddy.setPresenceAndStatus(((QQTransport)getTransport()).convertQQStatusToXMPP(p.status), null);
+                }
+                catch (NotFoundException ee) {
+                    // Not in our list.
+                    Log.debug("QQ: Received presense notification for contact we don't care about: "+String.valueOf(p.friendQQ));
+                }
+            }
+            else {
+            	getBuddyManager().storePendingStatus(getTransport().convertIDToJID(String.valueOf(p.friendQQ)), ((QQTransport)getTransport()).convertQQStatusToXMPP(p.status), null);
+            }
         } catch (Exception ex) {
             Log.error("Failed to handle friend status change event: ", ex);
         }
