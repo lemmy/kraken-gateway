@@ -248,7 +248,6 @@ public class QQSession extends TransportSession implements IQQListener {
         try {
             GetFriendListReplyPacket p =
                     (GetFriendListReplyPacket) e.getSource();
-            getBuddyManager().activate();
             for (QQFriend f : p.friends) {
                 friends.put(f.qqNum, f);
             }
@@ -260,6 +259,7 @@ public class QQSession extends TransportSession implements IQQListener {
         } catch (Exception ex) {
         	Log.error("Failed to process friend list: ", ex);
         }
+        getBuddyManager().activate();
     }
 
     public void syncContactGroups() {
@@ -271,7 +271,7 @@ public class QQSession extends TransportSession implements IQQListener {
             List<String> gl = new ArrayList<String>();
             gl.add(groupName);
             TransportBuddy tb = new TransportBuddy(getBuddyManager(),
-                    f.qqNum + "", f.nick, gl);
+                    String.valueOf(f.qqNum), f.nick, gl);
             getBuddyManager().storeBuddy(tb);
         }
 
@@ -324,11 +324,10 @@ public class QQSession extends TransportSession implements IQQListener {
             gl.add(JiveGlobals.getProperty("plugin.gateway.qq.qqGroupName",
                                            "QQ Group"));
             TransportBuddy tb = new TransportBuddy(getBuddyManager(),
-                    info.externalId + "", info.name, gl);
+            		String.valueOf(info.externalId), info.name, gl);
             getBuddyManager().storeBuddy(tb);
             Presence pp = new Presence();
-            pp.setFrom(getTransport().convertIDToJID("" +
-                    info.externalId));
+            pp.setFrom(getTransport().convertIDToJID(String.valueOf(info.externalId)));
             pp.setTo(getJID());
             pp.setShow(Presence.Show.chat);
             getTransport().sendPacket(pp);
@@ -400,7 +399,7 @@ public class QQSession extends TransportSession implements IQQListener {
             Message m = new Message();
             m.setType(Message.Type.chat);
             m.setTo(getJID());
-            m.setFrom(getTransport().convertIDToJID("" + im.externalId));
+            m.setFrom(getTransport().convertIDToJID(String.valueOf(im.externalId)));
             String b = " ";
             try {
                 b = new String(msg);
@@ -421,8 +420,7 @@ public class QQSession extends TransportSession implements IQQListener {
             Message m = new Message();
             m.setType(Message.Type.chat);
             m.setTo(getJID());
-            m.setFrom(getTransport().convertIDToJID("" +
-                    p.normalHeader.sender));
+            m.setFrom(getTransport().convertIDToJID(String.valueOf(p.normalHeader.sender)));
             String b = " ";
             try {
                 b = new String(im.messageBytes);
@@ -442,8 +440,7 @@ public class QQSession extends TransportSession implements IQQListener {
                     (GetOnlineOpReplyPacket) e.getSource();
             for (FriendOnlineEntry f : p.onlineFriends) {
                 Presence pp = new Presence();
-                pp.setFrom(getTransport().convertIDToJID("" +
-                        f.status.qqNum));
+                pp.setFrom(getTransport().convertIDToJID(String.valueOf(f.status.qqNum)));
                 pp.setTo(getJID());
                 pp.setShow(Presence.Show.chat);
                 getTransport().sendPacket(pp);
@@ -461,7 +458,7 @@ public class QQSession extends TransportSession implements IQQListener {
             FriendChangeStatusPacket p =
                     (FriendChangeStatusPacket) e.getSource();
             Presence presence = new Presence();
-            presence.setFrom(getTransport().convertIDToJID("" + p.friendQQ));
+            presence.setFrom(getTransport().convertIDToJID(String.valueOf(p.friendQQ)));
             presence.setTo(getJID());
             ((QQTransport) getTransport()).setUpPresencePacket(presence,
                     p.status);

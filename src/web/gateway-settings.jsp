@@ -352,6 +352,9 @@
     <!-- Tests Window -->
     <div class="jive-gatewayPanel" id="jive<%= this.gatewayType.toString().toUpperCase() %>tests" style="display: none;">
         <div>
+			<% if (this.gatewayType.toString().equals("qq")) { %>
+			<b>Tests not supported for QQ (yet).</b>
+			<% } else { %>
             <form id="jive<%= this.gatewayType.toString().toUpperCase() %>testsform" action="" onSubmit="return false">
                 <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttohost", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testhost"><%= connectHost %></span><br />
                 <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttoport", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testport"><%= connectPort %></span><br />
@@ -359,6 +362,7 @@
                 <span id="<%= this.gatewayType.toString() %>testsresults" class="saveResultsMsg"></span>
                 <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.testconnection", "kraken") %>" onclick="testConnect('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
             </form>
+			<% } %>
         </div>
     </div>
     <!-- Options Window -->
