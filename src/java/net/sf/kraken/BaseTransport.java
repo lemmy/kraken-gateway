@@ -598,7 +598,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             if (from.getNode() == null || RegistrationManager.getInstance().isRegistered(from, this.transportType) || permissionManager.hasAccess(from)) {
                 Element response = DocumentHelper.createElement(QName.get("query", NameSpace.DISCO_INFO));
                 response.addElement("identity")
-                        .addAttribute("category", "kraken")
+                        .addAttribute("category", "gateway")
                         .addAttribute("type", this.transportType.discoIdentity())
                         .addAttribute("name", this.description);
                 response.addElement("feature")
