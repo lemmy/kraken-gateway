@@ -17,17 +17,15 @@
 	<classpathentry kind="lib" path="lib/joscar-protocol.jar"/>
 	<classpathentry kind="lib" path="lib/jsocks.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/lumaqq.jar"/>
 	<classpathentry kind="lib" path="lib/martyr.jar"/>
 	<classpathentry kind="lib" path="lib/openymsg.jar"/>
 	<classpathentry kind="lib" path="lib/smack.jar"/>
 	<classpathentry kind="lib" path="lib/smackx.jar"/>
 	<classpathentry kind="lib" path="lib/xmlrpc.jar"/>
-	<classpathentry kind="lib" path="target/release/gateway/plugins/gateway.jar"/>
-	<classpathentry kind="lib" path="target/release/tmp/gateway_1_2_4d/plugins/gateway.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/openfire"/>
-	<classpathentry kind="lib" path="/openfire/target/openfire/lib/openfire.jar"/>
 	<classpathentry kind="lib" path="/openfire/build/lib/dist/servlet.jar"/>
+	<classpathentry kind="lib" path="lib/jqql.jar"/>
+	<classpathentry kind="lib" path="/openfire/work/classes"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

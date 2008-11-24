@@ -1,5 +1,6 @@
 package net.sf.kraken.protocols.qq;
 
+import net.sf.jqql.QQ;
 import net.sf.kraken.*;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
@@ -7,10 +8,7 @@ import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.jivesoftware.util.LocaleUtils;
-import org.openymsg.network.Status;
 import org.xmpp.packet.JID;
-import org.xmpp.packet.Presence;
-import edu.tsinghua.lumaqq.qq.QQ;
 
 
 /**

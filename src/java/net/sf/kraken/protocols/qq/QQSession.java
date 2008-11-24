@@ -1,7 +1,24 @@
 package net.sf.kraken.protocols.qq;
 
-import net.sf.kraken.protocols.yahoo.YahooBuddy;
-import net.sf.kraken.protocols.yahoo.YahooTransport;
+import net.sf.jqql.QQ;
+import net.sf.jqql.QQClient;
+import net.sf.jqql.beans.ClusterIM;
+import net.sf.jqql.beans.ClusterInfo;
+import net.sf.jqql.beans.DownloadFriendEntry;
+import net.sf.jqql.beans.FriendOnlineEntry;
+import net.sf.jqql.beans.NormalIM;
+import net.sf.jqql.beans.QQFriend;
+import net.sf.jqql.beans.QQUser;
+import net.sf.jqql.events.IQQListener;
+import net.sf.jqql.events.QQEvent;
+import net.sf.jqql.net.PortGateFactory;
+import net.sf.jqql.packets.in.ClusterCommandReplyPacket;
+import net.sf.jqql.packets.in.DownloadGroupFriendReplyPacket;
+import net.sf.jqql.packets.in.FriendChangeStatusPacket;
+import net.sf.jqql.packets.in.GetFriendListReplyPacket;
+import net.sf.jqql.packets.in.GetOnlineOpReplyPacket;
+import net.sf.jqql.packets.in.GroupDataOpReplyPacket;
+import net.sf.jqql.packets.in.ReceiveIMPacket;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
@@ -12,7 +29,6 @@ import net.sf.kraken.type.TransportLoginStatus;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.NotFoundException;
-import org.openymsg.network.YahooUser;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
@@ -21,26 +37,8 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.tsinghua.lumaqq.qq.QQ;
-import edu.tsinghua.lumaqq.qq.QQClient;
-import edu.tsinghua.lumaqq.qq.beans.QQUser;
-import edu.tsinghua.lumaqq.qq.beans.QQFriend;
-import edu.tsinghua.lumaqq.qq.beans.ClusterIM;
-import edu.tsinghua.lumaqq.qq.net.PortGateFactory;
-import edu.tsinghua.lumaqq.qq.events.IQQListener;
-import edu.tsinghua.lumaqq.qq.events.QQEvent;
-import java.util.Date;
-import edu.tsinghua.lumaqq.qq.packets.in.GetFriendListReplyPacket;
-import edu.tsinghua.lumaqq.qq.packets.in.DownloadGroupFriendReplyPacket;
-import edu.tsinghua.lumaqq.qq.beans.DownloadFriendEntry;
-import edu.tsinghua.lumaqq.qq.beans.ClusterInfo;
 import java.util.*;
-import edu.tsinghua.lumaqq.qq.packets.in.*;
 import java.text.SimpleDateFormat;
-import edu.tsinghua.lumaqq.qq.beans.NormalIM;
-import edu.tsinghua.lumaqq.qq.beans.FriendOnlineEntry;
-import edu.tsinghua.lumaqq.qq.Util;
-import edu.tsinghua.lumaqq.qq.beans.Member;
 
 public class QQSession extends TransportSession implements IQQListener {
 
@@ -113,26 +111,26 @@ public class QQSession extends TransportSession implements IQQListener {
 
     }
 
-    public void addContact(JID jID, String string, ArrayList arrayList) {
-    	// TODO: Implement this
+    public void addContact(JID jid, String nickname, ArrayList<String> groups) {
+    	qqclient.addFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
     }
 
     public void removeContact(TransportBuddy transportBuddy) {
-    	// TODO: Implement this
+    	qqclient.deleteFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
     }
 
     public void updateContact(TransportBuddy transportBuddy) {
-    	// TODO: Implement this
+    	// There's nothing to change here currently.
     }
 
     public void sendMessage(JID jID, String message) {
         try {
             int qqNum = Integer.parseInt(getTransport().convertJIDToID(jID));
             if (clusters.get(qqNum) != null) {
-                qqclient.im_SendCluster(clusters.get(qqNum).clusterId,
+                qqclient.sendClusterIM(clusters.get(qqNum).clusterId,
                                         message);
             } else {
-                qqclient.im_Send(qqNum, message.getBytes());
+                qqclient.sendIM(qqNum, message.getBytes());
             }
 
         } catch (Exception ex) {
@@ -142,9 +140,11 @@ public class QQSession extends TransportSession implements IQQListener {
     }
 
     public void sendChatState(JID jID, ChatStateType chatStateType) {
+    	// either not supported by QQ, or not supported by the lumaqq library
     }
 
     public void sendBuzzNotification(JID jID, String string) {
+    	// either not supported by QQ, or not supported by the lumaqq library
     }
 
     public void logIn(PresenceType presenceType, String string) {
@@ -160,6 +160,7 @@ public class QQSession extends TransportSession implements IQQListener {
         qqclient.setConnectionPoolFactory(new PortGateFactory());
         //qqclient.setTcpLoginPort(8000);
         qqclient.addQQListener(this);
+        qquser.setServerPort(8000);
         qqclient.setLoginServer(qqserver);
         try {
 			qqclient.login();
@@ -190,56 +191,52 @@ public class QQSession extends TransportSession implements IQQListener {
     }
 
     public void qqEvent(QQEvent e) {
-        Log.debug(" QQEvent： " + Integer.toHexString(e.type) +
+        Log.debug(" QQEvent: " + Integer.toHexString(e.type) +
                            " " + e.getSource());
         switch (e.type) {
-        case QQEvent.LOGIN_FAIL:
+        case QQEvent.QQ_LOGIN_FAIL:
             sessionDisconnectedNoReconnect(null);
             break;
-        case QQEvent.LOGIN_NEED_VERIFY:
-        case QQEvent.LOGIN_UNKNOWN_ERROR:
-        case QQEvent.LOGIN_GET_TOKEN_FAIL:
+        case QQEvent.QQ_LOGIN_UNKNOWN_ERROR:
+        case QQEvent.QQ_CONNECTION_BROKEN:
+        case QQEvent.QQ_CONNECTION_LOST:
             sessionDisconnected(null);
             break;
-        case QQEvent.USER_STATUS_CHANGE_OK:
+        case QQEvent.QQ_CHANGE_STATUS_SUCCESS:
             processStatusChangeOK(e);
             break;
-        case QQEvent.USER_STATUS_CHANGE_FAIL:
-            sessionDisconnected(null);
-            break;
-        case QQEvent.FRIEND_DOWNLOAD_GROUPS_OK:
-            processGroupFriend(e);
-            break;
-        case QQEvent.FRIEND_GET_GROUP_NAMES_OK:
-            processGroupNames(e);
-            break;
-        case QQEvent.FRIEND_DOWNLOAD_GROUPS_FAIL:
-            sessionDisconnected(null);
-            break;
-        case QQEvent.CLUSTER_GET_INFO_OK:
+//        case QQEvent.USER_STATUS_CHANGE_FAIL:
+//            sessionDisconnected(null);
+//            break;
+//        case QQEvent.FRIEND_DOWNLOAD_GROUPS_OK:
+//            processGroupFriend(e);
+//            break;
+//        case QQEvent.FRIEND_GET_GROUP_NAMES_OK:
+//            processGroupNames(e);
+//            break;
+        case QQEvent.QQ_GET_CLUSTER_INFO_SUCCESS:
             processClusterInfo(e);
             break;
-        case QQEvent.CLUSTER_GET_MEMBER_INFO_OK:
-            processClusterMemberInfo(e);
-            break;
-        case QQEvent.IM_CLUSTER_RECEIVED:
+//        case QQEvent.QQ_GET_MEMBER_INFO_SUCCESS
+//            processClusterMemberInfo(e);
+//            break;
+        case QQEvent.QQ_RECEIVE_CLUSTER_IM:
             processClusterIM(e);
             break;
-        case QQEvent.IM_RECEIVED:
+        case QQEvent.QQ_RECEIVE_NORMAL_IM:
             processNormalIM(e);
             break;
-        case QQEvent.ERROR_CONNECTION_BROKEN:
-        case QQEvent.ERROR_NETWORK:
-        case QQEvent.SYS_TIMEOUT:
+        case QQEvent.QQ_NETWORK_ERROR:
+        case QQEvent.QQ_RUNTIME_ERROR:
             sessionDisconnected(null);
             break;
-        case QQEvent.FRIEND_GET_ONLINE_OK:
-            processFriendOnline(e);
-            break;
-        case QQEvent.FRIEND_STATUS_CHANGED:
+//        case QQEvent.FRIEND_GET_ONLINE_OK:
+//            processFriendOnline(e);
+//            break;
+        case QQEvent.QQ_FRIEND_CHANGE_STATUS:
             processFriendChangeStatus(e);
             break;
-        case QQEvent.FRIEND_GET_LIST_OK:
+        case QQEvent.QQ_GET_FRIEND_LIST_SUCCESS:
             processFriendList(e);
             break;
         default:
@@ -257,7 +254,7 @@ public class QQSession extends TransportSession implements IQQListener {
                 friends.put(f.qqNum, f);
             }
             if (p.position != 0xFFFF) {
-                qqclient.user_GetList(p.position);
+                qqclient.getFriendList(p.position);
             } else {
                 syncContactGroups();
             }
@@ -297,7 +294,7 @@ public class QQSession extends TransportSession implements IQQListener {
                     (DownloadGroupFriendReplyPacket) e.getSource();
             for (DownloadFriendEntry entry : p.friends) {
                 if (entry.isCluster()) {
-                    qqclient.cluster_GetInfo(entry.qqNum);
+                    qqclient.getClusterInfo(entry.qqNum);
                 } else {
                     if (groupNames != null && groupNames.size() > entry.group) {
                         friendGroup.put(entry.qqNum, groupNames.get(entry.group));
@@ -307,7 +304,7 @@ public class QQSession extends TransportSession implements IQQListener {
                 }
             }
             if (p.beginFrom != 0) {
-                qqclient.cluster_GetOnlineMember(p.beginFrom);
+                qqclient.getClusterOnlineMember(p.beginFrom);
             }
         } catch (Exception ex) {
             Log.error("Failed to process group friend: ", ex);
@@ -345,7 +342,7 @@ public class QQSession extends TransportSession implements IQQListener {
             pp.setTo(getJID());
             pp.setShow(Presence.Show.chat);
             getTransport().sendPacket(pp);
-            qqclient.cluster_GetMemberInfo(info.clusterId, p.members);
+            qqclient.getClusterMemberInfo(info.clusterId, p.members);
         } catch (Exception ex) {
             Log.error("Failed to process cluster info: ", ex);
         }
@@ -379,10 +376,10 @@ public class QQSession extends TransportSession implements IQQListener {
         p.setFrom(getTransport().getJID());
         p.setStatus("Chat");
         getTransport().sendPacket(p);
-        qqclient.user_GetGroupNames();
-        qqclient.user_DownloadGroups(0);
-        qqclient.user_GetList();
-        qqclient.user_GetOnline();
+        qqclient.getFriendList();
+        qqclient.downloadGroup();
+//        qqclient.user_GetList();
+//        qqclient.user_GetOnline();
 
     }
 
@@ -391,7 +388,7 @@ public class QQSession extends TransportSession implements IQQListener {
             ReceiveIMPacket p = (ReceiveIMPacket) e.getSource();
             ClusterIM im = p.clusterIM;
             if (clusters.get(im.externalId) == null) {
-                qqclient.user_DownloadGroups(0);
+                qqclient.downloadGroup();
             }
             String sDate = sdf.format(new Date(im.sendTime));
             String clusterName = "";
@@ -467,9 +464,9 @@ public class QQSession extends TransportSession implements IQQListener {
                 	getBuddyManager().storePendingStatus(getTransport().convertIDToJID(String.valueOf(f.status.qqNum)), ((QQTransport)getTransport()).convertQQStatusToXMPP(f.status.status), null);
                 }
             }
-            if (!p.finished) {
-                qqclient.user_GetOnline(p.position);
-            }
+//            if (!p.finished) {
+//                qqclient.getUser().user_GetOnline(p.position);
+//            }
         } catch (Exception ex) {
             Log.error("Failed to handle friend online event: ", ex);
         }
