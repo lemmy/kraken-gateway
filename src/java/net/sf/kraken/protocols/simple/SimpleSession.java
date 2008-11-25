@@ -678,8 +678,8 @@ public class SimpleSession extends TransportSession {
 	private Request prepareRequest(RequestType requestType, SipURI destUri, String toTag, SipURI requestUri, String callId, long seqNum) {
 		Request request  = null;
 		
-		String  myJiveId = this.jid.getNode();
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing request packet of type '" + requestType + "'");
+		String  myXMPPUsername = this.jid.getNode();
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing request packet of type '" + requestType + "'");
 		
 		try {
 			// Prepare request packet first
@@ -687,11 +687,11 @@ public class SimpleSession extends TransportSession {
 			request.setMethod(requestType.toString());
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing request.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing request.", e);
 		}
 		
 		// Prepare "From" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"From\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"From\" header...");
 		String mySipUsername = registration.getUsername();
 		try {
 			SipURI     fromUri         = addressFactory.createSipURI(mySipUsername, sipHost);
@@ -704,13 +704,13 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(fromHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing FromHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing FromHeader.", e);
 			
 			return null;
 		}
 		
 		// Prepare "To" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"To\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"To\" header...");
 		try {
 			if (destUri == null)
 				destUri = addressFactory.createSipURI(mySipUsername, sipHost);
@@ -722,13 +722,13 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(toHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing ToHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing ToHeader.", e);
 			
 			return null;
 		}
 		
 		// Prepare "Via" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"Via\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"Via\" header...");
 		try {
 			ViaHeader viaHeader = headerFactory.createViaHeader(InetAddress.getLocalHost().getHostAddress(), sipPort, ListeningPoint.UDP, null);
 			
@@ -736,13 +736,13 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(viaHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing ViaHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing ViaHeader.", e);
 			
 			return null;
 		}
 		
 		// Prepare "CallId" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"CallId\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"CallId\" header...");
 		CallIdHeader callIdHeader;
 		try {
 			if (callId != null)
@@ -754,13 +754,13 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(callIdHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing CallIdHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing CallIdHeader.", e);
 			
 			return null;
 		}
 		
 		// Prepare "CSeq" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"CSeq\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"CSeq\" header...");
 		try {
 			CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(seqNum, requestType.toString());
 			
@@ -768,13 +768,13 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(cSeqHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing CSeqHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing CSeqHeader.", e);
 			
 			return null;
 		}
 		
 		// Prepare "MaxForwards" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"MaxForwards\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"MaxForwards\" header...");
 		try {
 			MaxForwardsHeader maxForwardsHeader = headerFactory.createMaxForwardsHeader(70);
 			
@@ -782,13 +782,13 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(maxForwardsHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing MaxForwardsHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing MaxForwardsHeader.", e);
 			
 			return null;
 		}
 		
 		// Setting Request URI
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  setting request URI...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  setting request URI...");
 		try {
 			if (requestUri == null) {
 				requestUri = (SipURI) destUri.clone();
@@ -797,13 +797,13 @@ public class SimpleSession extends TransportSession {
 			request.setRequestURI(requestUri);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when setting request URI.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when setting request URI.", e);
 			
 			return null;
 		}
 		
 		// Add "Contact" header
-		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"Contact\" header...");
+		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"Contact\" header...");
 		try {
 			SipURI contactURI = addressFactory.createSipURI(mySipUsername, InetAddress.getLocalHost().getHostAddress());
 			contactURI.setPort(sipPort);
@@ -816,7 +816,7 @@ public class SimpleSession extends TransportSession {
 			request.setHeader(contactHeader);
 		}
 		catch (Exception e) {
-			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when adding ContactHeader.", e);
+			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when adding ContactHeader.", e);
 			
 			return null;
 		}
@@ -851,13 +851,13 @@ public class SimpleSession extends TransportSession {
 //			int            maxForward,
 //			List<Header>   headers,
 //			MessageContent content) {
-//		String myJiveId      = this.jid.getNode();
+//		String myXMPPUsername      = this.jid.getNode();
 //		String mySipUsername = registration.getUsername();
 //
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing request packet of type '" + requestType + "'");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing request packet of type '" + requestType + "'");
 //
 //		// Prepare "From" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"From\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"From\" header...");
 //		FromHeader fromHeader = null;
 //		try {
 //			SipURI     fromUri         = addressFactory.createSipURI(mySipUsername, sipHost);
@@ -867,13 +867,13 @@ public class SimpleSession extends TransportSession {
 //			fromHeader = headerFactory.createFromHeader(fromNameAddress, getTag());
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing FromHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing FromHeader.", e);
 //
 //			return false;
 //		}
 //
 //		// Prepare "To" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"To\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"To\" header...");
 //		ToHeader toHeader = null;
 //
 //		String destUsername = "";
@@ -887,10 +887,10 @@ public class SimpleSession extends TransportSession {
 //		if (destination.indexOf("@") > 0) {
 //			destUsername = destination.substring(destination.indexOf(":") + 1, destination.indexOf("@"));
 //			destAddress  = destination.substring(destination.indexOf("@") + 1);
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  destUsername = '" + destUsername + "';  destAddress = '" + destAddress + "'");
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  destUsername = '" + destUsername + "';  destAddress = '" + destAddress + "'");
 //		}
 //		else {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing ToHeader.",
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing ToHeader.",
 //			          new IllegalArgumentException("The destination specified is not a valid SIP address"));
 //
 //			return false;
@@ -912,26 +912,26 @@ public class SimpleSession extends TransportSession {
 //			toHeader = headerFactory.createToHeader(toNameAddress, toTag);
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing ToHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing ToHeader.", e);
 //
 //			return false;
 //		}
 //
 //		// Prepare "Via" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"Via\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"Via\" header...");
 //		ArrayList viaHeaders = new ArrayList();
 //		try {
 //			ViaHeader viaHeader  = headerFactory.createViaHeader(InetAddress.getLocalHost().getHostAddress(), sipPort, ListeningPoint.UDP, null);
 //			viaHeaders.add(viaHeader);
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing ViaHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing ViaHeader.", e);
 //
 //			return false;
 //		}
 //
 //		// Prepare "CallId" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"CallId\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"CallId\" header...");
 //		CallIdHeader callIdHeader = null;
 //		try {
 //			if (callId != null)
@@ -940,50 +940,50 @@ public class SimpleSession extends TransportSession {
 //				callIdHeader = udpSipProvider.getNewCallId();
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing CallIdHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing CallIdHeader.", e);
 //
 //			return false;
 //		}
 //
 //		// Prepare "CSeq" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"CSeq\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"CSeq\" header...");
 //		CSeqHeader cSeqHeader = null;
 //		try {
 //			cSeqHeader = headerFactory.createCSeqHeader(seqNum, requestType.toString());
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing CSeqHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing CSeqHeader.", e);
 //
 //			return false;
 //		}
 //
 //		// Prepare "MaxForwards" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"MaxForwards\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"MaxForwards\" header...");
 //		MaxForwardsHeader maxForwardsHeader = null;
 //		try {
 //			maxForwardsHeader = headerFactory.createMaxForwardsHeader(maxForward);
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing MaxForwardsHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing MaxForwardsHeader.", e);
 //
 //			return false;
 //		}
 //
 //		// Prepare request URI
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing request URI...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing request URI...");
 //		SipURI requestURI = null;
 //		try {
 //			requestURI = addressFactory.createSipURI(destUsername, destAddress);
 //			requestURI.setTransportParam(ListeningPoint.UDP);
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when preparing Request URI.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when preparing Request URI.", e);
 //
 //			return false;
 //		}
 //
 //		// Instantiate Request packet
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Instantiating Request packet...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Instantiating Request packet...");
 //		Request request = null;
 //		try {
 //			request = messageFactory.createRequest(
@@ -994,13 +994,13 @@ public class SimpleSession extends TransportSession {
 //					);
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when instantiating Request packet.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when instantiating Request packet.", e);
 //
 //			return false;
 //		}
 //
 //		// Add custom headers
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Start adding custom headers...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Start adding custom headers...");
 //		int headerCount = 0;
 //		if (headers != null) {
 //			headerCount = headers.size();
@@ -1010,20 +1010,20 @@ public class SimpleSession extends TransportSession {
 //					request.addHeader(aHeader);
 //				}
 //				catch (Exception e) {
-//					Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when adding a " +
+//					Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when adding a " +
 //					          aHeader.getClass().toString() + " to the request packet.", e);
 //					headerCount--;
 //				}
 //			}
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Finished adding custom headers.  " +
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Finished adding custom headers.  " +
 //			          headerCount + " of " + headers.size() + " headers successfully added.");
 //		}
 //		else {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  The custom headers input is null.  No custom headers to add.");
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  The custom headers input is null.  No custom headers to add.");
 //		}
 //
 //		// Add "Contact" header
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Preparing \"Contact\" header...");
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Preparing \"Contact\" header...");
 //		try {
 //			SipURI contactURI;
 //			if (requestType.equals(RequestType.NOTIFY))
@@ -1041,30 +1041,30 @@ public class SimpleSession extends TransportSession {
 //			request.addHeader(contactHeader);
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when adding ContactHeader.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when adding ContactHeader.", e);
 //
 //			return false;
 //		}
 //
 //		if (content != null) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Content is specified.  Adding content...");
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Content is specified.  Adding content...");
 //			try {
 //				request.setContent(content.getContent(), content.getContentTypeHeader());
 //			}
 //			catch (Exception e) {
-//				Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when adding content to the request packet.", e);
+//				Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when adding content to the request packet.", e);
 //				// Just tell, then continue the request!
 //			}
 //		}
 //
 //		// Send the request
-//		Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Sending Request packet:  \n" + request.toString());
+//		Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Sending Request packet:  \n" + request.toString());
 //		try {
 //			ClientTransaction clientTransaction = udpSipProvider.getNewClientTransaction(request);
 //			clientTransaction.sendRequest();
 //		}
 //		catch (Exception e) {
-//			Log.debug("SimpleSession(" + myJiveId + ").prepareRequest:  Exception occured when sending Request packet.", e);
+//			Log.debug("SimpleSession(" + myXMPPUsername + ").prepareRequest:  Exception occured when sending Request packet.", e);
 //			return false;
 //		}
 //

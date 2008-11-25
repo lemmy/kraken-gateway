@@ -70,7 +70,7 @@ public class SimpleListener implements SipListener {
     }
 
     /**
-	 * Stores the Jive username using this SIMPLE session listener.
+	 * Stores the XMPP server username using this SIMPLE session listener.
 	 * <br><br>
 	 * The storage is for logging purpose.
 	 */
