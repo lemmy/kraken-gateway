@@ -472,7 +472,7 @@
 
 <head>
 <title><fmt:message key="gateway.web.settings.title" /></title>
-<meta name="pageID" content="gateway-settings">
+<meta name="pageID" content="kraken-settings">
 <style type="text/css">
 <!-- @import url("style/kraken.css"); -->
 </style>

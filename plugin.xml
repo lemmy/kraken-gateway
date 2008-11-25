@@ -20,13 +20,13 @@
         <tab id="tab-server">
 		
             <sidebar id="gateways" name="${gateway.gateways}" description="${gateway.gateways.desc}">
-                <item id="gateway-settings" 
+                <item id="kraken-settings" 
                       name="${gateway.settings}"
-                      url="gateway-settings.jsp"
+                      url="kraken-settings.jsp"
                       description="${gateway.settings.desc}"/>
-                <item id="gateway-registrations" 
+                <item id="kraken-registrations" 
                       name="${gateway.registrations}"
-                      url="gateway-registrations.jsp"
+                      url="kraken-registrations.jsp"
                       description="${gateway.registrations.desc}"/>
             </sidebar>
 		

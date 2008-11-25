@@ -276,7 +276,7 @@
 
 <head>
 <title><fmt:message key="gateway.web.registrations.title" /></title>
-<meta name="pageID" content="gateway-registrations">
+<meta name="pageID" content="kraken-registrations">
 <style type="text/css">
 <!--	@import url("style/kraken.css");    -->
 </style>
