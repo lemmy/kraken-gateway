@@ -278,7 +278,7 @@
 <title><fmt:message key="gateway.web.registrations.title" /></title>
 <meta name="pageID" content="gateway-registrations">
 <style type="text/css">
-<!--	@import url("style/gateways.css");    -->
+<!--	@import url("style/kraken.css");    -->
 </style>
 <script src="dwr/engine.js" type="text/javascript"></script>
 <script src="dwr/util.js" type="text/javascript"></script>
