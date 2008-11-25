@@ -1,15 +1,12 @@
 /**
- * $RCSfile$
- * $Revision: 3144 $
- * $Date: 2005-12-01 14:20:11 -0300 (Thu, 01 Dec 2005) $
+ * $Revision$
+ * $Date$
  *
- * Copyright (C) 2004-2008 Jive Software. All rights reserved.
+ * Copyright (C) 2008 Daniel Henninger. All rights reserved.
  *
  * This software is published under the terms of the GNU Public License (GPL),
- * a copy of which is included in this distribution, or a commercial license
- * agreement with Jive.
+ * a copy of which is included in this distribution.
  */
-
 package net.sf.kraken.protocols.xmpp.packet;
 
 import org.jivesoftware.smack.packet.PacketExtension;
