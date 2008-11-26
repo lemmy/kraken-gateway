@@ -110,22 +110,33 @@ public class QQSession extends TransportSession implements IQQListener {
 
     public void updateStatus(PresenceType presenceType, String string) {
         if (isLoggedIn()) {
-            try { 
-                qquser.setStatus(((QQTransport) getTransport()).
-                                 convertJabStatusToQQ(presenceType));
-            } catch (IllegalStateException e) {
-                // Nothing to do
-            }
+        	if (presenceType.equals(PresenceType.away) ||
+        			presenceType.equals(PresenceType.xa) ||
+        			presenceType.equals(PresenceType.dnd)) {
+        		qqclient.makeMeAway();
+        	}
+        	else {
+        		qqclient.makeMeOnline();
+        	}
+//            try { 
+//                qquser.setStatus(((QQTransport) getTransport()).
+//                                 convertJabStatusToQQ(presenceType));
+//            } catch (IllegalStateException e) {
+//                // Nothing to do
+//            	Log.debug("Failed to change QQ status: ", e);
+//            }
         }
 
     }
 
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
-    	qqclient.addFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
+    	//qqclient.addFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
+    	qqclient.sendAddFriendAuth(Integer.valueOf(getTransport().convertJIDToID(jid)), "Please accept my friend request!");
+    	qqclient.downloadFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
     }
 
     public void removeContact(TransportBuddy transportBuddy) {
-    	qqclient.deleteFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
+    	qqclient.deleteFriend(Integer.valueOf(getTransport().convertJIDToID(transportBuddy.getJID())));
     }
 
     public void updateContact(TransportBuddy transportBuddy) {
@@ -214,21 +225,21 @@ public class QQSession extends TransportSession implements IQQListener {
         case QQEvent.QQ_CHANGE_STATUS_SUCCESS:
             processStatusChangeOK(e);
             break;
-//        case QQEvent.USER_STATUS_CHANGE_FAIL:
-//            sessionDisconnected(null);
-//            break;
-//        case QQEvent.FRIEND_DOWNLOAD_GROUPS_OK:
-//            processGroupFriend(e);
-//            break;
-//        case QQEvent.FRIEND_GET_GROUP_NAMES_OK:
-//            processGroupNames(e);
-//            break;
+        case QQEvent.QQ_CHANGE_STATUS_FAIL:
+            sessionDisconnected(null);
+            break;
+        case QQEvent.QQ_DOWNLOAD_GROUP_FRIEND_SUCCESS:
+            processGroupFriend(e);
+            break;
+        case QQEvent.QQ_DOWNLOAD_GROUP_NAME_SUCCESS:
+            processGroupNames(e);
+            break;
         case QQEvent.QQ_GET_CLUSTER_INFO_SUCCESS:
             processClusterInfo(e);
             break;
-//        case QQEvent.QQ_GET_MEMBER_INFO_SUCCESS
-//            processClusterMemberInfo(e);
-//            break;
+        case QQEvent.QQ_GET_MEMBER_INFO_SUCCESS:
+            processClusterMemberInfo(e);
+            break;
         case QQEvent.QQ_RECEIVE_CLUSTER_IM:
             processClusterIM(e);
             break;
@@ -239,9 +250,9 @@ public class QQSession extends TransportSession implements IQQListener {
         case QQEvent.QQ_RUNTIME_ERROR:
             sessionDisconnected(null);
             break;
-//        case QQEvent.FRIEND_GET_ONLINE_OK:
-//            processFriendOnline(e);
-//            break;
+        case QQEvent.QQ_GET_FRIEND_ONLINE_SUCCESS:
+            processFriendOnline(e);
+            break;
         case QQEvent.QQ_FRIEND_CHANGE_STATUS:
             processFriendChangeStatus(e);
             break;
@@ -387,6 +398,7 @@ public class QQSession extends TransportSession implements IQQListener {
         getTransport().sendPacket(p);
         qqclient.getFriendList();
         qqclient.downloadGroup();
+        qqclient.getFriendOnline();
 //        qqclient.user_GetList();
 //        qqclient.user_GetOnline();
 
