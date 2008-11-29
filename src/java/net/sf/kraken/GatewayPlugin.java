@@ -22,11 +22,13 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
+import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.xmpp.component.ComponentManager;
 import org.xmpp.component.ComponentManagerFactory;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Hashtable;
@@ -62,6 +64,20 @@ public class GatewayPlugin implements Plugin {
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
         this.pluginDirectory = pluginDirectory;
         this.pluginManager = manager;
+        
+        // Check if the IM Gateway plugin is installed and stop loading this plugin if found
+        File pluginDir = new File(JiveGlobals.getHomeDirectory(), "plugins");
+        File[] jars = pluginDir.listFiles(new FileFilter() {
+            public boolean accept(File pathname) {
+                String fileName = pathname.getName().toLowerCase();
+                return (fileName.equalsIgnoreCase("gateway.jar"));
+            }
+        });
+        if (jars.length > 0) {
+            // Do not load this plugin since the original IM Gateway plugin is still installed
+            System.out.println("IM Gateway plugin found. Stopping Kraken");
+            throw new IllegalStateException("This plugin cannot run next to the IM Gateway plugin");
+        }
 
         transports = new Hashtable<String,TransportInstance>();
         ComponentManager componentManager = ComponentManagerFactory.getComponentManager();
