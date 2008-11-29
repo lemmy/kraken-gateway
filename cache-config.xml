@@ -1,6 +1,6 @@
 <cache-config>
     <cache-mapping>
-        <cache-name>Gateway Session Location Cache</cache-name>
+        <cache-name>Kraken Session Location Cache</cache-name>
         <scheme-name>optimistic</scheme-name>
         <init-params>
             <init-param>
@@ -18,7 +18,7 @@
         </init-params>
     </cache-mapping>
     <cache-mapping>
-        <cache-name>Gateway Registration Cache</cache-name>
+        <cache-name>Kraken Registration Cache</cache-name>
         <scheme-name>optimistic</scheme-name>
         <init-params>
             <init-param>

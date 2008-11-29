@@ -10,7 +10,7 @@
 
 package net.sf.kraken.web;
 
-import net.sf.kraken.GatewayPlugin;
+import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.permissions.PermissionManager;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.type.TransportType;
@@ -56,7 +56,7 @@ public class ConfigManager {
      */
     public boolean toggleTransport(String transportName) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
+        KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
         if (!plugin.serviceEnabled(transportName)) {
             plugin.enableService(transportName);
             return true;
@@ -75,7 +75,7 @@ public class ConfigManager {
      */
     public void saveSettings(String transportName, HashMap<String,String> options) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
+        KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
         Document optConfig = plugin.getOptionsConfig(TransportType.valueOf(transportName));
 
         Element leftPanel = optConfig.getRootElement().element("leftpanel");
@@ -211,7 +211,7 @@ public class ConfigManager {
      */
     public String addRegistration(String user, String transportType, String legacyUsername, String legacyPassword, String legacyNickname) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
+        KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
         JID jid;
         if (user.contains("@")) {
             jid = new JID(user);
@@ -248,7 +248,7 @@ public class ConfigManager {
      */
     public String deleteRegistration(Integer registrationID) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
+        KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
         try {
             Registration reg = new Registration(registrationID);
             if (!plugin.getTransportInstance(reg.getTransportType().toString()).isEnabled()) {
@@ -281,7 +281,7 @@ public class ConfigManager {
      */
     public String updateRegistration(Integer registrationID, String legacyUsername, String legacyPassword, String legacyNickname) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
+        KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
         try {
             Registration reg = new Registration(registrationID);
             if (!plugin.getTransportInstance(reg.getTransportType().toString()).isEnabled()) {

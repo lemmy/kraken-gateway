@@ -178,8 +178,8 @@ public class YahooTransport extends BaseTransport {
     }
 
     static {
-        GatewayPlugin.setLoggerProperty("log4j.additivity.org.openymsg", "false");
-        GatewayPlugin.setLoggerProperty("log4j.logger.org.openymsg", "DEBUG, openfiredebug");
+        KrakenPlugin.setLoggerProperty("log4j.additivity.org.openymsg", "false");
+        KrakenPlugin.setLoggerProperty("log4j.logger.org.openymsg", "DEBUG, openfiredebug");
     }
 
 }

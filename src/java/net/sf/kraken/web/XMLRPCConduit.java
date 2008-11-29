@@ -10,7 +10,7 @@
 
 package net.sf.kraken.web;
 
-import net.sf.kraken.GatewayPlugin;
+import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.registration.RegistrationManager;
 import net.sf.kraken.type.TransportType;
@@ -178,7 +178,7 @@ public class XMLRPCConduit {
             return Arrays.asList("Authorization failed!");
         }
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
-        GatewayPlugin plugin = (GatewayPlugin)pluginManager.getPlugin("kraken");
+        KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
         List<String> activeTransports = new ArrayList<String>();
         for (String transport : plugin.getTransports()) {
             if (plugin.serviceEnabled(transport)) {

@@ -11,6 +11,7 @@ package net.sf.kraken.protocols.qq;
 
 import net.sf.jqql.QQ;
 import net.sf.jqql.QQClient;
+import net.sf.jqql.beans.Card;
 import net.sf.jqql.beans.ClusterIM;
 import net.sf.jqql.beans.ClusterInfo;
 import net.sf.jqql.beans.DownloadFriendEntry;

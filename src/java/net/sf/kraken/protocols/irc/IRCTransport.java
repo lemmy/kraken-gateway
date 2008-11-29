@@ -154,8 +154,8 @@ public class IRCTransport extends BaseTransport {
     }
 
     static {
-        GatewayPlugin.setLoggerProperty("log4j.additivity.f00f.net.irc.martyr", "false");
-        GatewayPlugin.setLoggerProperty("log4j.logger.f00f.net.irc.martyr", "DEBUG, openfiredebug");
+        KrakenPlugin.setLoggerProperty("log4j.additivity.f00f.net.irc.martyr", "false");
+        KrakenPlugin.setLoggerProperty("log4j.logger.f00f.net.irc.martyr", "DEBUG, openfiredebug");
     }
 
 }

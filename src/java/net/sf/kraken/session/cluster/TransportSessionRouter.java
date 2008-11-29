@@ -11,7 +11,7 @@
 package net.sf.kraken.session.cluster;
 
 import net.sf.kraken.BaseTransport;
-import net.sf.kraken.GatewayPlugin;
+import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.TransportInstance;
 import net.sf.kraken.session.TransportSession;
 
@@ -39,7 +39,7 @@ public class TransportSessionRouter implements ClusterEventListener {
 
     static Logger Log = Logger.getLogger(TransportSessionRouter.class);
 
-    public static final String TRANSPORTSESSION_CACHE_NAME = "Gateway Session Location Cache";
+    public static final String TRANSPORTSESSION_CACHE_NAME = "Kraken Session Location Cache";
 
     /**
      * Cache (unlimited, never expire) that holds the locations of a transport session.
@@ -49,17 +49,17 @@ public class TransportSessionRouter implements ClusterEventListener {
     public Cache<String, byte[]> sessionLocations;
 
     /**
-     * The instance of the gateway plugin we are attached to.
+     * The instance of the kraken plugin we are attached to.
      */
-    private WeakReference<GatewayPlugin> pluginRef;
+    private WeakReference<KrakenPlugin> pluginRef;
 
     /**
-     * Creates a transport session router instance associated with the gateway plugin.
+     * Creates a transport session router instance associated with the plugin.
      *
-     * @param plugin Gateway plugin instance we are associated with.
+     * @param plugin Kraken plugin instance we are associated with.
      */
-    public TransportSessionRouter(GatewayPlugin plugin) {
-        pluginRef = new WeakReference<GatewayPlugin>(plugin);
+    public TransportSessionRouter(KrakenPlugin plugin) {
+        pluginRef = new WeakReference<KrakenPlugin>(plugin);
         sessionLocations = CacheFactory.createCache(TRANSPORTSESSION_CACHE_NAME);
         ClusterManager.addListener(this);
     }
@@ -72,11 +72,11 @@ public class TransportSessionRouter implements ClusterEventListener {
     }
 
     /**
-     * Retrieves the reference to the gateway plugin we are associated with.
+     * Retrieves the reference to the plugin we are associated with.
      *
-     * @return GatewayPlugin instance.
+     * @return KrakenPlugin instance.
      */
-    public GatewayPlugin getPlugin() {
+    public KrakenPlugin getPlugin() {
         return pluginRef.get();
     }
 
@@ -139,7 +139,7 @@ public class TransportSessionRouter implements ClusterEventListener {
      * @see org.jivesoftware.openfire.cluster.ClusterEventListener#leftCluster(byte[])
      */
     public void leftCluster(byte[] leavingNodeID) {
-        GatewayPlugin plugin = getPlugin();
+        KrakenPlugin plugin = getPlugin();
         // TODO: Is this correct?  Lets say another node updates an entry before I get to it, will I see the update?
         for (Map.Entry<String,byte[]> entry : sessionLocations.entrySet()) {
             if (Arrays.equals(entry.getValue(), leavingNodeID)) {
@@ -148,7 +148,7 @@ public class TransportSessionRouter implements ClusterEventListener {
                     l.lock();
                     String jid = entry.getKey().substring(0, entry.getKey().lastIndexOf("@"));
                     String trType = entry.getKey().substring(entry.getKey().lastIndexOf("@")+1);
-                    Log.debug("Gateway: Node handling session "+jid+" on "+trType+" lost, taking over session...");
+                    Log.debug("Kraken: Node handling session "+jid+" on "+trType+" lost, taking over session...");
                     sessionLocations.remove(jid+"@"+trType);
                     TransportInstance trInstance = plugin.getTransportInstance(trType);
                     if (trInstance != null) {

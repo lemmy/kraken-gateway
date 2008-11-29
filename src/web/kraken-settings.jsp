@@ -1,6 +1,6 @@
 <%@ page import="javax.servlet.jsp.JspWriter,
                  org.jivesoftware.openfire.XMPPServer,
-                 net.sf.kraken.GatewayPlugin,
+                 net.sf.kraken.KrakenPlugin,
                  net.sf.kraken.type.TransportType"
     errorPage="error.jsp"
 %>
@@ -20,8 +20,8 @@
 <%@ taglib uri="http://java.sun.com/jstl/fmt_rt" prefix="fmt" %>
 
 <%
-    final GatewayPlugin plugin =
-            (GatewayPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
+    final KrakenPlugin plugin =
+            (KrakenPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
 
     final ArrayList<String> optionTypes = new ArrayList<String>();
 
@@ -44,7 +44,7 @@
         Integer globalPermSetting = 1;
         Boolean globalPermStrict = false;
 
-        GatewaySettings(JspWriter out, GatewayPlugin plugin, TransportType gatewayType,
+        GatewaySettings(JspWriter out, KrakenPlugin plugin, TransportType gatewayType,
                         String desc) {
             // Allow XMPP setting to be overridden.
             // TODO: Make this more generic.

@@ -3,7 +3,7 @@
                  org.jivesoftware.openfire.cluster.ClusterManager,
                  org.jivesoftware.openfire.cluster.ClusterNodeInfo,
                  org.jivesoftware.openfire.cluster.NodeID,
-                 net.sf.kraken.GatewayPlugin,
+                 net.sf.kraken.KrakenPlugin,
                  net.sf.kraken.registration.Registration,
                  net.sf.kraken.registration.RegistrationManager"
     errorPage="error.jsp"
@@ -26,8 +26,8 @@
 <jsp:useBean id="webManager" class="org.jivesoftware.util.WebManager" />
 
 <%
-    final GatewayPlugin plugin =
-            (GatewayPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
+    final KrakenPlugin plugin =
+            (KrakenPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
     HashMap<String, Boolean> trEnabled = new HashMap<String, Boolean>();
     trEnabled.put("aim", plugin.getTransportInstance("aim").isEnabled());
     trEnabled.put("gadugadu", plugin.getTransportInstance("gadugadu").isEnabled());

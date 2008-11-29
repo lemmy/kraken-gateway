@@ -55,7 +55,7 @@ public class RegistrationManager {
             "SELECT jid FROM ofGatewayRegistration WHERE transportType=?";
     private static final String UPDATE_REGISTRATION =
             "UPDATE ofGatewayRegistration SET jid=?,transportType=?,username=?,password=?,nickname=?,registrationDate=?,lastLogin=? WHERE registrationID=?";
-    public static final String GATEWAYREGISTRATIONS_CACHE_NAME = "Gateway Registration Cache";
+    public static final String GATEWAYREGISTRATIONS_CACHE_NAME = "Kraken Registration Cache";
 
     /* Cached known registrations. */
     /**

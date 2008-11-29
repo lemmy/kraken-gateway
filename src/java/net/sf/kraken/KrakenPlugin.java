@@ -36,7 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * IM Gateway plugin, which provides connectivity to IM networks that
+ * Kraken plugin, which provides connectivity to IM networks that
  * don't support the XMPP protocol. 
  *
  * The entire plugin is referred to as the gateway, while individual
@@ -44,7 +44,7 @@ import java.util.Set;
  *
  * @author Daniel Henninger
  */
-public class GatewayPlugin implements Plugin {
+public class KrakenPlugin implements Plugin {
 
     private File pluginDirectory;
     private PluginManager pluginManager;
@@ -55,7 +55,7 @@ public class GatewayPlugin implements Plugin {
      */
     public Hashtable<String,TransportInstance> transports;
 
-    public GatewayPlugin() {
+    public KrakenPlugin() {
         setLoggerProperty("log4j.appender.openfire", "net.sf.kraken.util.Log4JToOpenfireAppender");
         setLoggerProperty("log4j.appender.openfiredebug", "net.sf.kraken.util.DebugOnlyLog4JToOpenfireAppender");
         setLoggerProperty("log4j.rootLogger", "DEBUG, openfire");
