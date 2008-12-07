@@ -52,7 +52,7 @@ public class XMPPSession extends TransportSession {
     /**
      * Create an XMPP Session instance.
      *
-     * @param registration Registration informationed used for logging in.
+     * @param registration Registration information used for logging in.
      * @param jid JID associated with this session.
      * @param transport Transport instance associated with this session.
      * @param priority Priority of this session.
@@ -74,7 +74,7 @@ public class XMPPSession extends TransportSession {
             domain = connecthost;
         }
 
-        // For differenet domains other than 'gmail.com', which is given with Google Application services
+        // For different domains other than 'gmail.com', which is given with Google Application services
         if (registration.getUsername().indexOf("@") >- 1) {
             domain = registration.getUsername().substring( registration.getUsername().indexOf("@")+1 );
         }
@@ -151,12 +151,12 @@ public class XMPPSession extends TransportSession {
     }
 
     /**
-     * Returns a username based off of a registerd name (possible JID) passed in.
+     * Returns a username based off of a registered name (possible JID) passed in.
      *
      * If it already looks like a username, returns what was passed in.
      *
      * @param regName Registered name to turn into a username.
-     * @return Converted registerd name.
+     * @return Converted registered name.
      */
     public String generateUsername(String regName) {
         if (regName.indexOf("@") > -1) {
@@ -169,7 +169,7 @@ public class XMPPSession extends TransportSession {
         }
         else {
             if (getTransport().getType().equals(TransportType.gtalk)) {
-                return regName+"@"+"gmail.com";
+                return regName+"@gmail.com";
             }
             else {
                 return regName;

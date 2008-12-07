@@ -154,7 +154,7 @@ public class QQTransport extends BaseTransport {
 	        case QQ.QQ_STATUS_OFFLINE:
 	            return PresenceType.unavailable;
 	        case QQ.QQ_STATUS_ONLINE:
-	            return PresenceType.chat;
+	            return PresenceType.available;
 	        default:
 	            return PresenceType.unknown;
         }
