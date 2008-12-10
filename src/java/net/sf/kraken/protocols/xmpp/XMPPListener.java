@@ -174,7 +174,7 @@ public class XMPPListener implements MessageListener, RosterListener, Connection
     }
 
     public void connectionClosedOnError(Exception exception) {
-        getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionclosed"));
+        getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionclosed", "kraken"));
     }
 
     public void reconnectingIn(int i) {

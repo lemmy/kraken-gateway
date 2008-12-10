@@ -54,8 +54,7 @@ public class QQTransport extends BaseTransport {
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
     public String getTerminologyRegistration() {
-        return LocaleUtils.getLocalizedString("gateway.qq.registration",
-                                              "kraken");
+        return LocaleUtils.getLocalizedString("gateway.qq.registration", "kraken");
     }
 
     /**
