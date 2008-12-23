@@ -405,13 +405,13 @@ a.jive-gatewayButtonOn {
 	background-position: 2px 1px;
 	}
 .jive-gateway-SIMPLEon {
-        background: url(../images/simple.gif) no-repeat left;
-        background-position: 2px 1px;
-        }
+    background: url(../images/simple.gif) no-repeat left;
+    background-position: 2px 1px;
+    }
 .jive-gateway-SIMPLEoff {
-        background: url(../images/simple-gray.gif) no-repeat left;
-        background-position: 2px 1px;
-        }
+    background: url(../images/simple-gray.gif) no-repeat left;
+    background-position: 2px 1px;
+    }
 .jive-gateway-YAHOOon {
 	background-image: url(../images/yahoo.gif);
     background-repeat: no-repeat;
@@ -422,6 +422,23 @@ a.jive-gatewayButtonOn {
     background-repeat: no-repeat;
 	background-position: 0 1px;
 	}
+.jive-gateway-QQon {
+	background: url(../images/qq.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-QQoff {
+	background: url(../images/qq-gray.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-SAMETIMEon {
+	background: url(../images/sametime.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-SAMETIMEoff {
+	background: url(../images/sametime-gray.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+	
 
 /* *************************** */
 /* edit gateway registrations  */
