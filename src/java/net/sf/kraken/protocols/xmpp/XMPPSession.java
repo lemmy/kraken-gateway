@@ -295,6 +295,12 @@ public class XMPPSession extends TransportSession {
                 // Ignore
             }
             try {
+                conn.removePacketListener(listener);
+            }
+            catch (Exception e) {
+                // Ignore
+            }
+            try {
                 conn.getRoster().removeRosterListener(listener);
             }
             catch (Exception e) {
