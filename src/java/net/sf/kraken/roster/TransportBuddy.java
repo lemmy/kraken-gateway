@@ -516,20 +516,19 @@ public class TransportBuddy {
     }
 
     /**
-     * Returns the PHOTO vcard element for an avatar.
+     * Adds the PHOTO vcard element (representing an avatar) to an existing vcard.
      *
-     * This will return null if the avatar has not been set.  Otherwise will return either an empty
-     * PHOTO element or a properly formatted PHOTO element with base64 encoded data in it.  The null
-     * return implies that you shouldn't bother including the PHOTO element in the vcard.
-     *
-     * @return null or PHOTO element
+     * This will add the avatar to a vcard if there's one to add.  Otherwise will not add anything.
+     * If added, a properly formatted PHOTO element with base64 encoded data in it will be added.
+     * 
+     * param vcard vcard to add PHOTO element to
      */
-    public Element getVCardPhoto() {
+    public void addVCardPhoto(Element vcard) {
         if (!avatarSet) {
             Log.debug("TransportBuddy: I've got nothing! (no avatar set)");
-            return null;
+            return;
         }
-        Element photo = DocumentHelper.createElement("PHOTO");
+        Element photo = vcard.addElement("PHOTO");
         if (avatar != null) {
             try {
                 photo.addElement("TYPE").addCDATA(avatar.getMimeType());
@@ -539,7 +538,6 @@ public class TransportBuddy {
                 // No problem, leave it empty then.
             }
         }
-        return photo;
     }
 
     /**
@@ -558,11 +556,7 @@ public class TransportBuddy {
         vcard.addElement("NICKNAME").addCDATA(getNickname() == null ? getName() : getNickname());
 
         if (JiveGlobals.getBooleanProperty("plugin.gateway."+getManager().getSession().getTransport().getType()+".avatars", true)) {
-            Element photo = getVCardPhoto();
-            if (photo != null) {
-                Log.debug("Found a photo");
-                vcard.add(photo);
-            }
+            addVCardPhoto(vcard);
         }
 
         return vcard;
