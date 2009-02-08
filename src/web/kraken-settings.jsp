@@ -460,7 +460,6 @@
     GatewaySettings ircSettings = new GatewaySettings(out, plugin, TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.service", "kraken"));
     GatewaySettings msnSettings = new GatewaySettings(out, plugin, TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.service", "kraken"));
     GatewaySettings qqSettings = new GatewaySettings(out, plugin, TransportType.qq, LocaleUtils.getLocalizedString("gateway.qq.service", "kraken"));
-    GatewaySettings sametimeSettings = new GatewaySettings(out, plugin, TransportType.sametime, LocaleUtils.getLocalizedString("gateway.sametime.service", "kraken"));
     GatewaySettings simpleSettings = new GatewaySettings(out, plugin, TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.service", "kraken"));
     GatewaySettings xmppSettings = new GatewaySettings(out, plugin, TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.service", "kraken"));
     GatewaySettings yahooSettings = new GatewaySettings(out, plugin, TransportType.yahoo, LocaleUtils.getLocalizedString("gateway.yahoo.service", "kraken"));
@@ -817,7 +816,6 @@
 
 <% gtalkSettings.printSettingsDialog(); %>
 <% qqSettings.printSettingsDialog(); %>
-<% sametimeSettings.printSettingsDialog(); %>
 <% simpleSettings.printSettingsDialog(); %>
 <% xmppSettings.printSettingsDialog(); %>
 

@@ -36,7 +36,6 @@
     trEnabled.put("irc", plugin.getTransportInstance("irc").isEnabled());
     trEnabled.put("msn", plugin.getTransportInstance("msn").isEnabled());
     trEnabled.put("qq", plugin.getTransportInstance("qq").isEnabled());
-    trEnabled.put("sametime", plugin.getTransportInstance("sametime").isEnabled());
     trEnabled.put("simple", plugin.getTransportInstance("simple").isEnabled());
     trEnabled.put("xmpp", plugin.getTransportInstance("xmpp").isEnabled());
     trEnabled.put("yahoo", plugin.getTransportInstance("yahoo").isEnabled());
@@ -94,9 +93,6 @@
         if (webManager.getPageProperty("gateway-registrations", "filterQQ", 0) != 0) {
             filteropts.add("qq");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterSAMETIME", 0) != 0) {
-            filteropts.add("sametime");
-        }
         if (webManager.getPageProperty("gateway-registrations", "filterSIMPLE", 0) != 0) {
             filteropts.add("simple");
         }
@@ -117,7 +113,6 @@
         filteropts.add("irc");
         filteropts.add("msn");
         filteropts.add("qq");
-        filteropts.add("sametime");
         filteropts.add("simple");
         filteropts.add("xmpp");
         filteropts.add("yahoo");
@@ -131,7 +126,6 @@
     webManager.setPageProperty("gateway-registrations", "filterIRC", filteropts.contains("irc") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterMSN", filteropts.contains("msn") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterQQ", filteropts.contains("qq") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterSAMETIME", filteropts.contains("sametime") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterSIMPLE", filteropts.contains("simple") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterXMPP", filteropts.contains("xmpp") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterYAHOO", filteropts.contains("yahoo") ? 1 : 0);
@@ -442,7 +436,6 @@
 			<% if (trEnabled.get("irc")) { %> <option value="irc"><fmt:message key="gateway.irc.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("msn")) { %> <option value="msn"><fmt:message key="gateway.msn.shortservice" /></option> <% } %>
             <% if (trEnabled.get("qq")) { %> <option value="qq"><fmt:message key="gateway.qq.shortservice" /></option> <% } %>
-            <% if (trEnabled.get("sametime")) { %> <option value="sametime"><fmt:message key="gateway.sametime.shortservice" /></option> <% } %>
             <% if (trEnabled.get("simple")) { %> <option value="simple"><fmt:message key="gateway.simple.shortservice" /></option> <% } %>
             <% if (trEnabled.get("xmpp")) { %> <option value="xmpp"><fmt:message key="gateway.xmpp.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("yahoo")) { %> <option value="yahoo"><fmt:message key="gateway.yahoo.shortservice" /></option> <% } %>
@@ -568,11 +561,6 @@
                 <input type="checkbox" name="filter[]" value="qq" <%= ((filteropts.contains("qq")) ? "checked" : "") %> id="filterQQcheckbox">
                 <img src="images/qq.gif" border="0" alt="<fmt:message key="gateway.qq.shortservice" />" title="<fmt:message key="gateway.qq.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.qq.shortservice" /></span>-->
-            </label>
-            <label for="filterSAMETIMEcheckbox">
-                <input type="checkbox" name="filter[]" value="sametime" <%= ((filteropts.contains("sametime")) ? "checked" : "") %> id="filterSAMETIMEcheckbox">
-                <img src="images/sametime.gif" border="0" alt="<fmt:message key="gateway.sametime.shortservice" />" title="<fmt:message key="gateway.sametime.shortservice" />"/>
-                <!--<span><fmt:message key="gateway.sametime.shortservice" /></span>-->
             </label>
             <label for="filterSIMPLEcheckbox">
                 <input type="checkbox" name="filter[]" value="simple" <%= ((filteropts.contains("simple")) ? "checked" : "") %> id="filterSIMPLEcheckbox">

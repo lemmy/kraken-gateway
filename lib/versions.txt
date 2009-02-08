@@ -19,7 +19,6 @@ openymsg.jar           | svn-20071126 (patched [#3])
 servlet.jar            | 2.5
 smack.jar              | svn-20071228
 smackx.jar             | svn-20071228
-stcomm.jar             | 3.0
 xmlrpc.jar             | 1.0.1
 
 

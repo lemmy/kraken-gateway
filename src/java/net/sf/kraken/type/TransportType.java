@@ -63,11 +63,6 @@ public enum TransportType {
      * The MSN instant messaging service.
      */
     msn ("msn"),
-    
-    /**
-     * MySpace IM service.
-     */
-    myspaceim ("myspaceim"),
 
     /**
      * Microsoft Office Communications service.
