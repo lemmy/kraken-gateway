@@ -786,7 +786,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 }
             }
             catch (Exception e) {
-                // No with data form apparantly
+                // No with data form apparently
             }
 
             if (packet.getType() == IQ.Type.set) {
