@@ -25,7 +25,6 @@ import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Timer;
@@ -51,7 +50,8 @@ public class MSNListener extends MsnAdapter {
      * @param session Session this listener is associated with.
      */
     public MSNListener(MSNSession session) {
-        this.msnSessionRef = new WeakReference<MSNSession>(session);
+        //this.msnSessionRef = new WeakReference<MSNSession>(session);
+        this.msnSession = session;
         sessionReaper = new SessionReaper();
         timer.schedule(sessionReaper, reaperInterval, reaperInterval);
     }
@@ -59,7 +59,8 @@ public class MSNListener extends MsnAdapter {
     /**
      * The session this listener is associated with.
      */
-    public WeakReference<MSNSession> msnSessionRef = null;
+    //public WeakReference<MSNSession> msnSessionRef = null;
+    public MSNSession msnSession = null;
 
     /**
      * Timer to check for stale typing notifications.
@@ -87,7 +88,8 @@ public class MSNListener extends MsnAdapter {
      * @return MSN session we are attached to.
      */
     public MSNSession getSession() {
-        return msnSessionRef.get();
+        //return msnSessionRef.get();
+        return msnSession;
     }
     
     /**
