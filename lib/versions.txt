@@ -9,8 +9,8 @@ jainsipapi.jar         | 1.2 (nightly 2007-06-05)
 jainsipri.jar          | 1.2 (nightly 2007-06-05)
 jggapi.jar             | 1.6
 jml.jar                | svn-20080805
-joscar-common.jar      | svn-20071204
-joscar-protocol.jar    | svn-20071204
+joscar-common.jar      | svn-20071204 (patched [#4])
+joscar-protocol.jar    | svn-20071204 (patched [#4])
 jqql.jar               | svn-20081124
 jsocks.jar             | 1.01 (patched [#2])
 log4j.jar              | 1.2.14
@@ -33,3 +33,6 @@ Patch Descriptions
 3) openymsg patches
 - patched to include fixes for ymsg protocol change
 - patched to include fixes for case of accounts
+
+4) joscar patches
+- patched to fix issue with russian icq users
