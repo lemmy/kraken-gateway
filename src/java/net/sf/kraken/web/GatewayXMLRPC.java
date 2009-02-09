@@ -39,7 +39,7 @@ public class GatewayXMLRPC extends XmlRpcServlet implements PropertyEventListene
 
             this.getXmlRpcServer().addInvocationHandler("Manager", conduit);
 
-            AuthCheckFilter.addExclude("gateway/xml-rpc");
+            AuthCheckFilter.addExclude("kraken/xml-rpc");
         }
         catch (ServletException e) {
             Log.error("Error while loading XMLRPC servlet: ", e);
@@ -47,7 +47,7 @@ public class GatewayXMLRPC extends XmlRpcServlet implements PropertyEventListene
     }
 
     public void destroy() {
-        AuthCheckFilter.removeExclude("gateway/xml-rpc");
+        AuthCheckFilter.removeExclude("kraken/xml-rpc");
         PropertyEventDispatcher.removeListener(this);        
         conduit = null;
     }
