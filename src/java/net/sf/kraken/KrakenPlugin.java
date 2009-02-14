@@ -122,6 +122,10 @@ public class KrakenPlugin implements Plugin {
         /* Set up QQ transport. */
         transports.put("qq", new TransportInstance(TransportType.qq , LocaleUtils.getLocalizedString("gateway.qq.name", "kraken"), "net.sf.kraken.protocols.qq.QQTransport", componentManager, sessionRouter));
         maybeStartService("qq");
+        
+        /* Set up SameTime transport. */
+        transports.put("sametime", new TransportInstance(TransportType.sametime , LocaleUtils.getLocalizedString("gateway.sametime.name", "kraken"), "net.sf.kraken.protocols.sametime.SameTimeTransport", componentManager, sessionRouter));
+        maybeStartService("sametime");
     }
 
     public void destroyPlugin() {
