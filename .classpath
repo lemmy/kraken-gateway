@@ -30,5 +30,11 @@
 	<classpathentry kind="lib" path="/openfire/build/lib/merge/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j.jar"/>
 	<classpathentry kind="lib" path="lib/stcomm.jar"/>
+	<classpathentry kind="lib" path="lib/msim.jar"/>
+	<classpathentry kind="lib" path="lib/facebookchat.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore.jar"/>
+	<classpathentry kind="lib" path="lib/jna.jar"/>
+	<classpathentry kind="lib" path="lib/json.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

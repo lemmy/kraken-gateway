@@ -126,6 +126,14 @@ public class KrakenPlugin implements Plugin {
         /* Set up SameTime transport. */
         transports.put("sametime", new TransportInstance(TransportType.sametime , LocaleUtils.getLocalizedString("gateway.sametime.name", "kraken"), "net.sf.kraken.protocols.sametime.SameTimeTransport", componentManager, sessionRouter));
         maybeStartService("sametime");
+        
+        /* Set up Facebook transport. */
+        transports.put("facebook", new TransportInstance(TransportType.facebook , LocaleUtils.getLocalizedString("gateway.facebook.name", "kraken"), "net.sf.kraken.protocols.facebook.FacebookTransport", componentManager, sessionRouter));
+        maybeStartService("facebook");
+        
+        /* Set up MySpaceIM transport. */
+        transports.put("myspaceim", new TransportInstance(TransportType.myspaceim , LocaleUtils.getLocalizedString("gateway.myspaceim.name", "kraken"), "net.sf.kraken.protocols.myspaceim.MySpaceIMTransport", componentManager, sessionRouter));
+        maybeStartService("myspaceim");
     }
 
     public void destroyPlugin() {

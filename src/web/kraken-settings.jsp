@@ -454,11 +454,13 @@
     }
 
     GatewaySettings aimSettings = new GatewaySettings(out, plugin, TransportType.aim, LocaleUtils.getLocalizedString("gateway.aim.service", "kraken"));
+    GatewaySettings facebookSettings = new GatewaySettings(out, plugin, TransportType.facebook, LocaleUtils.getLocalizedString("gateway.facebook.service", "kraken"));
     GatewaySettings gadugaduSettings = new GatewaySettings(out, plugin, TransportType.gadugadu, LocaleUtils.getLocalizedString("gateway.gadugadu.service", "kraken"));
     GatewaySettings gtalkSettings = new GatewaySettings(out, plugin, TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.service", "kraken"));
     GatewaySettings icqSettings = new GatewaySettings(out, plugin, TransportType.icq, LocaleUtils.getLocalizedString("gateway.icq.service", "kraken"));
     GatewaySettings ircSettings = new GatewaySettings(out, plugin, TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.service", "kraken"));
     GatewaySettings msnSettings = new GatewaySettings(out, plugin, TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.service", "kraken"));
+    GatewaySettings myspaceimSettings = new GatewaySettings(out, plugin, TransportType.myspaceim, LocaleUtils.getLocalizedString("gateway.myspaceim.service", "kraken"));
     GatewaySettings qqSettings = new GatewaySettings(out, plugin, TransportType.qq, LocaleUtils.getLocalizedString("gateway.qq.service", "kraken"));
     GatewaySettings sametimeSettings = new GatewaySettings(out, plugin, TransportType.sametime, LocaleUtils.getLocalizedString("gateway.sametime.service", "kraken"));
     GatewaySettings simpleSettings = new GatewaySettings(out, plugin, TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.service", "kraken"));
@@ -815,8 +817,10 @@
 
 <p><fmt:message key="gateway.web.settings.unstable.notice" /></p>
 
+<% facebookSettings.printSettingsDialog(); %>
 <% gtalkSettings.printSettingsDialog(); %>
 <% qqSettings.printSettingsDialog(); %>
+<% myspaceimSettings.printSettingsDialog(); %>
 <% sametimeSettings.printSettingsDialog(); %>
 <% simpleSettings.printSettingsDialog(); %>
 <% xmppSettings.printSettingsDialog(); %>

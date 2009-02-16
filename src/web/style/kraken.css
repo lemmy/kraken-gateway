@@ -438,6 +438,22 @@ a.jive-gatewayButtonOn {
 	background: url(../images/sametime-gray.gif) no-repeat left;
 	background-position: 2px 1px;
 	}
+.jive-gateway-FACEBOOKon {
+	background: url(../images/facebook.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-FACEBOOKoff {
+	background: url(../images/facebook-gray.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-MYSPACEon {
+	background: url(../images/myspace.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-MYSPACEoff {
+	background: url(../images/myspace-gray.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
 	
 
 /* *************************** */

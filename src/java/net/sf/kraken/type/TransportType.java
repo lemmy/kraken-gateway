@@ -30,6 +30,11 @@ public enum TransportType {
     aim ("aim"),
 
     /**
+     * The Facebook instant messaging service.
+     */
+    facebook ("facebook"),
+
+    /**
      * The Gadu-Gadu instant messaging service.
      */
     gadugadu ("gadu-gadu"),

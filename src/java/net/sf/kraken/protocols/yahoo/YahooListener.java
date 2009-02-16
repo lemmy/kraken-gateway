@@ -33,7 +33,7 @@ import java.lang.ref.WeakReference;
  * @author Daniel Henninger
  * Heavily inspired by Noah Campbell's work.
  */
-public class YahooListener extends SessionAdapter {
+public class YahooListener extends SessionAdapter<YahooUser> {
 
     static Logger Log = Logger.getLogger(YahooListener.class);
 
@@ -120,30 +120,29 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    public void friendsUpdateReceived(SessionFriendEvent event) {
-        for (YahooUser user : event.getUsers()) {
-            if (getSession().getBuddyManager().isActivated()) {
-                try {
-                    YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
-                    yahooBuddy.yahooUser = user;
-                    yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+    public void friendsUpdateReceived(SessionFriendEvent<YahooUser> event) {
+        YahooUser user = event.getUser();
+        if (getSession().getBuddyManager().isActivated()) {
+            try {
+                YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
+                yahooBuddy.yahooUser = user;
+                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
 
-                }
-                catch (NotFoundException e) {
-                    // Not in our list.
-                    Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
-                }
             }
-            else {
-                getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(user.getId()), ((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+            catch (NotFoundException e) {
+                // Not in our list.
+                Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
             }
+        }
+        else {
+            getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(user.getId()), ((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
         }
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendAddedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    public void friendAddedReceived(SessionFriendEvent event) {
+    public void friendAddedReceived(SessionFriendEvent<YahooUser> event) {
         // TODO: This means a friend -we- added is now added, do we want to use this
 //        Presence p = new Presence(Presence.Type.subscribe);
 //        p.setTo(getSession().getJID());
@@ -154,7 +153,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendRemovedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    public void friendRemovedReceived(SessionFriendEvent event) {
+    public void friendRemovedReceived(SessionFriendEvent<YahooUser> event) {
         // TODO: This means a friend -we- removed is now gone, do we want to use this
 //        Presence p = new Presence(Presence.Type.unsubscribe);
 //        p.setTo(getSession().getJID());

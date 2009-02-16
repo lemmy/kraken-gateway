@@ -30,11 +30,13 @@
             (KrakenPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("kraken");
     HashMap<String, Boolean> trEnabled = new HashMap<String, Boolean>();
     trEnabled.put("aim", plugin.getTransportInstance("aim").isEnabled());
+    trEnabled.put("facebook", plugin.getTransportInstance("facebook").isEnabled());
     trEnabled.put("gadugadu", plugin.getTransportInstance("gadugadu").isEnabled());
     trEnabled.put("gtalk", plugin.getTransportInstance("gtalk").isEnabled());
     trEnabled.put("icq", plugin.getTransportInstance("icq").isEnabled());
     trEnabled.put("irc", plugin.getTransportInstance("irc").isEnabled());
     trEnabled.put("msn", plugin.getTransportInstance("msn").isEnabled());
+    trEnabled.put("myspaceim", plugin.getTransportInstance("myspaceim").isEnabled());
     trEnabled.put("qq", plugin.getTransportInstance("qq").isEnabled());
     trEnabled.put("sametime", plugin.getTransportInstance("sametime").isEnabled());
     trEnabled.put("simple", plugin.getTransportInstance("simple").isEnabled());
@@ -76,6 +78,9 @@
         if (webManager.getPageProperty("gateway-registrations", "filterAIM", 0) != 0) {
             filteropts.add("aim");
         }
+        if (webManager.getPageProperty("gateway-registrations", "filterFACEBOOK", 0) != 0) {
+            filteropts.add("facebook");
+        }
         if (webManager.getPageProperty("gateway-registrations", "filterGADUGADU", 0) != 0) {
             filteropts.add("gadugadu");
         }
@@ -90,6 +95,9 @@
         }
         if (webManager.getPageProperty("gateway-registrations", "filterMSN", 0) != 0) {
             filteropts.add("msn");
+        }
+        if (webManager.getPageProperty("gateway-registrations", "filterMYSPACEIM", 0) != 0) {
+            filteropts.add("myspaceim");
         }
         if (webManager.getPageProperty("gateway-registrations", "filterQQ", 0) != 0) {
             filteropts.add("qq");
@@ -111,11 +119,13 @@
         }
     } else {
         filteropts.add("aim");
+        filteropts.add("facebook");
         filteropts.add("gadugadu");
         filteropts.add("gtalk");
         filteropts.add("icq");
         filteropts.add("irc");
         filteropts.add("msn");
+        filteropts.add("myspaceim");
         filteropts.add("qq");
         filteropts.add("sametime");
         filteropts.add("simple");
@@ -125,11 +135,13 @@
 
     webManager.setPageProperty("gateway-registrations", "filterSET", 1);
     webManager.setPageProperty("gateway-registrations", "filterAIM", filteropts.contains("aim") ? 1 : 0);
+    webManager.setPageProperty("gateway-registrations", "filterFACEBOOK", filteropts.contains("facebook") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterGADUGADU", filteropts.contains("gadugadu") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterGTALK", filteropts.contains("gtalk") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterICQ", filteropts.contains("icq") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterIRC", filteropts.contains("irc") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterMSN", filteropts.contains("msn") ? 1 : 0);
+    webManager.setPageProperty("gateway-registrations", "filterMYSPACEIM", filteropts.contains("myspaceim") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterQQ", filteropts.contains("qq") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterSAMETIME", filteropts.contains("sametime") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterSIMPLE", filteropts.contains("simple") ? 1 : 0);
@@ -436,11 +448,13 @@
 			<select name="newRegistrationType" id="newRegistrationType" size="1">
 			<option value="0" SELECTED> -- <fmt:message key="gateway.web.registrations.select"/> -- </option>
 			<% if (trEnabled.get("aim")) { %> <option value="aim"><fmt:message key="gateway.aim.shortservice" /></option> <% } %>
+            <% if (trEnabled.get("facebook")) { %> <option value="facebook"><fmt:message key="gateway.facebook.shortservice" /></option> <% } %>
             <% if (trEnabled.get("gadugadu")) { %> <option value="gadugadu"><fmt:message key="gateway.gadugadu.shortservice" /></option> <% } %>
             <% if (trEnabled.get("gtalk")) { %> <option value="gtalk"><fmt:message key="gateway.gtalk.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("icq")) { %> <option value="icq"><fmt:message key="gateway.icq.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("irc")) { %> <option value="irc"><fmt:message key="gateway.irc.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("msn")) { %> <option value="msn"><fmt:message key="gateway.msn.shortservice" /></option> <% } %>
+            <% if (trEnabled.get("myspaceim")) { %> <option value="myspaceim"><fmt:message key="gateway.myspaceim.shortservice" /></option> <% } %>
             <% if (trEnabled.get("qq")) { %> <option value="qq"><fmt:message key="gateway.qq.shortservice" /></option> <% } %>
             <% if (trEnabled.get("sametime")) { %> <option value="sametime"><fmt:message key="gateway.sametime.shortservice" /></option> <% } %>
             <% if (trEnabled.get("simple")) { %> <option value="simple"><fmt:message key="gateway.simple.shortservice" /></option> <% } %>
@@ -539,6 +553,11 @@
                 <img src="images/aim.gif" border="0" alt="<fmt:message key="gateway.aim.shortservice" />" title="<fmt:message key="gateway.aim.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.aim.shortservice" /></span>-->
             </label>
+            <label for="filterFACEBOOKcheckbox">
+                <input type="checkbox" name="filter[]" value="facebook" <%= ((filteropts.contains("facebook")) ? "checked" : "") %> id="filterFACEBOOKcheckbox">
+                <img src="images/facebook.gif" border="0" alt="<fmt:message key="gateway.facebook.shortservice" />" title="<fmt:message key="gateway.facebook.shortservice" />"/>
+                <!--<span><fmt:message key="gateway.facebook.shortservice" /></span>-->
+            </label>
             <label for="filterGADUGADUcheckbox">
                 <input type="checkbox" name="filter[]" value="gadugadu" <%= ((filteropts.contains("gadugadu")) ? "checked" : "") %> id="filterGADUGADUcheckbox">
                 <img src="images/gadugadu.gif" border="0" alt="<fmt:message key="gateway.gadugadu.shortservice" />" title="<fmt:message key="gateway.gadugadu.shortservice" />"/>
@@ -563,6 +582,11 @@
                 <input type="checkbox" name="filter[]" value="msn" <%= ((filteropts.contains("msn")) ? "checked" : "") %> id="filterMSNcheckbox">
                 <img src="images/msn.gif" border="0" alt="<fmt:message key="gateway.msn.shortservice" />" title="<fmt:message key="gateway.msn.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.msn.shortservice" /></span>-->
+            </label>
+            <label for="filterMYSPACEIMcheckbox">
+                <input type="checkbox" name="filter[]" value="myspaceim" <%= ((filteropts.contains("myspaceim")) ? "checked" : "") %> id="filterMYSPACEIMcheckbox">
+                <img src="images/myspaceim.gif" border="0" alt="<fmt:message key="gateway.myspaceim.shortservice" />" title="<fmt:message key="gateway.myspaceim.shortservice" />"/>
+                <!--<span><fmt:message key="gateway.myspaceim.shortservice" /></span>-->
             </label>
             <label for="filterQQcheckbox">
                 <input type="checkbox" name="filter[]" value="qq" <%= ((filteropts.contains("qq")) ? "checked" : "") %> id="filterQQcheckbox">
