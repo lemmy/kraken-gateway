@@ -1,20 +1,30 @@
-/*
- * SIP Communicator, the OpenSource Java VoIP and Instant Messaging client.
- * 
- * Distributable under LGPL license. See terms of license at gnu.org.
+/**
+ * $Revision$
+ * $Date$
+ *
+ * Copyright 2009 Daniel Henninger.  All rights reserved.
+ *
+ * This software is published under the terms of the GNU Public License (GPL),
+ * a copy of which is included in this distribution.
  */
 package net.sf.kraken.protocols.facebook;
 
 import java.util.*;
 
+import net.sf.kraken.type.PresenceType;
+
 import org.apache.log4j.Logger;
+import org.jivesoftware.util.NotFoundException;
 import org.json.*;
 
 /**
  * Facebook buddy list that store the online buddies' information we got from
  * the server since we logged in. Some information of ourselves also included.
  * 
+ * Primarily borrowed from SIP Communicator.
+ * 
  * @author Dai Zhiwei
+ * @author Daniel Henninger
  * 
  */
 public class FacebookBuddyList
@@ -67,13 +77,13 @@ public class FacebookBuddyList
      */
     public void updateBuddyList(JSONObject buddyList) throws JSONException
     {
-        logger.info("Updating buddy list...");
+        logger.info("Facebook: Updating buddy list..."+buddyList.toString());
         // JSONObject buddyList = (JSONObject) payload.get("buddy_list");
         listChanged = (Boolean) buddyList.get("listChanged");
         availableCount = (Number) buddyList.get("availableCount");
 
-        logger.trace("listChanged: " + listChanged);
-        logger.trace("availableCount: " + availableCount);
+        logger.trace("Facebook: listChanged: " + listChanged);
+        logger.trace("Facebook: availableCount: " + availableCount);
 
         //if listChanged, then we can get the buddies available via looking at the nowAvailableList
         //else. we can only get the buddies' info, and the nowAvailableList is empty.
@@ -94,7 +104,7 @@ public class FacebookBuddyList
         while (it.hasNext())
         {
             String key = it.next();
-            logger.debug("userID: " + key);
+            logger.debug("Facebook: userID: " + key);
             JSONObject user = (JSONObject) userInfos.get(key);
             if(user == null)
             	continue;
@@ -123,27 +133,39 @@ public class FacebookBuddyList
             while (it.hasNext())
             {
                 String key = it.next();
-                logger.debug("userID: " + key);
+                logger.debug("Facebook: userID: " + key);
                 JSONObject status = (JSONObject) nowAvailableList.get(key);
                 if(status == null)
                 	continue;
                 buddyCache.get(key).isIdle = status.getBoolean("i");
             }
         }
+        //Activate the buddy list if it's not already
+        if (!adapter.getSession().getBuddyManager().isActivated()) {
+            adapter.getSession().getBuddyManager().activate();
+        }
         //At last, the best part: updating the contact list.
-//        cacheIt=buddyCache.entrySet().iterator();
-//        while(cacheIt.hasNext())
-//        {
-//            Map.Entry entry=(Map.Entry)cacheIt.next();
-//            String uid = (String)entry.getKey();
-//            FacebookUser user=(FacebookUser)entry.getValue();
-//            if(user.isOnline && user.isIdle)
-//            	operationSetPresence.setPresenceStatusForContact(uid, FacebookStatusEnum.IDLE);
-//            else if(user.isOnline)
-//            	operationSetPresence.setPresenceStatusForContact(uid, FacebookStatusEnum.ONLINE);
-//            else
-//            	operationSetPresence.setPresenceStatusForContact(uid, FacebookStatusEnum.OFFLINE);
-//        }
+        cacheIt=buddyCache.entrySet().iterator();
+        while(cacheIt.hasNext())
+        {
+            Map.Entry entry=(Map.Entry)cacheIt.next();
+            String uid = (String)entry.getKey();
+            FacebookUser user=(FacebookUser)entry.getValue();
+            FacebookBuddy buddy;
+            try {
+                buddy = (FacebookBuddy)adapter.getSession().getBuddyManager().getBuddy(adapter.getSession().getTransport().convertIDToJID(user.uid));
+            }
+            catch (NotFoundException e) {
+                buddy = new FacebookBuddy(adapter.getSession().getBuddyManager(), user);
+                adapter.getSession().getBuddyManager().storeBuddy(buddy); 
+            }
+            if(user.isOnline && user.isIdle)
+                buddy.setPresenceAndStatus(PresenceType.away, user.status);
+            else if(user.isOnline)
+                buddy.setPresenceAndStatus(PresenceType.available, user.status);
+            else
+                buddy.setPresenceAndStatus(PresenceType.unavailable, user.status);
+        }
     }
     /**
      * Get meta info of this account
@@ -162,12 +184,12 @@ public class FacebookBuddyList
      */
     private static void printUserInfo(FacebookUser user)
     {
-        logger.debug("name:\t" + user.name);
-        logger.debug("firstName:\t" + user.firstName);
-        logger.debug("thumbSrc:\t" + user.thumbSrc);
-        logger.debug("status:\t" + user.status);
-        logger.debug("statusTime:\t" + user.statusTime);
-        logger.debug("statusTimeRel:\t" + user.statusTimeRel);
+        logger.debug("Facebook: name:\t" + user.name);
+        logger.debug("Facebook: firstName:\t" + user.firstName);
+        logger.debug("Facebook: thumbSrc:\t" + user.thumbSrc);
+        logger.debug("Facebook: status:\t" + user.status);
+        logger.debug("Facebook: statusTime:\t" + user.statusTime);
+        logger.debug("Facebook: statusTimeRel:\t" + user.statusTimeRel);
     }
 
     /**

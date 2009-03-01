@@ -19,12 +19,16 @@ import java.util.Arrays;
  * @author Daniel Henninger
  */
 public class FacebookBuddy extends TransportBuddy {
+    
+    FacebookUser user;
 
-    public FacebookBuddy(TransportBuddyManager manager, String uin, String nickname, String group) {
-        super(manager, uin, nickname, null);
-        if (group != null) {
-            this.setGroups(Arrays.asList(group));
-        }
+    public FacebookBuddy(TransportBuddyManager manager, FacebookUser user) {
+        super(manager, user.uid, user.name, Arrays.asList("Facebook"));
+        this.user = user;
+    }
+    
+    public FacebookUser getUser() {
+        return user;
     }
 
 }

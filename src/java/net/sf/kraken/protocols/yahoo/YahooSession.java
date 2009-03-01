@@ -71,7 +71,7 @@ public class YahooSession extends TransportSession {
     /**
      * Yahoo session
      */
-    private Session<Roster<YahooUser>> yahooSession;
+    private Session<Roster<YahooUser>,YahooUser> yahooSession;
 
     /**
      * Yahoo session listener.

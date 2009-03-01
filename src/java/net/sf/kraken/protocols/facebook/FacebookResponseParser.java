@@ -1,7 +1,11 @@
-/*
- * SIP Communicator, the OpenSource Java VoIP and Instant Messaging client.
- * 
- * Distributable under LGPL license. See terms of license at gnu.org.
+/**
+ * $Revision$
+ * $Date$
+ *
+ * Copyright 2009 Daniel Henninger.  All rights reserved.
+ *
+ * This software is published under the terms of the GNU Public License (GPL),
+ * a copy of which is included in this distribution.
  */
 package net.sf.kraken.protocols.facebook;
 
@@ -11,7 +15,10 @@ import org.json.*;
 /**
  * A toolkit to parse Facebook responses.
  * 
+ * Primarily borrowed from SIP Communicator.
+ * 
  * @author Dai Zhiwei
+ * @author Daniel Henninger
  * 
  */
 public class FacebookResponseParser
@@ -36,7 +43,7 @@ public class FacebookResponseParser
         JSONObject respObjs = new JSONObject(response);
         if (respObjs == null)
             return FacebookErrorCode.Error_Global_JSONError;
-        logger.info("error: " + respObjs.getInt("error"));
+        logger.info("Facebook: error: " + respObjs.getInt("error"));
         if (respObjs.get("error") != null)
         {
             /*
@@ -72,7 +79,7 @@ public class FacebookResponseParser
                 }
                 catch (ClassCastException cce)
                 {
-                    cce.printStackTrace();
+                    logger.error("Facebook: ", cce);
                     // for
                     // (;;);{"error":0,"errorSummary":"","errorDescription":"No
                     // error.","payload":[],"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
@@ -95,7 +102,7 @@ public class FacebookResponseParser
             else
             {
                 //  handle the error
-                logger.warn("Error(" + errorCode
+                logger.warn("Facebook: Error(" + errorCode
                     + "): " + (String) respObjs.get("errorSummary") + ";"
                     + (String) respObjs.get("errorDescription"));
             }
@@ -147,7 +154,7 @@ public class FacebookResponseParser
         if (respObjs == null)
             throw new NullPointerException(
                 "Failed to parse JSONObject from the parameter response");
-        logger.info("error: " + respObjs.getInt("error"));
+        logger.info("Facebook: error: " + respObjs.getInt("error"));
         if (respObjs.get("error") != null)
         {
             /*
@@ -169,7 +176,7 @@ public class FacebookResponseParser
                     + (String) respObjs.get("errorSummary") + "; "
                     + (String) respObjs.get("errorDescription");
 
-            logger.warn(errorString);
+            logger.warn("Facebook: "+errorString);
 
             if (errorCode == FacebookErrorCode.Error_Global_NoError)
             {
@@ -211,7 +218,7 @@ public class FacebookResponseParser
             if (((String) respObjs.get("t")).equals("msg"))
             {
                 JSONArray ms = (JSONArray) respObjs.get("ms");
-                logger.info("NO of msges: " + ms.length());
+                logger.info("Facebook: NO of msges: " + ms.length());
                 // Iterator<JSONObject> it = ms..iterator();
                 int index = 0;
                 while (index < ms.length())
@@ -256,8 +263,7 @@ public class FacebookResponseParser
 
                         if (adapter.isMessageHandledBefore(fm.msgID))
                         {
-                            System.out
-                                .println("Omitting a already handled message: msgIDCollection.contains(msgID)");
+                            logger.trace("Omitting a already handled message: msgIDCollection.contains(msgID)");
                             continue;
                         }
                         adapter.addMessageToCollection(fm.msgID);
@@ -272,21 +278,21 @@ public class FacebookResponseParser
             //refresh means that the session or post_form_id is invalid
             else if (((String) respObjs.get("t")).equals("refresh"))
             {
-                logger.trace("Refresh");// do nothing
+                logger.trace("Facebook: Refresh");// do nothing
                 if (((String) respObjs.get("seq")) != null)
                 {
-                    logger.trace("refresh seq: "
+                    logger.trace("Facebook: refresh seq: "
                         + (String) respObjs.get("seq"));
                 }
             }
             //continue means that the server wants us to remake the connection
             else if (((String) respObjs.get("t")).equals("continue"))
             {
-                logger.trace("Time out? reconcect...");// do nothing
+                logger.trace("Facebook: Time out? reconnect...");// do nothing
             }
             else
             {
-                logger.warn("Unrecognized response type: "
+                logger.warn("Facebook: Unrecognized response type: "
                     + (String) respObjs.get("t"));
             }
         }
@@ -299,15 +305,15 @@ public class FacebookResponseParser
      */
     public static void printMessage(FacebookMessage msg)
     {
-        logger.trace("text:\t" + msg.text);
-        logger.trace("time:\t" + msg.time);
-        logger.trace("clientTime:\t" + msg.clientTime);
-        logger.trace("msgID:\t" + msg.msgID);
-        logger.trace("from:\t" + msg.from);
-        logger.trace("to:\t" + msg.to);
-        logger.trace("from_name:\t" + msg.fromName);
-        logger.trace("to_name:\t" + msg.toName);
-        logger.trace("from_first_name:\t" + msg.fromFirstName);
-        logger.trace("to_first_name:\t" + msg.toFirstName);
+        logger.trace("Facebook: text:\t" + msg.text);
+        logger.trace("Facebook: time:\t" + msg.time);
+        logger.trace("Facebook: clientTime:\t" + msg.clientTime);
+        logger.trace("Facebook: msgID:\t" + msg.msgID);
+        logger.trace("Facebook: from:\t" + msg.from);
+        logger.trace("Facebook: to:\t" + msg.to);
+        logger.trace("Facebook: from_name:\t" + msg.fromName);
+        logger.trace("Facebook: to_name:\t" + msg.toName);
+        logger.trace("Facebook: from_first_name:\t" + msg.fromFirstName);
+        logger.trace("Facebook: to_first_name:\t" + msg.toFirstName);
     }
 }

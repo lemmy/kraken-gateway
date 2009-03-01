@@ -30,7 +30,7 @@ public class Log4JToOpenfireAppender extends AppenderSkeleton {
 	protected void append(LoggingEvent event)
 	{
 		final Level l = event.getLevel();
-		final String message = event.getMessage().toString();
+		final String message = (event.getMessage() != null ? event.getMessage().toString() : "");
 
 		Throwable throwable = null;
 		if (event.getThrowableInformation() != null)

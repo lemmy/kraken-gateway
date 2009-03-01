@@ -1,14 +1,22 @@
-/*
- * SIP Communicator, the OpenSource Java VoIP and Instant Messaging client.
- * 
- * Distributable under LGPL license. See terms of license at gnu.org.
+/**
+ * $Revision$
+ * $Date$
+ *
+ * Copyright 2009 Daniel Henninger.  All rights reserved.
+ *
+ * This software is published under the terms of the GNU Public License (GPL),
+ * a copy of which is included in this distribution.
  */
+
 package net.sf.kraken.protocols.facebook;
 
 /**
  * Facebook meta message
  * 
+ * Primarily borrowed from SIP Communicator.
+ * 
  * @author Dai Zhiwei
+ * @author Daniel Henninger
  * 
  */
 public class FacebookMessage

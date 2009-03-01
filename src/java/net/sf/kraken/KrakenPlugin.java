@@ -58,7 +58,7 @@ public class KrakenPlugin implements Plugin {
     public KrakenPlugin() {
         setLoggerProperty("log4j.appender.openfire", "net.sf.kraken.util.Log4JToOpenfireAppender");
         setLoggerProperty("log4j.appender.openfiredebug", "net.sf.kraken.util.DebugOnlyLog4JToOpenfireAppender");
-        setLoggerProperty("log4j.rootLogger", "DEBUG, openfire");
+        setLoggerProperty("log4j.rootLogger", "TRACE, openfire");
     }
 
     public void initializePlugin(PluginManager manager, File pluginDirectory) {

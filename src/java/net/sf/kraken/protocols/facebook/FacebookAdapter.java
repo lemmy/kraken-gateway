@@ -1,7 +1,11 @@
-/*
- * SIP Communicator, the OpenSource Java VoIP and Instant Messaging client.
- * 
- * Distributable under LGPL license. See terms of license at gnu.org.
+/**
+ * $Revision$
+ * $Date$
+ *
+ * Copyright 2009 Daniel Henninger.  All rights reserved.
+ *
+ * This software is published under the terms of the GNU Public License (GPL),
+ * a copy of which is included in this distribution.
  */
 package net.sf.kraken.protocols.facebook;
 
@@ -31,7 +35,10 @@ import org.json.*;
  * Adapter for the facebook protocol.
  * With it we can login and send/receive facebook chat messages
  * 
+ * Primarily borrowed from SIP Communicator.
+ * 
  * @author Dai Zhiwei
+ * @author Daniel Henninger
  *
  */
 public class FacebookAdapter {
@@ -82,7 +89,7 @@ public class FacebookAdapter {
 	/**
 	 * The channel this account is using
 	 */
-	private String channel = "15";
+	private String channel = "26";
 	/**
 	 * The post form id
 	 */
@@ -145,7 +152,7 @@ public class FacebookAdapter {
 		buddyList = new FacebookBuddyList(FacebookAdapter.this);
 		this.session = session;
 		isClientRunning = true;
-		logger.trace("FacebookAdapter() begin");
+		logger.trace("Facebook: FacebookAdapter() begin");
 	}
 	/**
      * Performs general setup.
@@ -218,7 +225,7 @@ public class FacebookAdapter {
 //        
 //        Credentials creds = new UsernamePasswordCredentials(Proxy_Username, Proxy_Password);
 //        dhc.getCredentialsProvider().setCredentials(authScope, creds);
-//        logger.trace("executing request via " + proxy);
+//        logger.trace("Facebook: executing request via " + proxy);
 //    }
 	/**
 	 * Update the buddy list from the given data(JSON Object)
@@ -228,7 +235,7 @@ public class FacebookAdapter {
 		try {
 			this.buddyList.updateBuddyList(buddyListJO);
 		} catch (JSONException e) {
-		    logger.warn(e.getMessage());
+		    logger.warn("Facebook: ", e);
 		}
 	}
 	/**
@@ -253,7 +260,7 @@ public class FacebookAdapter {
 	 */
 	public boolean isMessageHandledBefore(String msgID){
 		if(msgIDCollection.contains(msgID)){
-			logger.debug("Omitting a already handled message: msgIDCollection.contains(msgID)");
+			logger.debug("Facebook: Omitting a already handled message: msgIDCollection.contains(msgID)");
 			return true;
 		}
 		return false;
@@ -276,7 +283,7 @@ public class FacebookAdapter {
 	 * @return the error code
 	 */
 	public int initialize(final String email, final String pass){
-		logger.trace("initialize() [begin]");
+		logger.trace("Facebook: initialize() [begin]");
 		isClientRunning = true;
 		
 		int loginErrorCode = connectAndLogin(email, pass);
@@ -290,12 +297,12 @@ public class FacebookAdapter {
 				//keep requesting message from the server
 				msgRequester = new Thread(new Runnable(){
 					public void run() {
-						logger.info("Keep requesting...");
+						logger.info("Facebook: Keep requesting...");
 						while(isClientRunning){
 							try{
 								keepRequesting();
 							} catch (Exception e){
-							    logger.warn(e.getMessage());
+							    logger.warn("Facebook: Exception while requesting message: ", e);
 							}
 						}
 					}
@@ -305,45 +312,44 @@ public class FacebookAdapter {
 				//requests buddy list every 60 seconds
 				buddyListRequester = new Thread(new Runnable(){
 					public void run() {
-						logger.info("Keep requesting buddylist...");
+						logger.info("Facebook: Keep requesting buddylist...");
 						while(isClientRunning){
 							try{
 								int errorCode = getBuddyList();
 								if(errorCode == FacebookErrorCode.kError_Async_NotLoggedIn){
 									//not logged in. try to log in again.
-									//TODO will this cause infinate loop?
-									initialize(email, pass);
+									getSession().sessionDisconnected("Lost login connection.");
 								}
 							} catch (Exception e){
-							    logger.warn(e.getMessage());
+							    logger.warn("Facebook: Failed to initialize", e);
 							}
 							// it's said that the buddy list is updated every 3 minutes at the server end.
 							// we refresh the buddy list every 1 minute
 							try {
 								Thread.sleep(60 * 1000);
 							} catch (InterruptedException e) {
-								logger.warn(e.getMessage());
+								logger.warn("Facebook: Sleep was interrupted", e);
 							}
 						}
 					}
 				});
 				buddyListRequester.start();
 				
-				logger.trace("initialize() [END]");
+				logger.trace("Facebook: initialize() [END]");
 				return FacebookErrorCode.Error_Global_NoError;
 			} else {
 			    //log in successfully but can't get home page
-			    logger.trace("initialize() [Home Page Parsing Error]");
+			    logger.trace("Facebook: initialize() [Home Page Parsing Error]");
 			    return hpParsingErrorCode;
 			}
 		} else if(loginErrorCode == FacebookErrorCode.kError_Login_GenericError){
 			//handle the error derived from this login
-			logger.error("Not logged in, please check your input or the internet connection!");
+			logger.error("Facebook: Not logged in, please check your input or the internet connection!");
 		} else {
 			//handle the error derived from this login
-			logger.error("Not logged in, please check your internet connection!");
+			logger.error("Facebook: Not logged in, please check your internet connection!");
 		}
-		logger.trace("initialize() [Login Error]");
+		logger.trace("Facebook: initialize() [Login Error]");
 		return loginErrorCode;
 	}
 	/**
@@ -355,7 +361,7 @@ public class FacebookAdapter {
 	 * @throws UnsupportedEncodingException 
 	 */
 	private int connectAndLogin(String email, String pass){
-		logger.trace("=========connectAndLogin begin===========");
+		logger.trace("Facebook: =========connectAndLogin begin===========");
 
 		String httpResponseBody = facebookGetMethod(loginPageUrl);
 		if(httpResponseBody == null){
@@ -370,21 +376,21 @@ public class FacebookAdapter {
             }
 		    httpResponseBody = facebookGetMethod(loginPageUrl);
 		}
-		logger.trace("========= get login page ResponseBody begin===========");
+		logger.trace("Facebook: ========= get login page ResponseBody begin===========");
 		logger.trace(httpResponseBody);
-		logger.trace("+++++++++ get login page ResponseBody end+++++++++");
+		logger.trace("Facebook: +++++++++ get login page ResponseBody end+++++++++");
 
-		logger.trace("Initial cookies: ");
+		logger.trace("Facebook: Initial cookies: ");
 		List<Cookie> cookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
         if (cookies.isEmpty()) {
-            logger.trace("None");
+            logger.trace("Facebook: None");
         } else {
             for (int i = 0; i < cookies.size(); i++) {
-                logger.trace("- " + cookies.get(i).toString());
+                logger.trace("Facebook: - " + cookies.get(i).toString());
             }
         }
         if(httpResponseBody == null){
-            logger.warn("Warning: Failed to get facebook login page.");
+            logger.warn("Facebook: Warning: Failed to get facebook login page.");
         }
 
         try
@@ -398,33 +404,33 @@ public class FacebookAdapter {
             nvps.add(new BasicNameValuePair("login", ""));
 
             httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-            logger.info("@executing post method to:" + loginPageUrl);
+            logger.info("Facebook: @executing post method to:" + loginPageUrl);
             
             HttpResponse loginPostResponse = httpClient.execute(httpost);
             HttpEntity entity = loginPostResponse.getEntity();
 
-            logger.trace("Login form post: " + loginPostResponse.getStatusLine());
+            logger.trace("Facebook: Login form post: " + loginPostResponse.getStatusLine());
             if (entity != null) {
-                logger.trace(EntityUtils.toString(entity));
+                logger.trace("Facebook: "+EntityUtils.toString(entity));
                 entity.consumeContent();
             } else {
-                logger.error("Error: login post's response entity is null");
+                logger.error("Facebook: Error: login post's response entity is null");
                 return FacebookErrorCode.kError_Login_GenericError;
             }
 
-            logger.trace("Post logon cookies:");
+            logger.trace("Facebook: Post logon cookies:");
             cookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
             if (cookies.isEmpty()) {
-                logger.trace("None");
+                logger.trace("Facebook: None");
             } else {
                 for (int i = 0; i < cookies.size(); i++) {
-                    logger.trace("- " + cookies.get(i).toString());
+                    logger.trace("Facebook: - " + cookies.get(i).toString());
                 }
             }
             
             int statusCode = loginPostResponse.getStatusLine().getStatusCode();
             
-            logger.info("Post Method done(" + statusCode + ")");
+            logger.info("Facebook: Post Method done(" + statusCode + ")");
             
             switch(statusCode){
             case 100: break;//we should try again;
@@ -436,19 +442,19 @@ public class FacebookAdapter {
                 //redirect
                 Header[] headers = loginPostResponse.getAllHeaders();
                 for (int i=0; i<headers.length; i++) {
-                    logger.trace(headers[i]);
+                    logger.trace("Facebook: "+headers[i]);
                 }
                 Header locationHeader = loginPostResponse.getFirstHeader("location");
                 if(locationHeader != null){
                     homePageUrl = locationHeader.getValue();
-                    logger.info("Redirect Location: " + homePageUrl);
+                    logger.info("Facebook: Redirect Location: " + homePageUrl);
                     if(homePageUrl == null 
                         || !homePageUrl.contains("facebook.com/home.php")){
-                        logger.error("Login error! Redirect Location Url not contains \"facebook.com/home.php\"");
+                        logger.error("Facebook: Login error! Redirect Location Url not contains \"facebook.com/home.php\"");
                         return FacebookErrorCode.kError_Login_GenericError;
                     }
                 } else {
-                    logger.warn("Warning: Got no redirect location.");
+                    logger.warn("Facebook: Warning: Got no redirect location.");
                 }
             }
             break;
@@ -457,11 +463,11 @@ public class FacebookAdapter {
         }
         catch (IOException ioe)
         {
-            logger.error("IOException\n" + ioe.getMessage());
+            logger.error("Facebook: IOException\n" + ioe.getMessage());
             return FacebookErrorCode.kError_Global_ValidationError;
         }
         
-		logger.trace("=========connectAndLogin end==========");
+		logger.trace("Facebook: =========connectAndLogin end==========");
 		return FacebookErrorCode.Error_Global_NoError;
 	}
 	/**
@@ -485,22 +491,22 @@ public class FacebookAdapter {
             }
             catch (InterruptedException e)
             {
-                logger.trace(e.getMessage());
+                logger.trace("Facebook:", e);
             }
 		    getMethodResponseBody = facebookGetMethod(loginPageUrl);
         }
-		logger.trace("=========HomePage: getMethodResponseBody begin=========");
+		logger.trace("Facebook: =========HomePage: getMethodResponseBody begin=========");
 		logger.trace(getMethodResponseBody);
-		logger.trace("+++++++++HomePage: getMethodResponseBody end+++++++++");
+		logger.trace("Facebook: +++++++++HomePage: getMethodResponseBody end+++++++++");
 
 		//deal with the cookies
-		logger.trace("The final cookies:");
+		logger.trace("Facebook: The final cookies:");
 		List<Cookie> finalCookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
         if (finalCookies.isEmpty()) {
-            logger.trace("None");
+            logger.trace("Facebook: None");
         } else {
             for (int i = 0; i < finalCookies.size(); i++) {
-                logger.trace("- " + finalCookies.get(i).toString());
+                logger.trace("Facebook: - " + finalCookies.get(i).toString());
                 //looking for our uid
                 if(finalCookies.get(i).getName().equals("c_user"))
                     uid = finalCookies.get(i).getValue();
@@ -508,12 +514,12 @@ public class FacebookAdapter {
         }
         
 		if(getMethodResponseBody == null){
-			logger.fatal("Can't get the home page! Exit.");
+			logger.fatal("Facebook: Can't get the home page! Exit.");
 			return FacebookErrorCode.Error_Async_UnexpectedNullResponse;
 		}
 		
 		if(uid == null){
-		    logger.fatal("Can't get the user's id! Exit.");
+		    logger.fatal("Facebook: Can't get the user's id! Exit.");
             return FacebookErrorCode.Error_System_UIDNotFound;
 		}
 		//<a href="http://www.facebook.com/profile.php?id=xxxxxxxxx" class="profile_nav_link">
@@ -524,13 +530,13 @@ public class FacebookAdapter {
 		if(uidPostFixPos >= 0){
 			int uidBeginPos = getMethodResponseBody.lastIndexOf(uidPrefix, uidPostFixPos) + uidPrefix.length();
 			if(uidBeginPos < uidPrefix.length()){
-				logger.error("Can't get the user's id! Exit.");
+				logger.error("Facebook: Can't get the user's id! Exit.");
 				return FacebookErrorCode.Error_System_UIDNotFound;
 			}
 			uid = getMethodResponseBody.substring(uidBeginPos, uidPostFixPos);
-			logger.info("UID: " + uid);
+			logger.info("Facebook: UID: " + uid);
 		}else{
-			logger.error("Can't get the user's id! Exit.");
+			logger.error("Facebook: Can't get the user's id! Exit.");
 			return FacebookErrorCode.Error_System_UIDNotFound;
 		}*/
 		
@@ -539,13 +545,13 @@ public class FacebookAdapter {
 		int channelBeginPos = getMethodResponseBody.indexOf(channelPrefix)
 				+ channelPrefix.length();
 		if (channelBeginPos < channelPrefix.length()){
-			logger.fatal("Error: Can't find channel!");
+			logger.fatal("Facebook: Error: Can't find channel!");
 			return FacebookErrorCode.Error_System_ChannelNotFound;
 		}
 		else {
 			channel = getMethodResponseBody.substring(channelBeginPos,
 					channelBeginPos + 2);
-			logger.info("Channel: " + channel);
+			logger.info("Facebook: Channel: " + channel);
 		}
 
 		//find the post form id
@@ -555,13 +561,13 @@ public class FacebookAdapter {
 		int formIdBeginPos = getMethodResponseBody.indexOf(postFormIDPrefix)
 				+ postFormIDPrefix.length();
 		if (formIdBeginPos < postFormIDPrefix.length()){
-			logger.fatal("Error: Can't find post form ID!");
+			logger.fatal("Facebook: Error: Can't find post form ID!");
 			return FacebookErrorCode.Error_System_PostFormIDNotFound;
 		}
 		else {
 			post_form_id = getMethodResponseBody.substring(formIdBeginPos,
 					formIdBeginPos + 32);
-			logger.info("post_form_id: " + post_form_id);
+			logger.info("Facebook: post_form_id: " + post_form_id);
 		}
 		
 		return FacebookErrorCode.Error_Global_NoError;
@@ -571,28 +577,31 @@ public class FacebookAdapter {
 	 * @return the error code
 	 */
 	private int getBuddyList(){
-		logger.trace("====== getBuddyList begin======");
+		logger.trace("Facebook: ====== getBuddyList begin======");
 
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
         nvps.add(new BasicNameValuePair("buddy_list", "1"));
-        nvps.add(new BasicNameValuePair("notifications", "1"));
-        nvps.add(new BasicNameValuePair("force_render", "true"));
-        //nvps.add(new BasicNameValuePair("popped_out", "false"));
+        //nvps.add(new BasicNameValuePair("notifications", "1"));
+        nvps.add(new BasicNameValuePair("force_render", "false"));
+        nvps.add(new BasicNameValuePair("popped_out", "false"));
+        nvps.add(new BasicNameValuePair("nectar_impid", "eb87807ed40569c13c16eb6c8ae9bf90"));
+        nvps.add(new BasicNameValuePair("nectar_navimpid", "eb87807ed40569c13c16eb6c8ae9bf90"));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
+        nvps.add(new BasicNameValuePair("post_form_id_source", "AsyncRequest"));
         nvps.add(new BasicNameValuePair("user", uid));
         
 		try{
-			String responseStr = facebookPostMethod(hostUrl, "/ajax/presence/update.php", nvps);
+			String responseStr = facebookPostMethod(hostUrl, "/ajax/chat/buddy_list.php", nvps);
 			
 			//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"buddy_list":{"listChanged":true,"availableCount":1,"nowAvailableList":{"UID1":{"i":false}},"wasAvailableIDs":[],"userInfos":{"UID1":{"name":"Buddy 1","firstName":"Buddy","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_default.gif","status":null,"statusTime":0,"statusTimeRel":""},"UID2":{"name":"Buddi 2","firstName":"Buddi","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_default.gif","status":null,"statusTime":0,"statusTimeRel":""}},"forcedRender":true},"time":1209560380000}}  
 			//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"time":1214626375000,"buddy_list":{"listChanged":true,"availableCount":1,"nowAvailableList":{},"wasAvailableIDs":[],"userInfos":{"1386786477":{"name":"\u5341\u4e00","firstName":"\u4e00","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_silhouette.gif","status":null,"statusTime":0,"statusTimeRel":""}},"forcedRender":null,"flMode":false,"flData":{}},"notifications":{"countNew":0,"count":1,"app_names":{"2356318349":"\u670b\u53cb"},"latest_notif":1214502420,"latest_read_notif":1214502420,"markup":"<div id=\"presence_no_notifications\" style=\"display:none\" class=\"no_notifications\">\u65e0\u65b0\u901a\u77e5\u3002<\/div><div class=\"notification clearfix notif_2356318349\" onmouseover=\"CSS.addClass(this, 'hover');\" onmouseout=\"CSS.removeClass(this, 'hover');\"><div class=\"icon\"><img src=\"http:\/\/static.ak.fbcdn.net\/images\/icons\/friend.gif?0:41046\" alt=\"\" \/><\/div><div class=\"notif_del\" onclick=\"return presenceNotifications.showHideDialog(this, 2356318349)\"><\/div><div class=\"body\"><a href=\"http:\/\/www.facebook.com\/profile.php?id=1190346972\"   >David Willer<\/a>\u63a5\u53d7\u4e86\u60a8\u7684\u670b\u53cb\u8bf7\u6c42\u3002 <span class=\"time\">\u661f\u671f\u56db<\/span><\/div><\/div>","inboxCount":"0"}},"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
-			logger.trace("+++++++++ getBuddyList end +++++++++");
+			logger.trace("Facebook: +++++++++ getBuddyList end +++++++++");
 			// testHttpClient("http://www.facebook.com/home.php?");
 			int errorCode = FacebookResponseParser.buddylistParser(FacebookAdapter.this, responseStr);
 
 			return errorCode;
 		} catch (JSONException e) {
-			logger.warn(e.getMessage());
+			logger.warn("Facebook: ", e);
 		}
 		return FacebookErrorCode.Error_Global_JSONError;
 	}
@@ -607,10 +616,10 @@ public class FacebookAdapter {
 		if(to.equals(this.uid))
 			return;
 		
-		logger.trace("====== Post Facebook Chat Message begin======");
+		logger.trace("Facebook: ====== Post Facebook Chat Message begin======");
 
-		logger.trace("PostMessage(): to:"+to);
-		logger.trace("PostMessage(): msg:"+msg);
+		logger.trace("Facebook: PostMessage(): to:"+to);
+		logger.trace("Facebook: PostMessage(): msg:"+msg);
 
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
         nvps.add(new BasicNameValuePair("msg_text", (msg == null)? "":msg));
@@ -618,7 +627,7 @@ public class FacebookAdapter {
         nvps.add(new BasicNameValuePair("to", to));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
 
-		logger.info("@executeMethod PostMessage() ing... : posting facebook chat message to " + to);
+		logger.info("Facebook: @executeMethod PostMessage() ing... : posting facebook chat message to " + to);
 		// execute postMethod
 		String responseStr = facebookPostMethod(hostUrl, "/ajax/chat/send.php", nvps);
 		//TODO process the respons string
@@ -630,7 +639,7 @@ public class FacebookAdapter {
 		//for (;;);{"t":"refresh", "seq":0}
 		//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":[],"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
 		//for (;;);{"error":1356003,"errorSummary":"Send destination not online","errorDescription":"This person is no longer online.","payload":null,"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
-		logger.trace("+++++++++ Post Facebook Chat Message end +++++++++");
+		logger.trace("Facebook: +++++++++ Post Facebook Chat Message end +++++++++");
 
 		FacebookResponseParser.messagePostingResultParser(msg, to, responseStr);
 	}
@@ -648,10 +657,10 @@ public class FacebookAdapter {
 //        if(to.getAddress().equals(this.uid))
 //            return null;
 //        
-//        logger.trace("====== PostMessage begin======");
+//        logger.trace("Facebook: ====== PostMessage begin======");
 //
-//        logger.trace("PostMessage(): to:"+to.getAddress());
-//        logger.trace("PostMessage(): msg:"+msg.getContent());
+//        logger.trace("Facebook: PostMessage(): to:"+to.getAddress());
+//        logger.trace("Facebook: PostMessage(): msg:"+msg.getContent());
 //
 //        //post_form_id=e699815281b6793a4e228417ee8e68d1&rand_id=12517489&message=ddddddddddddddddddddddddddd&subject=sssssssssssssssssssssssss&ids[0]=1355527894&ids[1]=1190346972&action=compose
 //        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
@@ -662,12 +671,12 @@ public class FacebookAdapter {
 //        nvps.add(new BasicNameValuePair("ids[0]", to.getAddress()));
 //        nvps.add(new BasicNameValuePair("action", "compose"));
 //
-//        logger.info("@executeMethod PostMessage() ing... : posting message to " + to.getAddress());
+//        logger.info("Facebook: @executeMethod PostMessage() ing... : posting message to " + to.getAddress());
 //        // execute postMethod
 //        String responseStr = facebookPostMethod(hostUrl, "/inbox/ajax/ajax.php", nvps);
 //
 //        //for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"title":"Message Sent","content":"<div class=\"status\">Your message has been sent.<\/div>"},"bootload":[{"name":"js\/common.js.pkg.php","type":"js
-//        logger.trace("+++++++++ PostMessage end +++++++++");
+//        logger.trace("Facebook: +++++++++ PostMessage end +++++++++");
 //
 //        return FacebookResponseParser.messagePostingResultParser(msg, to, responseStr);
 //    }
@@ -688,7 +697,7 @@ public class FacebookAdapter {
         {
             // PostMessage("1190346972", "SEQ:"+seq);
             int currentSeq = getSeq();
-            logger.trace("My seq:" + seq + " | Current seq:" + currentSeq
+            logger.trace("Facebook: My seq:" + seq + " | Current seq:" + currentSeq
                 + '\n');
             if (seq > currentSeq)
                 seq = currentSeq;
@@ -699,9 +708,9 @@ public class FacebookAdapter {
                 String msgResponseBody =
                     facebookGetMethod(getMessageRequestingUrl(seq));
 
-                logger.trace("=========msgResponseBody begin=========");
+                logger.trace("Facebook: =========msgResponseBody begin=========");
                 logger.trace(msgResponseBody);
-                logger.trace("+++++++++msgResponseBody end+++++++++");
+                logger.trace("Facebook: +++++++++msgResponseBody end+++++++++");
 
                 try
                 {
@@ -710,7 +719,7 @@ public class FacebookAdapter {
                 }
                 catch (JSONException e)
                 {
-                    logger.warn(e.getMessage());
+                    logger.warn("Facebook:", e);
                 }
                 seq++;
             }
@@ -733,7 +742,7 @@ public class FacebookAdapter {
                 seqResponseBody =
                     facebookGetMethod(getMessageRequestingUrl(-1));
                 tempSeq = parseSeq(seqResponseBody);
-                logger.trace("getSeq(): SEQ: " + tempSeq);
+                logger.trace("Facebook: getSeq(): SEQ: " + tempSeq);
 
                 if (tempSeq >= 0)
                 {
@@ -742,17 +751,16 @@ public class FacebookAdapter {
             }
             catch (JSONException e)
             {
-                logger.warn(e.getMessage());
+                logger.warn("Facebook:", e);
             }
             try
             {
-                logger
-                    .trace("retrying to fetch the seq code after 1 second...");
+                logger.trace("Facebook: retrying to fetch the seq code after 1 second...");
                 Thread.sleep(1000);
             }
             catch (InterruptedException e)
             {
-                logger.warn(e.getMessage());
+                logger.warn("Facebook: ", e);
             }
         }
         return tempSeq;
@@ -787,10 +795,17 @@ public class FacebookAdapter {
 	private String getMessageRequestingUrl(long seq)
     {
         // http://0.channel06.facebook.com/x/0/false/p_MYID=-1
+	    // http://0.channel26.facebook.com/x/1426908432/false/p_MYID=0
+	    //        ^-- always 0?  shows as 2 a lot in real client
+	    //                 ^^-- is given by server
+	    //                                   ^^^^^^^^^^---- timestamp? real client seems random
+	    //                                              ^^^^^--- idle or not, not worrying with it yet
+	    //                                                      ^^^^----- your id number
+	    //                                                           ^--- sequence number
         String url =
-            "http://0.channel" + channel + ".facebook.com/x/0/false/p_" + uid
+            "http://0.channel" + channel + ".facebook.com/x/" + new Date().getTime() + "/false/p_" + uid
                 + "=" + seq;
-        logger.trace("request url:" + url);
+        logger.trace("Facebook: request url:" + url);
         return url;
     }
 
@@ -802,7 +817,7 @@ public class FacebookAdapter {
 	public void promoteMessage(FacebookMessage fm)
     {
         // promote the incoming message
-        logger.trace("in promoteMessage(): Got a message: " + fm.text);
+        logger.trace("Facebook: in promoteMessage(): Got a message: " + fm.text);
         
         getSession().getTransport().sendMessage(getSession().getJID(), getSession().getTransport().convertIDToJID(fm.fromName), fm.text);
     }
@@ -838,7 +853,7 @@ public class FacebookAdapter {
 	    List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("visibility", isVisible + ""));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
-        logger.info("@executeMethod setVisibility() ing ...");
+        logger.info("Facebook: @executeMethod setVisibility() ing ...");
         // we don't care the response string now
         facebookPostMethod(hostUrl, "/ajax/chat/settings.php", nvps);
 	}
@@ -870,7 +885,7 @@ public class FacebookAdapter {
         nvps.add(new BasicNameValuePair("test_name", "INLINE_STATUS_EDITOR"));
         nvps.add(new BasicNameValuePair("action", "HOME_UPDATE"));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
-        logger.info("@executeMethod setStatusMessage() ing ...");
+        logger.info("Facebook: @executeMethod setStatusMessage() ing ...");
         // we don't care the response string now
         facebookPostMethod(hostUrl, "/updatestatus.php", nvps);
     }
@@ -891,11 +906,11 @@ public class FacebookAdapter {
 	/**
 	 * Log out
 	 */
-	private void Logout()
+	public void Logout()
     {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("confirm", "1"));
-        logger.info("@executeMethod Logout() ing ...");
+        logger.info("Facebook: @executeMethod Logout() ing ...");
         // we don't care the response string now
         facebookPostMethod(hostUrl, "/logout.php", nvps);
     }
@@ -907,6 +922,8 @@ public class FacebookAdapter {
     {
         // If every http client has its own ConnectionManager, then shut it
         // down.
+	    this.buddyListRequester = null;
+	    this.msgRequester = null;
         this.httpClient.getConnectionManager().shutdown();
         this.httpClient = null;
         this.msgIDCollection.clear();
@@ -946,21 +963,17 @@ public class FacebookAdapter {
             facebookTypingState = 0;
             break;
         }
-        logger.trace("====== PostTypingNotification begin======");
+        logger.trace("Facebook: ====== PostTypingNotification begin======");
 
-        logger.trace("PostTypingNotification(): to:"
-            + notifiedContact);
-        logger.trace("PostTypingNotification(): typing state:"
-            + facebookTypingState);
+        logger.trace("Facebook: PostTypingNotification(): to:" + notifiedContact);
+        logger.trace("Facebook: PostTypingNotification(): typing state:" + facebookTypingState);
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("typ", facebookTypingState + ""));
         nvps.add(new BasicNameValuePair("to", notifiedContact));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
 
-        logger
-            .info("@executeMethod PostMessage() ing... : posting TypingNotification to "
-                + notifiedContact);
+        logger.info("Facebook: @executeMethod PostMessage() ing... : posting TypingNotification to " + notifiedContact);
         // we don't care the response string now
         facebookPostMethod(hostUrl, "/ajax/chat/typ.php", nvps);
         // TODO process the respons string
@@ -975,7 +988,7 @@ public class FacebookAdapter {
         // for (;;);{"error":1356003,"errorSummary":"Send destination not
         // online","errorDescription":"This person is no longer
         // online.","payload":null,"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
-        logger.trace("+++++++++ PostTypingNotification end +++++++++");
+        logger.trace("Facebook: +++++++++ PostTypingNotification end +++++++++");
         // testHttpClient("http://www.facebook.com/home.php?");
     }
 
@@ -988,9 +1001,7 @@ public class FacebookAdapter {
 	public void promoteTypingNotification(String fromID, int facebookTypingState)
     {
         // promote the incoming message
-        logger
-            .info("in promoteTypingNotification(): Got a TypingNotification: "
-                + facebookTypingState);
+        logger.info("Facebook: in promoteTypingNotification(): Got a TypingNotification: " + facebookTypingState);
 
         switch (facebookTypingState)
         {
@@ -1018,7 +1029,7 @@ public class FacebookAdapter {
 	    
 	    //http://www.new.facebook.com/profile.php?id=1190346972&v=info&viewas=1190346972
         // http://www.new.facebook.com/profile.php?id=1386786477&v=info
-        return facebookGetMethod(hostUrlNew + "/profile.php?id="
+        return facebookGetMethod(hostUrl + "/profile.php?id="
             + contactAddress + "&v=info");
     }
 	/**
@@ -1031,7 +1042,8 @@ public class FacebookAdapter {
 	private String facebookPostMethod(String host, String urlPostfix,
         List<NameValuePair> nvps)
     {
-        logger.info("@executing facebookPostMethod():" + host + urlPostfix);
+        logger.info("Facebook: @executing facebookPostMethod():" + host + urlPostfix);
+        nvps.add(new BasicNameValuePair("force_render", "false"));
         String responseStr = null;
         try
         {
@@ -1042,21 +1054,21 @@ public class FacebookAdapter {
             HttpResponse postResponse = httpClient.execute(httpost);
             HttpEntity entity = postResponse.getEntity();
 
-            logger.trace("facebookPostMethod: " + postResponse.getStatusLine());
+            logger.trace("Facebook: facebookPostMethod: " + postResponse.getStatusLine());
             if (entity != null)
             {
                 responseStr = EntityUtils.toString(entity);
-                logger.trace(responseStr);
+                logger.trace("Facebook: "+responseStr);
                 entity.consumeContent();
             }
-            logger.info("Post Method done("
+            logger.info("Facebook: Post Method done("
                 + postResponse.getStatusLine().getStatusCode()
                 + "), response string length: "
                 + (responseStr == null ? 0 : responseStr.length()));
         }
         catch (IOException e)
         {
-            logger.warn(e.getMessage());
+            logger.warn("Facebook: ", e);
         }
         //TODO process the respons string
         //if statusCode == 200: no error;(responsStr contains "errorDescription":"No error.")
@@ -1070,7 +1082,7 @@ public class FacebookAdapter {
 	 */
 	private String facebookGetMethod(String url)
     {
-        logger.info("@executing facebookGetMethod():" + url);
+        logger.info("Facebook: @executing facebookGetMethod():" + url);
         String responseStr = null;
 
         try
@@ -1079,7 +1091,7 @@ public class FacebookAdapter {
             HttpResponse response = httpClient.execute(loginGet);
             HttpEntity entity = response.getEntity();
 
-            logger.trace("facebookGetMethod: " + response.getStatusLine());
+            logger.trace("Facebook: facebookGetMethod: " + response.getStatusLine());
             if (entity != null)
             {
                 responseStr = EntityUtils.toString(entity);
@@ -1095,16 +1107,16 @@ public class FacebookAdapter {
             if (statusCode != 200)
             {
                 // error occured
-                logger.warn("Error Occured! Status Code = " + statusCode);
+                logger.warn("Facebook: Error Occured! Status Code = " + statusCode);
                 responseStr = null;
             }
-            logger.info("Get Method done(" + statusCode
+            logger.info("Facebook: Get Method done(" + statusCode
                 + "), response string length: "
                 + (responseStr == null ? 0 : responseStr.length()));
         }
         catch (IOException e)
         {
-            logger.warn(e.getMessage());
+            logger.warn("Facebook: ", e);
         }
 
         return responseStr;
