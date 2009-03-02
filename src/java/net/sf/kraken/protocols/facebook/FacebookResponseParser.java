@@ -11,6 +11,7 @@ package net.sf.kraken.protocols.facebook;
 
 import org.apache.log4j.Logger;
 import org.json.*;
+import org.xmpp.packet.Message.Type;
 
 /**
  * A toolkit to parse Facebook responses.
@@ -136,7 +137,7 @@ public class FacebookResponseParser
      * @param response
      * @throws JSONException
      */
-    public static void messagePostingResultParser(
+    public static void messagePostingResultParser(FacebookAdapter adapter, 
         String msg, String to, String response) throws JSONException
     {
         if (response == null)
@@ -186,10 +187,15 @@ public class FacebookResponseParser
             else
             {
                 // notify the posting error
+                adapter.getSession().getTransport().sendMessage(adapter.getSession().getJID(),
+                        adapter.getSession().getTransport().getJID(),
+                        respObjs.get("errorSummary"), Type.error);
+                return;
 //                MessageDeliveryFailedEvent mdfe =
 //                    new MessageDeliveryFailedEvent(msg, to, errorCode,
 //                        new Date(), (String) respObjs.get("errorSummary"));
 //                return mdfe;
+                
             }
         }
         throw new JSONException("The response has no \'error\' code field");

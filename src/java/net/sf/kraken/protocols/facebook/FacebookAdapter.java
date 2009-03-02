@@ -47,7 +47,6 @@ public class FacebookAdapter {
 	 * The url of the host
 	 */
 	private static String hostUrl = "http://www.facebook.com";
-	private static String hostUrlNew = "http://www.new.facebook.com";
 	
 	/**
      * The url of the login page
@@ -582,11 +581,11 @@ public class FacebookAdapter {
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
         nvps.add(new BasicNameValuePair("buddy_list", "1"));
         //nvps.add(new BasicNameValuePair("notifications", "1"));
-        //nvps.add(new BasicNameValuePair("force_render", "false"));
+        nvps.add(new BasicNameValuePair("force_render", "true"));
         nvps.add(new BasicNameValuePair("popped_out", "false"));
         //nvps.add(new BasicNameValuePair("nectar_impid", "eb87807ed40569c13c16eb6c8ae9bf90"));
         //nvps.add(new BasicNameValuePair("nectar_navimpid", "eb87807ed40569c13c16eb6c8ae9bf90"));
-        nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
+        //nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
         //nvps.add(new BasicNameValuePair("post_form_id_source", "AsyncRequest"));
         nvps.add(new BasicNameValuePair("user", uid));
         
@@ -643,7 +642,7 @@ public class FacebookAdapter {
 		//for (;;);{"error":1356003,"errorSummary":"Send destination not online","errorDescription":"This person is no longer online.","payload":null,"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
 		logger.trace("Facebook: +++++++++ Post Facebook Chat Message end +++++++++");
 
-		FacebookResponseParser.messagePostingResultParser(msg, to, responseStr);
+		FacebookResponseParser.messagePostingResultParser(this, msg, to, responseStr);
 	}
 	
 	/**
@@ -680,7 +679,7 @@ public class FacebookAdapter {
 //        //for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"title":"Message Sent","content":"<div class=\"status\">Your message has been sent.<\/div>"},"bootload":[{"name":"js\/common.js.pkg.php","type":"js
 //        logger.trace("Facebook: +++++++++ PostMessage end +++++++++");
 //
-//        return FacebookResponseParser.messagePostingResultParser(msg, to, responseStr);
+//        return FacebookResponseParser.messagePostingResultParser(this, msg, to, responseStr);
 //    }
     
 	/**
@@ -1087,7 +1086,7 @@ public class FacebookAdapter {
         List<NameValuePair> nvps)
     {
         logger.info("Facebook: @executing facebookPostMethod():" + host + urlPostfix);
-        nvps.add(new BasicNameValuePair("force_render", "false"));
+        //nvps.add(new BasicNameValuePair("force_render", "false"));
         String responseStr = null;
         try
         {
