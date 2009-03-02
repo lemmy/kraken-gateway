@@ -47,9 +47,6 @@ public class FacebookSession extends TransportSession {
         super(registration, jid, transport, priority);
     }
 
-    /* Listener */
-    //private FacebookListener listener;
-    
     /* Adapter */
     private FacebookAdapter adapter;
 
@@ -61,6 +58,7 @@ public class FacebookSession extends TransportSession {
         if (!isLoggedIn()) {
             adapter = new FacebookAdapter(this);
             adapter.initialize(getRegistration().getUsername(), getRegistration().getPassword());
+            adapter.setVisibility(true);
             setLoginStatus(TransportLoginStatus.LOGGED_IN);
         }
     }
@@ -129,12 +127,19 @@ public class FacebookSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
     public void sendBuzzNotification(JID jid, String message) {
+        try {
+            adapter.postBuddyPoke(getTransport().convertJIDToID(jid));
+        }
+        catch (Exception e) {
+            Log.error("Facebook: Unable to send composing notification.", e);
+        }
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
     public void updateLegacyAvatar(String type, byte[] data) {
+        // we don't support this yet, may or may not implement this
     }
 
     /**
@@ -142,6 +147,7 @@ public class FacebookSession extends TransportSession {
      */
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         adapter.setVisibility(true);
+        // could set status message here, but not sure i want to... im status and facebook status aren't the same concepts
     }
 
 }

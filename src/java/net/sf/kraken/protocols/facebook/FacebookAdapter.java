@@ -260,7 +260,7 @@ public class FacebookAdapter {
 	 */
 	public boolean isMessageHandledBefore(String msgID){
 		if(msgIDCollection.contains(msgID)){
-			logger.debug("Facebook: Omitting a already handled message: msgIDCollection.contains(msgID)");
+			logger.debug("Facebook: Omitting a already handled message: "+msgIDCollection.contains(msgID));
 			return true;
 		}
 		return false;
@@ -582,16 +582,17 @@ public class FacebookAdapter {
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
         nvps.add(new BasicNameValuePair("buddy_list", "1"));
         //nvps.add(new BasicNameValuePair("notifications", "1"));
-        nvps.add(new BasicNameValuePair("force_render", "false"));
+        //nvps.add(new BasicNameValuePair("force_render", "false"));
         nvps.add(new BasicNameValuePair("popped_out", "false"));
-        nvps.add(new BasicNameValuePair("nectar_impid", "eb87807ed40569c13c16eb6c8ae9bf90"));
-        nvps.add(new BasicNameValuePair("nectar_navimpid", "eb87807ed40569c13c16eb6c8ae9bf90"));
+        //nvps.add(new BasicNameValuePair("nectar_impid", "eb87807ed40569c13c16eb6c8ae9bf90"));
+        //nvps.add(new BasicNameValuePair("nectar_navimpid", "eb87807ed40569c13c16eb6c8ae9bf90"));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
-        nvps.add(new BasicNameValuePair("post_form_id_source", "AsyncRequest"));
+        //nvps.add(new BasicNameValuePair("post_form_id_source", "AsyncRequest"));
         nvps.add(new BasicNameValuePair("user", uid));
         
 		try{
-			String responseStr = facebookPostMethod(hostUrl, "/ajax/chat/buddy_list.php", nvps);
+			//String responseStr = facebookPostMethod(hostUrl, "/ajax/chat/buddy_list.php", nvps);
+		    String responseStr = facebookPostMethod(hostUrl, "/ajax/presence/update.php", nvps);
 			
 			//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"buddy_list":{"listChanged":true,"availableCount":1,"nowAvailableList":{"UID1":{"i":false}},"wasAvailableIDs":[],"userInfos":{"UID1":{"name":"Buddy 1","firstName":"Buddy","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_default.gif","status":null,"statusTime":0,"statusTimeRel":""},"UID2":{"name":"Buddi 2","firstName":"Buddi","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_default.gif","status":null,"statusTime":0,"statusTimeRel":""}},"forcedRender":true},"time":1209560380000}}  
 			//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"time":1214626375000,"buddy_list":{"listChanged":true,"availableCount":1,"nowAvailableList":{},"wasAvailableIDs":[],"userInfos":{"1386786477":{"name":"\u5341\u4e00","firstName":"\u4e00","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_silhouette.gif","status":null,"statusTime":0,"statusTimeRel":""}},"forcedRender":null,"flMode":false,"flData":{}},"notifications":{"countNew":0,"count":1,"app_names":{"2356318349":"\u670b\u53cb"},"latest_notif":1214502420,"latest_read_notif":1214502420,"markup":"<div id=\"presence_no_notifications\" style=\"display:none\" class=\"no_notifications\">\u65e0\u65b0\u901a\u77e5\u3002<\/div><div class=\"notification clearfix notif_2356318349\" onmouseover=\"CSS.addClass(this, 'hover');\" onmouseout=\"CSS.removeClass(this, 'hover');\"><div class=\"icon\"><img src=\"http:\/\/static.ak.fbcdn.net\/images\/icons\/friend.gif?0:41046\" alt=\"\" \/><\/div><div class=\"notif_del\" onclick=\"return presenceNotifications.showHideDialog(this, 2356318349)\"><\/div><div class=\"body\"><a href=\"http:\/\/www.facebook.com\/profile.php?id=1190346972\"   >David Willer<\/a>\u63a5\u53d7\u4e86\u60a8\u7684\u670b\u53cb\u8bf7\u6c42\u3002 <span class=\"time\">\u661f\u671f\u56db<\/span><\/div><\/div>","inboxCount":"0"}},"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
@@ -623,6 +624,7 @@ public class FacebookAdapter {
 
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
         nvps.add(new BasicNameValuePair("msg_text", (msg == null)? "":msg));
+        nvps.add(new BasicNameValuePair("msg_id", new Random().nextInt()+""));
         nvps.add(new BasicNameValuePair("client_time", new Date().getTime() + ""));
         nvps.add(new BasicNameValuePair("to", to));
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
@@ -819,7 +821,7 @@ public class FacebookAdapter {
         // promote the incoming message
         logger.trace("Facebook: in promoteMessage(): Got a message: " + fm.text);
         
-        getSession().getTransport().sendMessage(getSession().getJID(), getSession().getTransport().convertIDToJID(fm.fromName), fm.text);
+        getSession().getTransport().sendMessage(getSession().getJID(), getSession().getTransport().convertIDToJID(fm.from.toString()), fm.text);
     }
 
 	/**
@@ -989,6 +991,48 @@ public class FacebookAdapter {
         // online","errorDescription":"This person is no longer
         // online.","payload":null,"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
         logger.trace("Facebook: +++++++++ PostTypingNotification end +++++++++");
+        // testHttpClient("http://www.facebook.com/home.php?");
+    }
+	
+	/**
+     * Post poke to the given contact.
+     * @param notifiedContact the contact we want to poke
+     * @throws HttpException the http exception
+     * @throws IOException IO exception
+     * @throws JSONException JSON parsing exception
+     * @throws Exception the general exception
+     */
+    public void postBuddyPoke(String pokedContact)
+        throws HttpException,
+        IOException,
+        JSONException,
+        Exception
+    {
+        logger.trace("Facebook: ====== PostBuddyPoke begin======");
+
+        logger.trace("Facebook: PostBuddyPoke(): to:" + pokedContact);
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("pokeback", "0"));
+        nvps.add(new BasicNameValuePair("to", pokedContact));
+        nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
+
+        logger.info("Facebook: @executeMethod PostMessage() ing... : posting Poke to " + pokedContact);
+        // we don't care the response string now
+        facebookPostMethod(hostUrl, "/ajax/poke.php", nvps);
+        // TODO process the respons string
+        // if statusCode == 200: no error;(responsStr contains "errorDescription":"No error.")
+        // else retry?
+
+        // for (;;);{"t":"continue"}
+        // for (;;);{"t":"refresh"}
+        // for (;;);{"t":"refresh", "seq":0}
+        // for (;;);{"error":0,"errorSummary":"","errorDescription":"No
+        // error.","payload":[],"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
+        // for (;;);{"error":1356003,"errorSummary":"Send destination not
+        // online","errorDescription":"This person is no longer
+        // online.","payload":null,"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
+        logger.trace("Facebook: +++++++++ PostBuddyPoke end +++++++++");
         // testHttpClient("http://www.facebook.com/home.php?");
     }
 
