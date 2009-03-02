@@ -189,7 +189,7 @@ public class FacebookResponseParser
                 // notify the posting error
                 adapter.getSession().getTransport().sendMessage(adapter.getSession().getJID(),
                         adapter.getSession().getTransport().getJID(),
-                        respObjs.get("errorSummary"), Type.error);
+                        respObjs.get("errorSummary").toString(), Type.error);
                 return;
 //                MessageDeliveryFailedEvent mdfe =
 //                    new MessageDeliveryFailedEvent(msg, to, errorCode,
