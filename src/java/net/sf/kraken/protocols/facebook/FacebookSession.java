@@ -67,8 +67,10 @@ public class FacebookSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
     public void logOut() {
-        adapter.setVisibility(false);
-        adapter.pause();
+        if (adapter != null) {
+            adapter.setVisibility(false);
+            adapter.pause();
+        }
         cleanUp();
         sessionDisconnectedNoReconnect(null);
     }
@@ -77,7 +79,8 @@ public class FacebookSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
     public void cleanUp() {
-        adapter.shutdown();
+        if (adapter != null)
+            adapter.shutdown();
         adapter = null;
     }
 

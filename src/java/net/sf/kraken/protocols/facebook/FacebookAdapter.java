@@ -783,7 +783,7 @@ public class FacebookAdapter {
 
         // JSONObject body =(JSONObject) JSONValue.parse(msgResponseBody);
         JSONObject body = new JSONObject(msgResponseBody);
-        if (body != null)
+        if (body != null && body.has("seq"))
             return body.getInt("seq");
         else
             return -1;
