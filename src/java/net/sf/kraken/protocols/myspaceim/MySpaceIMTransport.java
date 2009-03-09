@@ -136,5 +136,10 @@ public class MySpaceIMTransport extends BaseTransport {
                 return PresenceType.unknown;
         }
      }
+    
+    static {
+        KrakenPlugin.setLoggerProperty("log4j.additivity.net.sf.jmyspaceiml", "false");
+        KrakenPlugin.setLoggerProperty("log4j.logger.net.sf.jmyspaceiml", "DEBUG, openfiredebug");
+    }
 
 }

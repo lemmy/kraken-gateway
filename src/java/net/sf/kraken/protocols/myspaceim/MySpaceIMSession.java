@@ -17,6 +17,7 @@ import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.TransportLoginStatus;
 
 import org.xmpp.packet.JID;
 import org.apache.log4j.Logger;
@@ -62,6 +63,7 @@ public class MySpaceIMSession extends TransportSession {
             connection = new MSIMConnection();
             connection.connect();
             connection.login(getRegistration().getUsername(), getRegistration().getPassword());
+            this.setLoginStatus(TransportLoginStatus.LOGGED_IN);
             listener = new MySpaceIMListener(this);
             connection.addMessageListener(listener);
             connection.getContactManager().getContacts();
@@ -116,6 +118,7 @@ public class MySpaceIMSession extends TransportSession {
         Message msg = new Message();
         msg.setType(Message.Type.INSTANT_MESSAGE);
         msg.setTo(getTransport().convertJIDToID(jid));
+        msg.setFrom(String.valueOf(connection.getUserID()));
         msg.setBody(message);
         connection.sendPacket(msg);
     }
