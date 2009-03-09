@@ -127,6 +127,12 @@ public class MySpaceIMSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
     public void sendChatState(JID jid, ChatStateType chatState) {
+        Message msg = new Message();
+        msg.setType(Message.Type.ACTION_MESSAGE);
+        msg.setTo(getTransport().convertJIDToID(jid));
+        msg.setFrom(String.valueOf(connection.getUserID()));
+        msg.setBody(chatState == ChatStateType.composing ? "%typing%" : "%stoptyping");
+        connection.sendPacket(msg);
     }
 
     /**

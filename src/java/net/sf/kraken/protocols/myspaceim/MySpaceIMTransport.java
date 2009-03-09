@@ -98,6 +98,11 @@ public class MySpaceIMTransport extends BaseTransport {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }
+    
+    private final int MSIM_STATUS_CODE_OFFLINE = 0;
+    private final int MSIM_STATUS_CODE_ONLINE = 1;
+    private final int MSIM_STATUS_CODE_IDLE = 2;
+    private final int MSIM_STATUS_CODE_AWAY = 5;
 
     /**
      * Converts a XMPP status to a MySpaceIM status.
@@ -106,32 +111,46 @@ public class MySpaceIMTransport extends BaseTransport {
      * @param hasVerbose We have a verbose status so give me the appropriate status type.
      * @return MySpaceIM user status type.
      */
-    public short convertXMPPStatusToMySpaceIM(PresenceType jabStatus, Boolean hasVerbose) {
+    public int convertXMPPStatusToMySpaceIM(PresenceType jabStatus, Boolean hasVerbose) {
         if (jabStatus == PresenceType.available) {
+            return MSIM_STATUS_CODE_ONLINE;
         }
         else if (jabStatus == PresenceType.away) {
+            return MSIM_STATUS_CODE_AWAY;
         }
         else if (jabStatus == PresenceType.xa) {
+            return MSIM_STATUS_CODE_AWAY;
         }
         else if (jabStatus == PresenceType.dnd) {
+            return MSIM_STATUS_CODE_AWAY;
         }
         else if (jabStatus == PresenceType.chat) {
+            return MSIM_STATUS_CODE_ONLINE;
         }
         else if (jabStatus == PresenceType.unavailable) {
+            return MSIM_STATUS_CODE_OFFLINE;
         }
         else {
+            return MSIM_STATUS_CODE_ONLINE;
         }
-        return -1;
     }
 
     /**
      * Converts a MySpaceIM status to an XMPP status.
      *
-     * @param fbUserStatus MySpaceIM user status constant.
+     * @param msUserStatus MySpaceIM user status constant.
      * @return XMPP presence type.
      */
-    public PresenceType convertMySpaceIMStatusToXMPP(short fbUserStatus) {
-        switch (fbUserStatus) {
+    public PresenceType convertMySpaceIMStatusToXMPP(int msUserStatus) {
+        switch (msUserStatus) {
+            case MSIM_STATUS_CODE_OFFLINE:
+                return PresenceType.unavailable;
+            case MSIM_STATUS_CODE_IDLE:
+                return PresenceType.away;
+            case MSIM_STATUS_CODE_AWAY:
+                return PresenceType.away;
+            case MSIM_STATUS_CODE_ONLINE:
+                return PresenceType.available;
             default:
                 return PresenceType.unknown;
         }

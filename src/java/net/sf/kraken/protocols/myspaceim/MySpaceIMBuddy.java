@@ -20,11 +20,8 @@ import java.util.Arrays;
  */
 public class MySpaceIMBuddy extends TransportBuddy {
 
-    public MySpaceIMBuddy(TransportBuddyManager manager, String uin, String nickname, String group) {
-        super(manager, uin, nickname, null);
-        if (group != null) {
-            this.setGroups(Arrays.asList(group));
-        }
+    public MySpaceIMBuddy(TransportBuddyManager manager, Integer userid) {
+        super(manager, String.valueOf(userid), String.valueOf(userid), Arrays.asList("IM Buddies"));
     }
 
 }
