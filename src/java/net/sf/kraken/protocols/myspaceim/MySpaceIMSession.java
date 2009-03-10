@@ -11,7 +11,9 @@
 package net.sf.kraken.protocols.myspaceim;
 
 import net.sf.jmyspaceiml.MSIMConnection;
-import net.sf.jmyspaceiml.packet.Message;
+import net.sf.jmyspaceiml.packet.InstantMessage;
+import net.sf.jmyspaceiml.packet.ActionMessage;
+import net.sf.jmyspaceiml.packet.StatusMessage;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
@@ -115,8 +117,7 @@ public class MySpaceIMSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
     public void sendMessage(JID jid, String message) {
-        Message msg = new Message();
-        msg.setType(Message.Type.INSTANT_MESSAGE);
+        InstantMessage msg = new InstantMessage();
         msg.setTo(getTransport().convertJIDToID(jid));
         msg.setFrom(String.valueOf(connection.getUserID()));
         msg.setBody(message);
@@ -127,11 +128,10 @@ public class MySpaceIMSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
     public void sendChatState(JID jid, ChatStateType chatState) {
-        Message msg = new Message();
-        msg.setType(Message.Type.ACTION_MESSAGE);
+        ActionMessage msg = new ActionMessage();
         msg.setTo(getTransport().convertJIDToID(jid));
         msg.setFrom(String.valueOf(connection.getUserID()));
-        msg.setBody(chatState == ChatStateType.composing ? "%typing%" : "%stoptyping");
+        msg.setAction(chatState == ChatStateType.composing ? ActionMessage.ACTION_TYPING : ActionMessage.ACTION_STOPTYPING);
         connection.sendPacket(msg);
     }
 
@@ -151,6 +151,12 @@ public class MySpaceIMSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String)
      */
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
+        StatusMessage msg = new StatusMessage();
+        msg.setTo(getTransport().convertJIDToID(jid));
+        msg.setFrom(String.valueOf(connection.getUserID()));
+        msg.setStatusCode(((MySpaceIMTransport)getTransport()).convertXMPPStatusToMySpaceIM(presenceType));
+        msg.setStatusMessage(verboseStatus);
+        connection.sendPacket(msg);
     }
 
 }

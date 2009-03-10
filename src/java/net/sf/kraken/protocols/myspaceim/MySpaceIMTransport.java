@@ -10,6 +10,7 @@
 
 package net.sf.kraken.protocols.myspaceim;
 
+import net.sf.jmyspaceiml.packet.StatusMessage;
 import net.sf.kraken.*;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
@@ -99,39 +100,33 @@ public class MySpaceIMTransport extends BaseTransport {
         session.logOut();
     }
     
-    private final int MSIM_STATUS_CODE_OFFLINE = 0;
-    private final int MSIM_STATUS_CODE_ONLINE = 1;
-    private final int MSIM_STATUS_CODE_IDLE = 2;
-    private final int MSIM_STATUS_CODE_AWAY = 5;
-
     /**
      * Converts a XMPP status to a MySpaceIM status.
      *
      * @param jabStatus XMPP presence type.
-     * @param hasVerbose We have a verbose status so give me the appropriate status type.
      * @return MySpaceIM user status type.
      */
-    public int convertXMPPStatusToMySpaceIM(PresenceType jabStatus, Boolean hasVerbose) {
+    public int convertXMPPStatusToMySpaceIM(PresenceType jabStatus) {
         if (jabStatus == PresenceType.available) {
-            return MSIM_STATUS_CODE_ONLINE;
+            return StatusMessage.MSIM_STATUS_CODE_ONLINE;
         }
         else if (jabStatus == PresenceType.away) {
-            return MSIM_STATUS_CODE_AWAY;
+            return StatusMessage.MSIM_STATUS_CODE_AWAY;
         }
         else if (jabStatus == PresenceType.xa) {
-            return MSIM_STATUS_CODE_AWAY;
+            return StatusMessage.MSIM_STATUS_CODE_AWAY;
         }
         else if (jabStatus == PresenceType.dnd) {
-            return MSIM_STATUS_CODE_AWAY;
+            return StatusMessage.MSIM_STATUS_CODE_AWAY;
         }
         else if (jabStatus == PresenceType.chat) {
-            return MSIM_STATUS_CODE_ONLINE;
+            return StatusMessage.MSIM_STATUS_CODE_ONLINE;
         }
         else if (jabStatus == PresenceType.unavailable) {
-            return MSIM_STATUS_CODE_OFFLINE;
+            return StatusMessage.MSIM_STATUS_CODE_OFFLINE;
         }
         else {
-            return MSIM_STATUS_CODE_ONLINE;
+            return StatusMessage.MSIM_STATUS_CODE_ONLINE;
         }
     }
 
@@ -143,13 +138,13 @@ public class MySpaceIMTransport extends BaseTransport {
      */
     public PresenceType convertMySpaceIMStatusToXMPP(int msUserStatus) {
         switch (msUserStatus) {
-            case MSIM_STATUS_CODE_OFFLINE:
+            case StatusMessage.MSIM_STATUS_CODE_OFFLINE:
                 return PresenceType.unavailable;
-            case MSIM_STATUS_CODE_IDLE:
+            case StatusMessage.MSIM_STATUS_CODE_IDLE:
                 return PresenceType.away;
-            case MSIM_STATUS_CODE_AWAY:
+            case StatusMessage.MSIM_STATUS_CODE_AWAY:
                 return PresenceType.away;
-            case MSIM_STATUS_CODE_ONLINE:
+            case StatusMessage.MSIM_STATUS_CODE_ONLINE:
                 return PresenceType.available;
             default:
                 return PresenceType.unknown;
