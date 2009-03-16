@@ -56,6 +56,10 @@ public class MySpaceIMSession extends TransportSession {
     // Connection instance
     private MSIMConnection connection;
 
+    public MSIMConnection getConnection() {
+        return connection;
+    }
+
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
@@ -68,7 +72,8 @@ public class MySpaceIMSession extends TransportSession {
             this.setLoginStatus(TransportLoginStatus.LOGGED_IN);
             listener = new MySpaceIMListener(this);
             connection.addMessageListener(listener);
-            connection.getContactManager().getContacts();
+            connection.getContactManager().addContactListener(listener);
+            connection.getContactManager().requestContacts();
         }
     }
 
@@ -77,6 +82,10 @@ public class MySpaceIMSession extends TransportSession {
      */
     public void logOut() {
         if (connection != null) {
+            if (listener != null) {
+                connection.getContactManager().removeContactListener(listener);
+                connection.removeMessageListener(listener);
+            }
             connection.disconnect();
         }
         cleanUp();
@@ -88,6 +97,7 @@ public class MySpaceIMSession extends TransportSession {
      */
     public void cleanUp() {
         if (connection != null) {
+
             connection = null;
         }
         if (listener != null) {

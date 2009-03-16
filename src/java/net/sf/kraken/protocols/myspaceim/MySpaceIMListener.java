@@ -11,21 +11,28 @@
 package net.sf.kraken.protocols.myspaceim;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import net.sf.jmyspaceiml.MessageListener;
+import net.sf.jmyspaceiml.contact.Contact;
+import net.sf.jmyspaceiml.contact.ContactListener;
 import net.sf.jmyspaceiml.packet.ActionMessage;
 import net.sf.jmyspaceiml.packet.InstantMessage;
 import net.sf.jmyspaceiml.packet.MediaMessage;
 import net.sf.jmyspaceiml.packet.ProfileMessage;
 import net.sf.jmyspaceiml.packet.StatusMessage;
+import net.sf.jmyspaceiml.packet.ErrorMessage;
+import net.sf.kraken.protocols.msn.MSNTransport;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.NotFoundException;
+import org.xmpp.packet.Message;
 
 /**
  * @author Daniel Henninger
  */
-public class MySpaceIMListener implements MessageListener {
+public class MySpaceIMListener implements MessageListener, ContactListener {
 
     static Logger Log = Logger.getLogger(MySpaceIMListener.class);
     
@@ -66,22 +73,22 @@ public class MySpaceIMListener implements MessageListener {
     
     public void processIncomingMessage(StatusMessage msgPacket) {
         Log.debug("MySpaceIM: Received status message packet: "+msgPacket);
-        //Activate the buddy list if it's not already
-        if (!getSession().getBuddyManager().isActivated()) {
-            getSession().getBuddyManager().activate();
+        if (getSession().getBuddyManager().isActivated()) {
+            try {
+                MySpaceIMBuddy buddy = (MySpaceIMBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(msgPacket.getFrom()));
+                buddy.setPresenceAndStatus(
+                        ((MySpaceIMTransport)getSession().getTransport()).convertMySpaceIMStatusToXMPP(msgPacket.getStatusCode()),
+                        msgPacket.getStatusMessage()
+                );
+            }
+            catch (NotFoundException e) {
+                // Not in our contact list.  Ignore.
+                Log.debug("MySpaceIM: Received presense notification for contact we don't care about: "+msgPacket.getFrom());
+            }
         }
-        MySpaceIMBuddy buddy;
-        try {
-            buddy = (MySpaceIMBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(msgPacket.getFrom()));
+        else {
+            getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(msgPacket.getFrom()), ((MySpaceIMTransport)getSession().getTransport()).convertMySpaceIMStatusToXMPP(msgPacket.getStatusCode()), msgPacket.getStatusMessage());
         }
-        catch (NotFoundException e) {
-            buddy = new MySpaceIMBuddy(getSession().getBuddyManager(), Integer.valueOf(msgPacket.getFrom()));
-            getSession().getBuddyManager().storeBuddy(buddy); 
-        }
-        buddy.setPresenceAndStatus(
-                ((MySpaceIMTransport)getSession().getTransport()).convertMySpaceIMStatusToXMPP(msgPacket.getStatusCode()),
-                msgPacket.getStatusMessage()
-        );
     }
     
     public void processIncomingMessage(MediaMessage msgPacket) {
@@ -90,6 +97,41 @@ public class MySpaceIMListener implements MessageListener {
     
     public void processIncomingMessage(ProfileMessage msgPacket) {
         Log.debug("MySpaceIM: Received profile message packet: "+msgPacket);
+    }
+    
+    public void processIncomingMessage(ErrorMessage msgPacket) {
+        Log.debug("MySpaceIM: Received error message packet: "+msgPacket);
+        getSession().getTransport().sendMessage(
+                getSession().getJID(),
+                getSession().getTransport().getJID(),
+                msgPacket.getErrorMessage(),
+                Message.Type.error
+        );
+        if (msgPacket.isFatal()) {
+            getSession().sessionDisconnected(msgPacket.getErrorMessage());
+        }
+    }
+
+    public void contactListUpdateReceived() {
+        Log.debug("MySpaceIM: Got contact list.");
+        List<Contact> contacts = getSession().getConnection().getContactManager().getContacts();
+        for (Contact contact : contacts) {
+            MySpaceIMBuddy buddy;
+            try {
+                buddy = (MySpaceIMBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(contact.getContactID())));
+            }
+            catch (NotFoundException e) {
+                buddy = new MySpaceIMBuddy(getSession().getBuddyManager(), contact.getContactID());
+                getSession().getBuddyManager().storeBuddy(buddy); 
+            }
+        }
+        try {
+            getSession().getTransport().syncLegacyRoster(getSession().getJID(), getSession().getBuddyManager().getBuddies());
+        }
+        catch (UserNotFoundException e) {
+            Log.debug("Unable to sync MySpaceIM contact list for " + getSession().getJID(), e);
+        }
+        getSession().getBuddyManager().activate();
     }
     
 }
