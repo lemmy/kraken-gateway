@@ -189,8 +189,7 @@ public class YahooSession extends TransportSession {
      */
     public void syncUsers() {
         // Now we will run through the entire list of users and set up our sync group.
-        YahooUser user = null;
-        for (Iterator<YahooUser> iter = yahooSession.getRoster().iterator(); iter.hasNext(); user = iter.next()) {
+        for (YahooUser user : yahooSession.getRoster()) {
             PseudoRosterItem rosterItem = pseudoRoster.getItem(user.getId());
             String nickname = null;
             if (rosterItem != null) {
@@ -334,7 +333,7 @@ public class YahooSession extends TransportSession {
      */
     public void sendMessage(JID jid, String message) {
         try {
-            yahooSession.sendMessage(jid.getNode(), message);
+            yahooSession.sendMessage(getTransport().convertJIDToID(jid), message);
         }
         catch (IOException e) {
             Log.debug("Failed to send message to yahoo user.");
