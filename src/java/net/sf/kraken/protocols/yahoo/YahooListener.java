@@ -184,7 +184,7 @@ public class YahooListener extends SessionAdapter<YahooUser> {
      * @see org.openymsg.network.event.SessionAdapter#connectionClosed(org.openymsg.network.event.SessionEvent)
      */
     public void connectionClosed(SessionEvent event) {
-        Log.debug(event.toString());
+        Log.debug(event == null ? "closed event is null":event.toString());
         if (getSession().isLoggedIn()) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
             getSession().sessionDisconnectedNoReconnect(null);
