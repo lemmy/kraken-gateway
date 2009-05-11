@@ -21,8 +21,8 @@ martyr.jar               | svn-20070908
 msim.jar                 | svn-20090125
 openymsg.jar             | svn-20090125
 servlet.jar              | 2.5
-smack.jar                | svn-20071228
-smackx.jar               | svn-20071228
+smack.jar                | svn-20090510 (patched [#4])
+smackx.jar               | svn-20090510 (patched [#4])
 stcomm.jar               | 3.0
 xmlrpc.jar               | 1.0.1
 
@@ -37,3 +37,6 @@ Patch Descriptions
 
 3) joscar patches
 - patched to fix issue with russian icq users
+
+4) smack patches
+- patched to fix digest issues (from Eric Sessoms)

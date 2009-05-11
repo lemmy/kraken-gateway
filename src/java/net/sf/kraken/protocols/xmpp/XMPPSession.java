@@ -201,7 +201,7 @@ public class XMPPSession extends TransportSession {
                         conn.connect();
                         conn.addConnectionListener(listener);
                         try {
-                            conn.login(userName, registration.getPassword(), StringUtils.randomString(10), true);
+                            conn.login(userName, registration.getPassword(), StringUtils.randomString(10));
                             conn.getRoster().addRosterListener(listener);
                             conn.getChatManager().addChatListener(listener);
                             // Use this to filter out anything we don't care about
