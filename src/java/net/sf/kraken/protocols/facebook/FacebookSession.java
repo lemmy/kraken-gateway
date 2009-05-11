@@ -19,6 +19,7 @@ import net.sf.kraken.type.TransportLoginStatus;
 
 import org.xmpp.packet.JID;
 import org.apache.log4j.Logger;
+import org.jivesoftware.util.JiveGlobals;
 import org.json.JSONException;
 
 import java.util.ArrayList;
