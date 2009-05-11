@@ -150,7 +150,19 @@ public class FacebookSession extends TransportSession {
      */
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         adapter.setVisibility(true);
-        // could set status message here, but not sure i want to... im status and facebook status aren't the same concepts
+        // setting status on facebook will literally publish a new status on facebook on behalf of the user.  this could
+        // potentially be spammy.  therefore, we will only allow this if the admin decides to turn it on via the system property
+        if (JiveGlobals.getBooleanProperty("plugin.gateway.facebook.updatestatus", false)) {
+          try{
+            if( verboseStatus != null) {
+              Log.debug("Facebook: setting facebook status to " + verboseStatus);
+              adapter.setStatusMessage(verboseStatus);
+            }
+          }
+          catch (Exception e) {
+            Log.error("Facebook: Unable to update status of user", e);
+          }
+        }
     }
 
 }
