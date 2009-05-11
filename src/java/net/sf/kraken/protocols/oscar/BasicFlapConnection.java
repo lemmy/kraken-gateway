@@ -217,6 +217,10 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
             if (info.getAwayStatus()) {
                 pType = PresenceType.away;
             }
+            if ((info.getFlags() & FullUserInfo.MASK_WIRELESS) != 0) {
+                pType = PresenceType.xa;
+                vStatus = "Mobile: ";
+            }
 
             if (getMainSession().getTransport().getType().equals(TransportType.icq) && info.getScreenname().matches("/^\\d+$/")) {
                 pType = ((OSCARTransport)getMainSession().getTransport()).convertICQStatusToXMPP(info.getIcqStatus());
@@ -240,7 +244,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                                 continue;
                             }
                             if (msg.length() > 0) {
-                                vStatus = msg;
+                                vStatus = vStatus + msg;
                             }
                         }
                     }
