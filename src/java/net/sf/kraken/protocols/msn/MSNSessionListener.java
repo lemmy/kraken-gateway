@@ -15,9 +15,10 @@ import org.jivesoftware.util.LocaleUtils;
 
 import java.lang.ref.WeakReference;
 
-import net.sf.cindy.SessionAdapter;
-import net.sf.cindy.Session;
-import net.sf.cindy.Message;
+import net.sf.jml.net.Message;
+import net.sf.jml.net.Session;
+import net.sf.jml.net.SessionAdapter;
+
 import net.sf.kraken.type.TransportLoginStatus;
 
 /**
