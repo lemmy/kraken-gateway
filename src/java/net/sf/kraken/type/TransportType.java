@@ -55,14 +55,19 @@ public enum TransportType {
     icq ("icq"),
 
     /**
+     * IRC services. (not in the official spec)
+     */
+    irc ("irc"),
+
+    /**
      * Microsoft Live Communications service.
      */
     lcs ("lcs"),
 
     /**
-     * IRC services. (not in the official spec)
+     * Live Journal (a 'special' XMPP server)
      */
-    irc ("irc"),
+    livejournal ("xmpp"),
 
     /**
      * The MSN instant messaging service.

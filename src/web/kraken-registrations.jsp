@@ -35,6 +35,7 @@
     trEnabled.put("gtalk", plugin.getTransportInstance("gtalk").isEnabled());
     trEnabled.put("icq", plugin.getTransportInstance("icq").isEnabled());
     trEnabled.put("irc", plugin.getTransportInstance("irc").isEnabled());
+    trEnabled.put("livejournal", plugin.getTransportInstance("livejournal").isEnabled());
     trEnabled.put("msn", plugin.getTransportInstance("msn").isEnabled());
     trEnabled.put("myspaceim", plugin.getTransportInstance("myspaceim").isEnabled());
     trEnabled.put("qq", plugin.getTransportInstance("qq").isEnabled());
@@ -93,6 +94,9 @@
         if (webManager.getPageProperty("gateway-registrations", "filterIRC", 0) != 0) {
             filteropts.add("irc");
         }
+        if (webManager.getPageProperty("gateway-registrations", "filterLIVEJOURNAL", 0) != 0) {
+            filteropts.add("livejournal");
+        }
         if (webManager.getPageProperty("gateway-registrations", "filterMSN", 0) != 0) {
             filteropts.add("msn");
         }
@@ -124,6 +128,7 @@
         filteropts.add("gtalk");
         filteropts.add("icq");
         filteropts.add("irc");
+        filteropts.add("livejournal");
         filteropts.add("msn");
         filteropts.add("myspaceim");
         filteropts.add("qq");
@@ -140,6 +145,7 @@
     webManager.setPageProperty("gateway-registrations", "filterGTALK", filteropts.contains("gtalk") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterICQ", filteropts.contains("icq") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterIRC", filteropts.contains("irc") ? 1 : 0);
+    webManager.setPageProperty("gateway-registrations", "filterLIVEJOURNAL", filteropts.contains("livejournal") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterMSN", filteropts.contains("msn") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterMYSPACEIM", filteropts.contains("myspaceim") ? 1 : 0);
     webManager.setPageProperty("gateway-registrations", "filterQQ", filteropts.contains("qq") ? 1 : 0);
@@ -453,6 +459,7 @@
             <% if (trEnabled.get("gtalk")) { %> <option value="gtalk"><fmt:message key="gateway.gtalk.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("icq")) { %> <option value="icq"><fmt:message key="gateway.icq.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("irc")) { %> <option value="irc"><fmt:message key="gateway.irc.shortservice" /></option> <% } %>
+            <% if (trEnabled.get("livejournal")) { %> <option value="xmpp"><fmt:message key="gateway.livejournal.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("msn")) { %> <option value="msn"><fmt:message key="gateway.msn.shortservice" /></option> <% } %>
             <% if (trEnabled.get("myspaceim")) { %> <option value="myspaceim"><fmt:message key="gateway.myspaceim.shortservice" /></option> <% } %>
             <% if (trEnabled.get("qq")) { %> <option value="qq"><fmt:message key="gateway.qq.shortservice" /></option> <% } %>
@@ -577,6 +584,11 @@
                 <input type="checkbox" name="filter[]" value="irc" <%= ((filteropts.contains("irc")) ? "checked" : "") %> id="filterIRCcheckbox">
                 <img src="images/irc.gif" border="0" alt="<fmt:message key="gateway.irc.shortservice" />" title="<fmt:message key="gateway.irc.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.irc.shortservice" /></span>-->
+            </label>
+            <label for="filterLIVEJOURNALcheckbox">
+                <input type="checkbox" name="filter[]" value="livejournal" <%= ((filteropts.contains("livejournal")) ? "checked" : "") %> id="filterLIVEJOURNALcheckbox">
+                <img src="images/livejournal.gif" border="0" alt="<fmt:message key="gateway.livejournal.shortservice" />" title="<fmt:message key="gateway.livejournal.shortservice" />"/>
+                <!--<span><fmt:message key="gateway.livejournal.shortservice" /></span>-->
             </label>
             <label for="filterMSNcheckbox">
                 <input type="checkbox" name="filter[]" value="msn" <%= ((filteropts.contains("msn")) ? "checked" : "") %> id="filterMSNcheckbox">

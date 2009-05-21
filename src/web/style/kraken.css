@@ -404,6 +404,14 @@ a.jive-gatewayButtonOn {
 	background: url(../images/xmpp-gray.gif) no-repeat left;
 	background-position: 2px 1px;
 	}
+.jive-gateway-LIVEJOURNALon {
+	background: url(../images/livejournal.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
+.jive-gateway-LIVEJOURNALoff {
+	background: url(../images/livejournal-gray.gif) no-repeat left;
+	background-position: 2px 1px;
+	}
 .jive-gateway-SIMPLEon {
     background: url(../images/simple.gif) no-repeat left;
     background-position: 2px 1px;

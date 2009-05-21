@@ -459,6 +459,7 @@
     GatewaySettings gtalkSettings = new GatewaySettings(out, plugin, TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.service", "kraken"));
     GatewaySettings icqSettings = new GatewaySettings(out, plugin, TransportType.icq, LocaleUtils.getLocalizedString("gateway.icq.service", "kraken"));
     GatewaySettings ircSettings = new GatewaySettings(out, plugin, TransportType.irc, LocaleUtils.getLocalizedString("gateway.irc.service", "kraken"));
+    GatewaySettings livejournalSettings = new GatewaySettings(out, plugin, TransportType.livejournal, LocaleUtils.getLocalizedString("gateway.livejournal.service", "kraken"));
     GatewaySettings msnSettings = new GatewaySettings(out, plugin, TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.service", "kraken"));
     GatewaySettings myspaceimSettings = new GatewaySettings(out, plugin, TransportType.myspaceim, LocaleUtils.getLocalizedString("gateway.myspaceim.service", "kraken"));
     GatewaySettings qqSettings = new GatewaySettings(out, plugin, TransportType.qq, LocaleUtils.getLocalizedString("gateway.qq.service", "kraken"));
@@ -820,6 +821,7 @@
 <% facebookSettings.printSettingsDialog(); %>
 <% gtalkSettings.printSettingsDialog(); %>
 <% qqSettings.printSettingsDialog(); %>
+<% livejournalSettings.printSettingsDialog(); %>
 <% myspaceimSettings.printSettingsDialog(); %>
 <% sametimeSettings.printSettingsDialog(); %>
 <% simpleSettings.printSettingsDialog(); %>

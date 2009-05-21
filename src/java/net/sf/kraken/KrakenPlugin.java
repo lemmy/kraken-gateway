@@ -111,6 +111,10 @@ public class KrakenPlugin implements Plugin {
         transports.put("gtalk", new TransportInstance(TransportType.gtalk, LocaleUtils.getLocalizedString("gateway.gtalk.name", "kraken"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
         maybeStartService("gtalk");
 
+        /* Set up LiveJournal transport. */
+        transports.put("livejournal", new TransportInstance(TransportType.livejournal, LocaleUtils.getLocalizedString("gateway.livejournal.name", "kraken"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
+        maybeStartService("livejournal");
+
         /* Set up SIMPLE transport. */
         transports.put("simple", new TransportInstance(TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.name", "kraken"), "net.sf.kraken.protocols.simple.SimpleTransport", componentManager, sessionRouter));
         maybeStartService("simple");

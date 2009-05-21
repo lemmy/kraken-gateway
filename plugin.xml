@@ -5,10 +5,10 @@
     <class>net.sf.kraken.KrakenPlugin</class>
     
     <!-- Plugin meta-data -->
-    <name>${gateway.name}</name>
+    <name>kraken</name>
     <description>${gateway.description}</description>
     <author>Daniel Henninger</author>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <date>02/08/2009</date>
     <minServerVersion>3.6.0</minServerVersion>
     <databaseKey>gateway</databaseKey>
