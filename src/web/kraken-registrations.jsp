@@ -555,6 +555,7 @@
 	<div class="jive-gateway-filter" id="jiveGatewayFilters">
 		<div>
             <strong><fmt:message key="gateway.web.registrations.filterby" />:</strong>
+            <div>
             <label for="filterAIMcheckbox">
                 <input type="checkbox" name="filter[]" value="aim" <%= ((filteropts.contains("aim")) ? "checked" : "") %> id="filterAIMcheckbox">
                 <img src="images/aim.gif" border="0" alt="<fmt:message key="gateway.aim.shortservice" />" title="<fmt:message key="gateway.aim.shortservice" />"/>
@@ -595,6 +596,7 @@
                 <img src="images/msn.gif" border="0" alt="<fmt:message key="gateway.msn.shortservice" />" title="<fmt:message key="gateway.msn.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.msn.shortservice" /></span>-->
             </label>
+            <br />
             <label for="filterMYSPACEIMcheckbox">
                 <input type="checkbox" name="filter[]" value="myspaceim" <%= ((filteropts.contains("myspaceim")) ? "checked" : "") %> id="filterMYSPACEIMcheckbox">
                 <img src="images/myspaceim.gif" border="0" alt="<fmt:message key="gateway.myspaceim.shortservice" />" title="<fmt:message key="gateway.myspaceim.shortservice" />"/>
@@ -625,6 +627,7 @@
                 <img src="images/yahoo.gif" border="0" alt="<fmt:message key="gateway.yahoo.shortservice" />" title="<fmt:message key="gateway.yahoo.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.yahoo.shortservice" /></span>-->
             </label>
+            </div>
 		</div>
         <div class="jive-gateway-filter-textentryline">
             <div class="jive-gateway-filter-textentry">
