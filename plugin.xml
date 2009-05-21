@@ -5,7 +5,7 @@
     <class>net.sf.kraken.KrakenPlugin</class>
     
     <!-- Plugin meta-data -->
-    <name>kraken</name>
+    <name>Kraken IM Gateway</name>
     <description>${gateway.description}</description>
     <author>Daniel Henninger</author>
     <version>1.1.0</version>
