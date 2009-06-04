@@ -75,50 +75,50 @@
     if (ParamUtils.getParameter(request, "filter[]") != null) {
         String[] optlist = ParamUtils.getParameters(request, "filter[]");
         filteropts.addAll(Arrays.asList(optlist));
-    } else if (webManager.getPageProperty("gateway-registrations", "filterSET", 0) != 0) {
-        if (webManager.getPageProperty("gateway-registrations", "filterAIM", 0) != 0) {
+    } else if (webManager.getPageProperty("kraken-registrations", "filterSET", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterAIM", 0) != 0) {
             filteropts.add("aim");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterFACEBOOK", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterFACEBOOK", 0) != 0) {
             filteropts.add("facebook");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterGADUGADU", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterGADUGADU", 0) != 0) {
             filteropts.add("gadugadu");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterGTALK", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterGTALK", 0) != 0) {
             filteropts.add("gtalk");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterICQ", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterICQ", 0) != 0) {
             filteropts.add("icq");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterIRC", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterIRC", 0) != 0) {
             filteropts.add("irc");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterLIVEJOURNAL", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterLIVEJOURNAL", 0) != 0) {
             filteropts.add("livejournal");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterMSN", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterMSN", 0) != 0) {
             filteropts.add("msn");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterMYSPACEIM", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterMYSPACEIM", 0) != 0) {
             filteropts.add("myspaceim");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterQQ", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterQQ", 0) != 0) {
             filteropts.add("qq");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterSAMETIME", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterSAMETIME", 0) != 0) {
             filteropts.add("sametime");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterSIMPLE", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterSIMPLE", 0) != 0) {
             filteropts.add("simple");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterXMPP", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterXMPP", 0) != 0) {
             filteropts.add("xmpp");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterYAHOO", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterYAHOO", 0) != 0) {
             filteropts.add("yahoo");
         }
-        if (webManager.getPageProperty("gateway-registrations", "filterSIGNEDON", 0) != 0) {
+        if (webManager.getPageProperty("kraken-registrations", "filterSIGNEDON", 0) != 0) {
             filteropts.add("signedon");
         }
     } else {
@@ -138,22 +138,22 @@
         filteropts.add("yahoo");
     }
 
-    webManager.setPageProperty("gateway-registrations", "filterSET", 1);
-    webManager.setPageProperty("gateway-registrations", "filterAIM", filteropts.contains("aim") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterFACEBOOK", filteropts.contains("facebook") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterGADUGADU", filteropts.contains("gadugadu") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterGTALK", filteropts.contains("gtalk") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterICQ", filteropts.contains("icq") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterIRC", filteropts.contains("irc") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterLIVEJOURNAL", filteropts.contains("livejournal") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterMSN", filteropts.contains("msn") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterMYSPACEIM", filteropts.contains("myspaceim") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterQQ", filteropts.contains("qq") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterSAMETIME", filteropts.contains("sametime") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterSIMPLE", filteropts.contains("simple") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterXMPP", filteropts.contains("xmpp") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterYAHOO", filteropts.contains("yahoo") ? 1 : 0);
-    webManager.setPageProperty("gateway-registrations", "filterSIGNEDON", filteropts.contains("signedon") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterSET", 1);
+    webManager.setPageProperty("kraken-registrations", "filterAIM", filteropts.contains("aim") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterFACEBOOK", filteropts.contains("facebook") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterGADUGADU", filteropts.contains("gadugadu") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterGTALK", filteropts.contains("gtalk") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterICQ", filteropts.contains("icq") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterIRC", filteropts.contains("irc") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterLIVEJOURNAL", filteropts.contains("livejournal") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterMSN", filteropts.contains("msn") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterMYSPACEIM", filteropts.contains("myspaceim") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterQQ", filteropts.contains("qq") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterSAMETIME", filteropts.contains("sametime") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterSIMPLE", filteropts.contains("simple") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterXMPP", filteropts.contains("xmpp") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterYAHOO", filteropts.contains("yahoo") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterSIGNEDON", filteropts.contains("signedon") ? 1 : 0);
 
     TransportSessionRouter sessionRouter = plugin.getSessionRouter();
     byte[] thisNode = XMPPServer.getInstance().getNodeID().toByteArray();
@@ -280,10 +280,10 @@
     final int[] RANGE_PRESETS = {15, 30, 50, 100};
 
     int start = ParamUtils.getIntParameter(request, "start", 0);
-    int range = ParamUtils.getIntParameter(request, "range", webManager.getRowsPerPage("gateway-registrations", DEFAULT_RANGE));
+    int range = ParamUtils.getIntParameter(request, "range", webManager.getRowsPerPage("kraken-registrations", DEFAULT_RANGE));
 
     if (request.getParameter("range") != null) {
-        webManager.setRowsPerPage("gateway-registrations", range);
+        webManager.setRowsPerPage("kraken-registrations", range);
     }
 
     // paginator vars
@@ -505,7 +505,7 @@
 
 
 	<!-- BEGIN results size (num per page) -->
-	<div class="jive-registrations-resultsSize"><form action="gateway-registrations.jsp" method="get">
+	<div class="jive-registrations-resultsSize"><form action="kraken-registrations.jsp" method="get">
 		<select name="range" id="range" size="1" onchange="this.form.submit()">
                 <%  for (int rangePreset : RANGE_PRESETS) { %>
 
@@ -524,7 +524,7 @@
             <%
                 if (numPages > 1 && ((curPage) > 1)) {
             %>
-                    <a href="gateway-registrations.jsp?start=<%= ((curPage-2)*range) %>">&lt; <fmt:message key="gateway.web.registrations.prev" /></a>
+                    <a href="kraken-registrations.jsp?start=<%= ((curPage-2)*range) %>">&lt; <fmt:message key="gateway.web.registrations.prev" /></a>
             <%
                 }
                 for (int i=0; i<numPages; i++) {
@@ -536,13 +536,13 @@
                     }
                     else {
             %>
-                        <a href="gateway-registrations.jsp?start=<%= (i*range) %>"><%= (i+1) %></a> 
+                        <a href="kraken-registrations.jsp?start=<%= (i*range) %>"><%= (i+1) %></a> 
             <%
                     }
                 }
                 if (numPages > 1 && ((curPage) < numPages)) {
             %>
-                    <a href="gateway-registrations.jsp?start=<%= (curPage*range) %>"><fmt:message key="gateway.web.registrations.next" /> &gt;</a>
+                    <a href="kraken-registrations.jsp?start=<%= (curPage*range) %>"><fmt:message key="gateway.web.registrations.next" /> &gt;</a>
             <%
                 }
             %>
@@ -551,7 +551,7 @@
 	
 	
 	<!-- BEGIN gateway filter -->
-	<form action="gateway-registrations.jsp" name="jive-filterForm">
+	<form action="kraken-registrations.jsp" name="jive-filterForm">
 	<div class="jive-gateway-filter" id="jiveGatewayFilters">
 		<div>
             <strong><fmt:message key="gateway.web.registrations.filterby" />:</strong>
@@ -723,7 +723,7 @@
             <%
                 if (numPages > 1 && ((curPage) > 1)) {
             %>
-                    <a href="gateway-registrations.jsp?start=<%= ((curPage-2)*range) %>">&lt; <fmt:message key="gateway.web.registrations.prev" /></a>
+                    <a href="kraken-registrations.jsp?start=<%= ((curPage-2)*range) %>">&lt; <fmt:message key="gateway.web.registrations.prev" /></a>
             <%
                 }
                 for (int i=0; i<numPages; i++) {
@@ -735,13 +735,13 @@
                     }
                     else {
             %>
-                        <a href="gateway-registrations.jsp?start=<%= (i*range) %>"><%= (i+1) %></a>
+                        <a href="kraken-registrations.jsp?start=<%= (i*range) %>"><%= (i+1) %></a>
             <%
                     }
                 }
                 if (numPages > 1 && ((curPage) < numPages)) {
             %>
-                    <a href="gateway-registrations.jsp?start=<%= (curPage*range) %>"><fmt:message key="gateway.web.registrations.next" /> &gt;</a>
+                    <a href="kraken-registrations.jsp?start=<%= (curPage*range) %>"><fmt:message key="gateway.web.registrations.next" /> &gt;</a>
             <%
                 }
             %>
