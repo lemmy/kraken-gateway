@@ -33,7 +33,7 @@ import java.lang.ref.WeakReference;
  * @author Daniel Henninger
  * Heavily inspired by Noah Campbell's work.
  */
-public class YahooListener extends SessionAdapter<YahooUser> {
+public class YahooListener extends SessionAdapter {
 
     static Logger Log = Logger.getLogger(YahooListener.class);
 
@@ -120,7 +120,7 @@ public class YahooListener extends SessionAdapter<YahooUser> {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    public void friendsUpdateReceived(SessionFriendEvent<YahooUser> event) {
+    public void friendsUpdateReceived(SessionFriendEvent event) {
         YahooUser user = event.getUser();
         if (getSession().getBuddyManager().isActivated()) {
             try {
@@ -142,7 +142,7 @@ public class YahooListener extends SessionAdapter<YahooUser> {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendAddedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    public void friendAddedReceived(SessionFriendEvent<YahooUser> event) {
+    public void friendAddedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- added is now added, do we want to use this
 //        Presence p = new Presence(Presence.Type.subscribe);
 //        p.setTo(getSession().getJID());
@@ -153,7 +153,7 @@ public class YahooListener extends SessionAdapter<YahooUser> {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendRemovedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    public void friendRemovedReceived(SessionFriendEvent<YahooUser> event) {
+    public void friendRemovedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- removed is now gone, do we want to use this
 //        Presence p = new Presence(Presence.Type.unsubscribe);
 //        p.setTo(getSession().getJID());
