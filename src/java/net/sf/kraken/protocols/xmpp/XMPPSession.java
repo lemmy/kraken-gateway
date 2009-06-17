@@ -443,6 +443,26 @@ public class XMPPSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID, net.sf.kraken.type.ChatStateType)
      */
     public void sendChatState(JID jid, ChatStateType chatState) {
+        Chat chat =
+conn.getChatManager().createChat(getTransport().convertJIDToID(jid),
+listener);
+        try {
+            ChatState state = ChatState.active;
+            switch (chatState) {
+                case active:    state = ChatState.active;    break;
+                case composing: state = ChatState.composing; break;
+                case paused:    state = ChatState.paused;    break;
+                case inactive:  state = ChatState.inactive;  break;
+                case gone:      state = ChatState.gone;      break;
+            };
+
+            Message message = new Message();
+            message.addExtension(new ChatStateExtension(state));
+            chat.sendMessage(message);
+        }
+        catch (XMPPException e) {
+            // Ignore
+        }
     }
 
     /**
