@@ -185,7 +185,7 @@ public class TransportInstance implements PropertyEventListener {
             running = true;
         }
         catch (Exception e) {
-            componentManager.getLog().error(e);
+            Log.error("Error while adding component "+this.subDomain+": ", e);
         }
     }
 
@@ -205,7 +205,7 @@ public class TransportInstance implements PropertyEventListener {
             componentManager.removeComponent(this.subDomain);
         }
         catch (Exception e) {
-            componentManager.getLog().error(e);
+            Log.error("Error while removing component "+this.subDomain+": ", e);
         }
         transport = null;
         running = false;
