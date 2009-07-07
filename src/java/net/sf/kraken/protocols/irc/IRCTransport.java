@@ -16,6 +16,7 @@ import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.util.LocaleUtils;
 import org.xmpp.packet.JID;
 
@@ -28,6 +29,8 @@ import org.xmpp.packet.JID;
  * @author Daniel Henninger
  */
 public class IRCTransport extends BaseTransport {
+
+    static Logger Log = Logger.getLogger(IRCTransport.class);
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
@@ -138,7 +141,7 @@ public class IRCTransport extends BaseTransport {
             componentManager.addComponent("conference.irc", mucTransport);
         }
         catch (Exception e) {
-            componentManager.getLog().error(e);
+            Log.error("Error starting IRC MUC component: ", e);
         }
     }
 
@@ -148,7 +151,7 @@ public class IRCTransport extends BaseTransport {
             componentManager.removeComponent("conference.irc");
         }
         catch (Exception e) {
-            componentManager.getLog().error(e);
+            Log.error("Error shutting down IRC MUC component: ", e);
         }
         super.shutdown();
     }
