@@ -28,6 +28,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.packet.VCard;
+import org.jivesoftware.smackx.ChatState;
+import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.util.Base64;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
