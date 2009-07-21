@@ -806,7 +806,7 @@ public class FacebookAdapter {
 	    //                                                      ^^^^----- your id number
 	    //                                                           ^--- sequence number
         String url =
-            "http://0.channel" + channel + ".facebook.com/x/" + new Date().getTime() + "/false/p_" + uid
+            "http://0." + channel + ".facebook.com/x/" + new Date().getTime() + "/false/p_" + uid
                 + "=" + seq;
         logger.trace("Facebook: request url:" + url);
         return url;
