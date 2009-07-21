@@ -88,7 +88,7 @@ public class FacebookAdapter {
 	/**
 	 * The channel this account is using
 	 */
-	private String channel = "26";
+	private String channel = "channel15";
 	/**
 	 * The post form id
 	 */
@@ -1167,7 +1167,7 @@ public class FacebookAdapter {
         return responseStr;
     }
 
-    private static void getChannel() {
+    private void getChannel() {
       if(post_form_id != null) {
         String url = "http://www.facebook.com/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
         System.out.println("@executing facebookGetChannel():" + url);
