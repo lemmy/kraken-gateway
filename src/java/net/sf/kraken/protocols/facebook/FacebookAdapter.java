@@ -540,18 +540,18 @@ public class FacebookAdapter {
 		}*/
 		
 		//find the channel
-		String channelPrefix = " \"channel";
-		int channelBeginPos = getMethodResponseBody.indexOf(channelPrefix)
-				+ channelPrefix.length();
-		if (channelBeginPos < channelPrefix.length()){
-			logger.fatal("Facebook: Error: Can't find channel!");
-			return FacebookErrorCode.Error_System_ChannelNotFound;
-		}
-		else {
-			channel = getMethodResponseBody.substring(channelBeginPos,
-					channelBeginPos + 2);
-			logger.info("Facebook: Channel: " + channel);
-		}
+		//String channelPrefix = " \"channel";
+		//int channelBeginPos = getMethodResponseBody.indexOf(channelPrefix)
+		//		+ channelPrefix.length();
+		//if (channelBeginPos < channelPrefix.length()){
+		//	logger.fatal("Facebook: Error: Can't find channel!");
+		//	return FacebookErrorCode.Error_System_ChannelNotFound;
+		//}
+		//else {
+		//	channel = getMethodResponseBody.substring(channelBeginPos,
+		//			channelBeginPos + 2);
+		//	logger.info("Facebook: Channel: " + channel);
+		//}
 
 		//find the post form id
 		// <input type="hidden" id="post_form_id" name="post_form_id"
@@ -567,6 +567,8 @@ public class FacebookAdapter {
 			post_form_id = getMethodResponseBody.substring(formIdBeginPos,
 					formIdBeginPos + 32);
 			logger.info("Facebook: post_form_id: " + post_form_id);
+
+                        getChannel();
 		}
 		
 		return FacebookErrorCode.Error_Global_NoError;
@@ -1164,4 +1166,58 @@ public class FacebookAdapter {
 
         return responseStr;
     }
+
+    private static void getChannel() {
+      if(post_form_id != null) {
+        String url = "http://www.facebook.com/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
+        System.out.println("@executing facebookGetChannel():" + url);
+        String responseStr = null;
+        
+        try {
+            HttpGet loginGet = new HttpGet(url);
+            HttpResponse response = httpClient.execute(loginGet);
+            HttpEntity entity = response.getEntity();
+            
+            System.out.println("facebookGetChannel: " + response.getStatusLine());
+            if (entity != null) {
+                responseStr = EntityUtils.toString(entity);
+                entity.consumeContent();
+            }
+            
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            /**
+             * @fixme I am not sure of if 200 is the only code that 
+             *  means "success"
+             */
+            if(statusCode != 200){
+                //error occured
+                System.out.println("Error Occured! Status Code = " + statusCode);
+                responseStr = null;
+            } else {
+              System.out.println("Get Channel Method done(" + statusCode+"), response string length: " + (responseStr==null? 0:responseStr.length()));
+              System.out.println("Get Channel Method responseStr : " + responseStr);
+
+              String hostPrefix = "\"host\":\"";
+              int hostBeginPos = responseStr.indexOf(hostPrefix) + hostPrefix.length();
+              if (hostBeginPos < hostPrefix.length()) {
+                System.out.println("Failed to parse channel");
+              } else {
+                System.out.println("channel host found.");
+                channel = responseStr.substring(hostBeginPos, responseStr.substring(hostBeginPos).indexOf("\"") + hostBeginPos);
+                System.out.println("channel: " + channel);
+              }
+            }
+
+        } catch (HttpException e) {
+            System.out.println("Failed to get the page: " + url);
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (URISyntaxException e) {
+            System.out.println(e.getMessage());
+        }
+      }
+    }
+
 }
