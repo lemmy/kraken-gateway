@@ -1209,13 +1209,13 @@ public class FacebookAdapter {
               }
             }
 
-        } catch (HttpException e) {
-            System.out.println("Failed to get the page: " + url);
-            System.out.println(e.getMessage());
+        //} catch (HttpException e) {
+        //    System.out.println("Failed to get the page: " + url);
+        //    System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        } catch (URISyntaxException e) {
-            System.out.println(e.getMessage());
+        //} catch (URISyntaxException e) {
+        //    System.out.println(e.getMessage());
         }
       }
     }
