@@ -17,10 +17,21 @@ import org.jivesoftware.util.NotFoundException;
 import org.jivesoftware.util.JiveGlobals;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
-import org.openymsg.network.YahooUser;
-import org.openymsg.network.event.*;
-import org.openymsg.support.MessageDecoder;
 import org.apache.log4j.Logger;
+
+import ymsg.network.StatusConstants;
+import ymsg.network.YahooUser;
+import ymsg.network.event.SessionAdapter;
+import ymsg.network.event.SessionChatEvent;
+import ymsg.network.event.SessionConferenceEvent;
+import ymsg.network.event.SessionErrorEvent;
+import ymsg.network.event.SessionEvent;
+import ymsg.network.event.SessionExceptionEvent;
+import ymsg.network.event.SessionFileTransferEvent;
+import ymsg.network.event.SessionFriendEvent;
+import ymsg.network.event.SessionNewMailEvent;
+import ymsg.network.event.SessionNotifyEvent;
+import ymsg.support.MessageDecoder;
 
 import java.util.Arrays;
 import java.lang.ref.WeakReference;
@@ -121,21 +132,22 @@ public class YahooListener extends SessionAdapter {
      * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
      */
     public void friendsUpdateReceived(SessionFriendEvent event) {
-        YahooUser user = event.getUser();
-        if (getSession().getBuddyManager().isActivated()) {
-            try {
-                YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
-                yahooBuddy.yahooUser = user;
-                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
-
+        for (YahooUser user : event.getFriends()) {
+            if (getSession().getBuddyManager().isActivated()) {
+                try {
+                    YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
+                    yahooBuddy.yahooUser = user;
+                    yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+    
+                }
+                catch (NotFoundException e) {
+                    // Not in our list.
+                    Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
+                }
             }
-            catch (NotFoundException e) {
-                // Not in our list.
-                Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
+            else {
+                getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(user.getId()), ((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
             }
-        }
-        else {
-            getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(user.getId()), ((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
         }
     }
 
@@ -144,6 +156,7 @@ public class YahooListener extends SessionAdapter {
      */
     public void friendAddedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- added is now added, do we want to use this
+        event.getFriend();
 //        Presence p = new Presence(Presence.Type.subscribe);
 //        p.setTo(getSession().getJID());
 //        p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
@@ -159,13 +172,6 @@ public class YahooListener extends SessionAdapter {
 //        p.setTo(getSession().getJID());
 //        p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
 //        getSession().getTransport().sendPacket(p);
-    }
-
-    /**
-     * @see org.openymsg.network.event.SessionAdapter#groupRenameReceived(org.openymsg.network.event.SessionGroupEvent)
-     */
-    public void groupRenameReceived(SessionGroupEvent sessionGroupEvent) {
-        // TODO: Handle this
     }
 
     /**
@@ -251,7 +257,7 @@ public class YahooListener extends SessionAdapter {
     public void notifyReceived(SessionNotifyEvent event) {
         Log.debug(event.toString());
         if (event.isTyping()) {
-            if (event.isOn()) {
+            if (event.getStatus() == StatusConstants.STATUS_TYPING) {
                 getSession().getTransport().sendComposingNotification(
                         getSession().getJID(),
                         getSession().getTransport().convertIDToJID(event.getFrom())

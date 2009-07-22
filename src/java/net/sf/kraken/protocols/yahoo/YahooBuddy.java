@@ -14,9 +14,9 @@ import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 
-import org.openymsg.network.YahooUser;
-
 import java.util.Collection;
+
+import ymsg.network.YahooUser;
 
 /**
  * @author Daniel Henninger

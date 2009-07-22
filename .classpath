@@ -18,7 +18,6 @@
 	<classpathentry kind="lib" path="lib/jsocks.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/martyr.jar"/>
-	<classpathentry kind="lib" path="lib/openymsg.jar"/>
 	<classpathentry kind="lib" path="lib/smack.jar"/>
 	<classpathentry kind="lib" path="lib/smackx.jar"/>
 	<classpathentry kind="lib" path="lib/xmlrpc.jar"/>
@@ -36,5 +35,6 @@
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient.jar"/>
+	<classpathentry kind="lib" path="lib/yahoo.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
