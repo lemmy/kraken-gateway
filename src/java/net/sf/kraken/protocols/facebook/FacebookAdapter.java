@@ -1170,7 +1170,7 @@ public class FacebookAdapter {
     private void getChannel() {
       if(post_form_id != null) {
         String url = "http://www.facebook.com/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
-        System.out.println("@executing facebookGetChannel():" + url);
+        logger.debug("@executing facebookGetChannel():" + url);
         String responseStr = null;
         
         try {
@@ -1178,7 +1178,7 @@ public class FacebookAdapter {
             HttpResponse response = httpClient.execute(loginGet);
             HttpEntity entity = response.getEntity();
             
-            System.out.println("facebookGetChannel: " + response.getStatusLine());
+            logger.debug("facebookGetChannel: " + response.getStatusLine());
             if (entity != null) {
                 responseStr = EntityUtils.toString(entity);
                 entity.consumeContent();
@@ -1192,30 +1192,30 @@ public class FacebookAdapter {
              */
             if(statusCode != 200){
                 //error occured
-                System.out.println("Error Occured! Status Code = " + statusCode);
+                logger.debug("Error Occured! Status Code = " + statusCode);
                 responseStr = null;
             } else {
-              System.out.println("Get Channel Method done(" + statusCode+"), response string length: " + (responseStr==null? 0:responseStr.length()));
-              System.out.println("Get Channel Method responseStr : " + responseStr);
+              logger.debug("Get Channel Method done(" + statusCode+"), response string length: " + (responseStr==null? 0:responseStr.length()));
+              logger.debug("Get Channel Method responseStr : " + responseStr);
 
               String hostPrefix = "\"host\":\"";
               int hostBeginPos = responseStr.indexOf(hostPrefix) + hostPrefix.length();
               if (hostBeginPos < hostPrefix.length()) {
-                System.out.println("Failed to parse channel");
+                logger.debug("Failed to parse channel");
               } else {
-                System.out.println("channel host found.");
+                logger.debug("channel host found.");
                 channel = responseStr.substring(hostBeginPos, responseStr.substring(hostBeginPos).indexOf("\"") + hostBeginPos);
-                System.out.println("channel: " + channel);
+                logger.debug("channel: " + channel);
               }
             }
 
         //} catch (HttpException e) {
-        //    System.out.println("Failed to get the page: " + url);
-        //    System.out.println(e.getMessage());
+        //    logger.debug("Failed to get the page: " + url);
+        //    logger.debug(e.getMessage());
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.debug(e.getMessage());
         //} catch (URISyntaxException e) {
-        //    System.out.println(e.getMessage());
+        //    logger.debug(e.getMessage());
         }
       }
     }
