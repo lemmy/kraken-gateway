@@ -459,7 +459,7 @@
             <% if (trEnabled.get("gtalk")) { %> <option value="gtalk"><fmt:message key="gateway.gtalk.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("icq")) { %> <option value="icq"><fmt:message key="gateway.icq.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("irc")) { %> <option value="irc"><fmt:message key="gateway.irc.shortservice" /></option> <% } %>
-            <% if (trEnabled.get("livejournal")) { %> <option value="xmpp"><fmt:message key="gateway.livejournal.shortservice" /></option> <% } %>
+            <% if (trEnabled.get("livejournal")) { %> <option value="livejournal"><fmt:message key="gateway.livejournal.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("msn")) { %> <option value="msn"><fmt:message key="gateway.msn.shortservice" /></option> <% } %>
             <% if (trEnabled.get("myspaceim")) { %> <option value="myspaceim"><fmt:message key="gateway.myspaceim.shortservice" /></option> <% } %>
             <% if (trEnabled.get("qq")) { %> <option value="qq"><fmt:message key="gateway.qq.shortservice" /></option> <% } %>
