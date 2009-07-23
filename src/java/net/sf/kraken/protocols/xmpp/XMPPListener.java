@@ -16,6 +16,7 @@ import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.Message;
+import org.xmpp.packet.Presence;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -125,48 +126,82 @@ public class XMPPListener implements MessageListener, RosterListener, Connection
 
     public void presenceChanged(org.jivesoftware.smack.packet.Presence presence) {
         if (getSession().getBuddyManager().isActivated()) {
-            try {
-                final XMPPBuddy xmppBuddy = (XMPPBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(presence.getFrom()));
-                Log.debug("XMPP: Presence changed detected type "+presence.getType()+" and mode "+presence.getMode()+" for "+presence.getFrom());
-                xmppBuddy.setPresenceAndStatus(
-                        ((XMPPTransport)getSession().getTransport()).convertXMPPStatusToGateway(presence.getType(), presence.getMode()),
-                        presence.getStatus()
-                );
-                if (JiveGlobals.getBooleanProperty("plugin.gateway."+getSession().getTransport().getType()+".avatars", true)) {
-                    PacketExtension pe = presence.getExtension("x", NameSpace.VCARD_TEMP_X_UPDATE);
-                    if (pe != null) {
-                        DefaultPacketExtension dpe = (DefaultPacketExtension)pe;
-                        String hash = dpe.getValue("photo");
-                        final String from = presence.getFrom();
-                        if (hash != null) {
-                            Avatar curAvatar = xmppBuddy.getAvatar();
-                            if (curAvatar == null || !curAvatar.getLegacyIdentifier().equals(hash)) {
-                                new Thread() {
-                                    public void run() {
-                                        VCard vcard = new VCard();
-                                        try {
-                                            vcard.load(getSession().conn, from);
-                                            xmppBuddy.setAvatar(new Avatar(xmppBuddy.getJID(), from, vcard.getAvatar()));
+            if (presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.available) ||
+                    presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.unavailable)) {
+                // TODO: Need to handle resources and priorities!
+                try {
+                    final XMPPBuddy xmppBuddy = (XMPPBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(presence.getFrom()));
+                    Log.debug("XMPP: Presence changed detected type "+presence.getType()+" and mode "+presence.getMode()+" for "+presence.getFrom());
+                    xmppBuddy.setPresenceAndStatus(
+                            ((XMPPTransport)getSession().getTransport()).convertXMPPStatusToGateway(presence.getType(), presence.getMode()),
+                            presence.getStatus()
+                    );
+                    if (JiveGlobals.getBooleanProperty("plugin.gateway."+getSession().getTransport().getType()+".avatars", true)) {
+                        PacketExtension pe = presence.getExtension("x", NameSpace.VCARD_TEMP_X_UPDATE);
+                        if (pe != null) {
+                            DefaultPacketExtension dpe = (DefaultPacketExtension)pe;
+                            String hash = dpe.getValue("photo");
+                            final String from = presence.getFrom();
+                            if (hash != null) {
+                                Avatar curAvatar = xmppBuddy.getAvatar();
+                                if (curAvatar == null || !curAvatar.getLegacyIdentifier().equals(hash)) {
+                                    new Thread() {
+                                        public void run() {
+                                            VCard vcard = new VCard();
+                                            try {
+                                                vcard.load(getSession().conn, from);
+                                                xmppBuddy.setAvatar(new Avatar(xmppBuddy.getJID(), from, vcard.getAvatar()));
+                                            }
+                                            catch (XMPPException e) {
+                                                Log.debug("XMPP: Failed to load XMPP avatar: ", e);
+                                            }
+                                            catch (IllegalArgumentException e) {
+                                                Log.debug("XMPP: Got null avatar, ignoring.");
+                                            }
                                         }
-                                        catch (XMPPException e) {
-                                            Log.debug("XMPP: Failed to load XMPP avatar: ", e);
-                                        }
-                                        catch (IllegalArgumentException e) {
-                                            Log.debug("XMPP: Got null avatar, ignoring.");
-                                        }
-                                    }
-                                }.start();
+                                    }.start();
+                                }
                             }
                         }
                     }
                 }
+                catch (NotFoundException e) {
+                    Log.debug("XMPP: Received presense notification for contact we don't care about: "+presence.getFrom());
+                }   
             }
-            catch (NotFoundException e) {
-                Log.debug("XMPP: Received presense notification for contact we don't care about: "+presence.getFrom());
+            else {
+                getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(presence.getFrom()), ((XMPPTransport)getSession().getTransport()).convertXMPPStatusToGateway(presence.getType(), presence.getMode()), presence.getStatus());
             }
         }
-        else {
-            getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(presence.getFrom()), ((XMPPTransport)getSession().getTransport()).convertXMPPStatusToGateway(presence.getType(), presence.getMode()), presence.getStatus());
+        else if (presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.subscribe)) {
+            Presence p = new Presence(Presence.Type.subscribe);
+            p.setTo(getSession().getJID());
+            p.setFrom(getSession().getTransport().convertIDToJID(presence.getFrom()));
+            getSession().getTransport().sendPacket(p);
+        }
+        else if (presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.unsubscribe)) {
+            Presence p = new Presence(Presence.Type.unsubscribe);
+            p.setTo(getSession().getJID());
+            p.setFrom(getSession().getTransport().convertIDToJID(presence.getFrom()));
+            getSession().getTransport().sendPacket(p);
+        }
+        else if (presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.subscribed)) {
+            Presence p = new Presence(Presence.Type.subscribed);
+            p.setTo(getSession().getJID());
+            p.setFrom(getSession().getTransport().convertIDToJID(presence.getFrom()));
+            getSession().getTransport().sendPacket(p);
+        }
+        else if (presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.unsubscribed)) {
+            Presence p = new Presence(Presence.Type.unsubscribed);
+            p.setTo(getSession().getJID());
+            p.setFrom(getSession().getTransport().convertIDToJID(presence.getFrom()));
+            getSession().getTransport().sendPacket(p);
+        }
+        else if (presence.getType().equals(org.jivesoftware.smack.packet.Presence.Type.error)) {
+            Presence p = new Presence(Presence.Type.error);
+            p.setTo(getSession().getJID());
+            p.setFrom(getSession().getTransport().convertIDToJID(presence.getFrom()));
+            getSession().getTransport().sendPacket(p);
         }
     }
 
