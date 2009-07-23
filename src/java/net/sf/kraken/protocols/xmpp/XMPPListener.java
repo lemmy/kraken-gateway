@@ -127,6 +127,7 @@ public class XMPPListener implements MessageListener, RosterListener, Connection
         if (getSession().getBuddyManager().isActivated()) {
             try {
                 final XMPPBuddy xmppBuddy = (XMPPBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(presence.getFrom()));
+                Log.debug("XMPP: Presence changed detected type "+presence.getType()+" and mode "+presence.getMode()+" for "+presence.getFrom());
                 xmppBuddy.setPresenceAndStatus(
                         ((XMPPTransport)getSession().getTransport()).convertXMPPStatusToGateway(presence.getType(), presence.getMode()),
                         presence.getStatus()

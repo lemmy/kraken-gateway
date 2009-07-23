@@ -1075,6 +1075,10 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         else if (presenceType.equals(PresenceType.unavailable)) {
             packet.setType(Presence.Type.unavailable);
         }
+        else if (presenceType.equals(PresenceType.unknown)) {
+            // We consider this unavailable since we don't know what it is.
+            packet.setType(Presence.Type.unavailable);
+        }
     }
 
     /**

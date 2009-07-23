@@ -124,6 +124,9 @@ public class XMPPTransport extends BaseTransport {
         else if (type == Presence.Type.unavailable) {
             return PresenceType.unavailable;
         }
+        else if (type == Presence.Type.error) {
+            return PresenceType.unavailable;
+        }        
         else {
             return PresenceType.available;
         }
