@@ -568,7 +568,7 @@ public class FacebookAdapter {
 					formIdBeginPos + 32);
 			logger.info("Facebook: post_form_id: " + post_form_id);
 
-                        getChannel();
+                        findChannel();
 		}
 		
 		return FacebookErrorCode.Error_Global_NoError;
@@ -1167,6 +1167,9 @@ public class FacebookAdapter {
         return responseStr;
     }
 
+    /**
+     * @Deprecated, use findChannel instead.
+     */
     private void getChannel() {
       if(post_form_id != null) {
         String url = "http://www.facebook.com/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
@@ -1218,6 +1221,30 @@ public class FacebookAdapter {
         //    logger.debug(e.getMessage());
         }
       }
+    }
+
+    /**
+      * The method to find and set the channel host.
+      */
+    private void findChannel() {
+        if(post_form_id != null) {
+            String url = hostUrl + "/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
+            String responseStr = facebookGetMethod(url);
+
+            if(responseStr == null) {
+                logger.warn("Facebook: Error getting the reconnect page needed to find the channel!");
+            } else {
+                String hostPrefix = "\"host\":\"";
+                int hostBeginPos = responseStr.indexOf(hostPrefix) + hostPrefix.length();
+                if (hostBeginPos < hostPrefix.length()) {
+                    logger.warn("Facebook: Failed to parse channel");
+                } else {
+                    logger.debug("Facebook: channel host found.");
+                    channel = responseStr.substring(hostBeginPos, responseStr.substring(hostBeginPos).indexOf("\"") + hostBeginPos);
+                    logger.debug("Facebook: channel host: " + channel);
+                }
+            }
+        }
     }
 
 }
