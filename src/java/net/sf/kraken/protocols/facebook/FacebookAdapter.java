@@ -782,6 +782,8 @@ public class FacebookAdapter {
         String prefix = "for (;;);";
         if (msgResponseBody.startsWith(prefix))
             msgResponseBody = msgResponseBody.substring(prefix.length());
+        if (msgResponseBody == null)
+            return -1;
 
         // JSONObject body =(JSONObject) JSONValue.parse(msgResponseBody);
         JSONObject body = new JSONObject(msgResponseBody);
