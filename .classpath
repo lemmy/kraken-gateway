@@ -5,7 +5,6 @@
 	<classpathentry kind="lib" path="build/lib/ant-contrib.jar"/>
 	<classpathentry kind="lib" path="build/lib/ant-jive-edition.jar"/>
 	<classpathentry kind="lib" path="build/lib/qdox.jar"/>
-	<classpathentry kind="lib" path="lib/cindy.jar"/>
 	<classpathentry kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/dwr.jar"/>
 	<classpathentry kind="lib" path="lib/jainsipapi.jar"/>
@@ -30,9 +29,7 @@
 	<classpathentry kind="lib" path="lib/dom4j.jar"/>
 	<classpathentry kind="lib" path="lib/stcomm.jar"/>
 	<classpathentry kind="lib" path="lib/msim.jar"/>
-	<classpathentry kind="lib" path="lib/facebookchat.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore.jar"/>
-	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient.jar"/>
 	<classpathentry kind="lib" path="lib/yahoo.jar"/>
