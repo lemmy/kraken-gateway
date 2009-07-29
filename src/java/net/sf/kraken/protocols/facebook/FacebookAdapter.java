@@ -14,11 +14,16 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import org.apache.http.*;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.AuthState;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.params.*;
 import org.apache.http.conn.*;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.*;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.cookie.Cookie;
@@ -29,6 +34,7 @@ import org.apache.http.params.*;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.jivesoftware.util.JiveGlobals;
 import org.json.*;
 
 /**
@@ -46,16 +52,16 @@ public class FacebookAdapter {
 	/**
 	 * The url of the host
 	 */
-	private static String hostUrl = "http://www.facebook.com";
+	private static String hostUrl = "http://" + JiveGlobals.getProperty("plugin.gateway.facebook.connecthost");
 	
 	/**
      * The url of the login page
      */
-    private static String loginPageUrl = "http://www.facebook.com/login.php";
+    private static String loginPageUrl = hostUrl + "/login.php";
     /**
      * The url of the home page
      */
-    private static String homePageUrl = "http://www.facebook.com/home.php";
+    private static String homePageUrl = hostUrl + "/home.php";
 	/**
 	 * The http client we use to simulate a browser.
 	 */
@@ -129,13 +135,6 @@ public class FacebookAdapter {
 	 * The thread which requests buddy list every 90 seconds.
 	 */
 	private Thread buddyListRequester;
-	/**
-	 * The proxy settings
-	 */
-//	private String Proxy_Host = "ISASRV";
-//	private int Proxy_Port = 80;
-//	private String Proxy_Username = "daizw";
-//	private String Proxy_Password = "xxxxxx";
 
 	/**
 	 * Adapter for each Facebook Chat account.  
@@ -201,10 +200,10 @@ public class FacebookAdapter {
         
         //DefaultRedirectHandler
         dhc.setRedirectHandler(new DefaultRedirectHandler());
-        // ------------------- Proxy Setting Block BEGINE -------------------
-        // If we needn't a proxy, just comment this block
-        //setUpProxy(dhc);
-        // --------------------- Proxy Setting Block END --------------------
+        
+        if(JiveGlobals.getBooleanProperty("plugin.gateway.facebook.useproxy")) {
+           setUpProxy(dhc);
+        }
         
         return dhc;
     }
@@ -212,20 +211,20 @@ public class FacebookAdapter {
      * Set up proxy according to the proxy setting consts
      * @param dhc the http client we're setting up.
      */
-//    private void setUpProxy(DefaultHttpClient dhc){
-//        final HttpHost proxy =
-//            new HttpHost(Proxy_Host, Proxy_Port, "http");
-//        
-//        dhc.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-//        AuthState authState = new AuthState();
-//        authState.setAuthScope(new AuthScope(proxy.getHostName(), 
-//            proxy.getPort()));
-//        AuthScope authScope = authState.getAuthScope();
-//        
-//        Credentials creds = new UsernamePasswordCredentials(Proxy_Username, Proxy_Password);
-//        dhc.getCredentialsProvider().setCredentials(authScope, creds);
-//        logger.trace("Facebook: executing request via " + proxy);
-//    }
+    private void setUpProxy(DefaultHttpClient dhc){
+        final HttpHost proxy =
+            new HttpHost(JiveGlobals.getProperty("plugin.gateway.facebook.proxyhost"), Integer.valueOf(JiveGlobals.getProperty("plugin.gateway.facebook.proxyport")), "http");
+        
+        dhc.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        AuthState authState = new AuthState();
+        authState.setAuthScope(new AuthScope(proxy.getHostName(), 
+            proxy.getPort()));
+        AuthScope authScope = authState.getAuthScope();
+        
+        Credentials creds = new UsernamePasswordCredentials(JiveGlobals.getProperty("plugin.gateway.facebook.proxylogin"), JiveGlobals.getProperty("plugin.gateway.facebook.proxypass"));
+        dhc.getCredentialsProvider().setCredentials(authScope, creds);
+        logger.trace("Facebook: executing request via " + proxy);
+    }
 	/**
 	 * Update the buddy list from the given data(JSON Object)
 	 * @param buddyListJO the JSON Object that contains the buddy list
