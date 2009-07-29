@@ -736,7 +736,7 @@ public class FacebookAdapter {
 	private int getSeq()
     {
         int tempSeq = -1;
-        while (tempSeq == -1)
+        while (tempSeq == -1 && isClientRunning)
         {
             // for (;;);{"t":"refresh", "seq":0}
             String seqResponseBody;
