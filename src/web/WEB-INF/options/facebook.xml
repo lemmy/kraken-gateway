@@ -5,12 +5,12 @@
             <item type="text" sysprop="plugin.gateway.facebook.reconnectattempts" var="autoreconnectattempts" desckey="gateway.web.settings.autoreconnectattempts" default="3" size="5" maxlength="5"/>
         </item>
 
-        <item type="toggle" sysprop="plugin.gateway.facebook.useproxy" var="useproxy" desckey="gateway.web.settings.useproxy" default="false">
+        <!--<item type="toggle" sysprop="plugin.gateway.facebook.useproxy" var="useproxy" desckey="gateway.web.settings.useproxy" default="false">
 			  <item type="text" sysprop="plugin.gateway.facebook.proxyhost" var="proxyhost" desckey="gateway.web.settings.proxyhost" default="" />
 			  <item type="text" sysprop="plugin.gateway.facebook.proxyport" var="proxyport" desckey="gateway.web.settings.proxyport" default="" />
 			  <item type="text" sysprop="plugin.gateway.facebook.proxylogin" var="proxylogin" desckey="gateway.web.settings.proxylogin" default="" />
 			  <item type="text" sysprop="plugin.gateway.facebook.proxypass" var="proxypass" desckey="gateway.web.settings.proxypass" default="" />
-		  </item>
+		  </item>-->
     </leftpanel>
     <rightpanel>
         <item type="text" sysprop="plugin.gateway.facebook.connecthost" var="host" desckey="gateway.web.settings.host" default="www.facebook.com"/>
