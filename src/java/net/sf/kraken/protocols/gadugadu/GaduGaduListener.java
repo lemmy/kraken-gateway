@@ -116,6 +116,7 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         // Not really sure what this is
     }
 
+    @SuppressWarnings("unchecked")
     public void contactListReceived(Collection collection) {
         Log.debug("GaduGadu: Contact list received: "+collection);
         for (Object localUserObj : collection) {
