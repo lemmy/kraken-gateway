@@ -192,6 +192,7 @@ public class YahooSession extends TransportSession {
     /**
      * Syncs up the yahoo roster with the jabber roster.
      */
+    @SuppressWarnings("unchecked")
     public void syncUsers() {
         // First we need to get a good mapping of users to what groups they are in.
         HashMap<String,ArrayList<String>> userToGroups = new HashMap<String,ArrayList<String>>();
@@ -263,18 +264,18 @@ public class YahooSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
     public void removeContact(TransportBuddy contact) {
-        // TODO: Temporarily disabled
-//        String yahooContact = getTransport().convertJIDToID(contact.getJID());
-//        YahooUser yUser = ((YahooBuddy)contact).yahooUser;
-//        for (String yahooGroup : yUser.getGroupIds()) {
-//            try {
-//                yahooSession.removeFriend(yahooContact, yahooGroup);
-//            }
-//            catch (IOException e) {
-//                Log.debug("Failed to remove yahoo user "+yUser+" from group "+yahooGroup);
-//            }
-//        }
-//        pseudoRoster.removeItem(yahooContact);
+        String yahooContact = getTransport().convertJIDToID(contact.getJID());
+        for (YahooGroup yahooGroup : yahooSession.getGroups()) {
+            if (yahooGroup.getIndexOfFriend(yahooContact) >= 0) {
+                try {
+                    yahooSession.removeFriend(yahooContact, yahooGroup.getName());
+                }
+                catch (IOException e) {
+                    Log.debug("Failed to remove yahoo user "+yahooContact+" from group "+yahooGroup);
+                }
+            }
+        }
+        pseudoRoster.removeItem(yahooContact);
     }
 
     /**
@@ -293,7 +294,7 @@ public class YahooSession extends TransportSession {
         try {
             YahooBuddy yBuddy = (YahooBuddy)getBuddyManager().getBuddy(contact.getJID());
             yBuddy.pseudoRosterItem = rosterItem;
-            //syncContactGroups(yBuddy);
+            syncContactGroups(yBuddy);
         }
         catch (NotFoundException e) {
             Log.debug("Yahoo: Updated buddy not found in buddy manager: "+yahooContact);
