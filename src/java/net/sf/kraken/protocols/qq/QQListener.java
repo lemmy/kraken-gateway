@@ -9,7 +9,6 @@
  */
 package net.sf.kraken.protocols.qq;
 
-import net.sf.jqql.QQ;
 import net.sf.jqql.beans.FriendOnlineEntry;
 import net.sf.jqql.beans.NormalIM;
 import net.sf.jqql.beans.QQFriend;

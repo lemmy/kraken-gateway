@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
  *
  * @author Daniel Henninger
  */
+@SuppressWarnings("serial")
 public class GatewayDWR extends DWRServlet {
 
     static Logger Log = Logger.getLogger(GatewayDWR.class);

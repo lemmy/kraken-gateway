@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 /**
  * @author Daniel Henninger
  */
+@SuppressWarnings("serial")
 public class GatewayXMLRPC extends XmlRpcServlet implements PropertyEventListener {
 
     static Logger Log = Logger.getLogger(GatewayXMLRPC.class);

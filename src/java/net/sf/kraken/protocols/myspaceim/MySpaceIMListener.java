@@ -22,7 +22,6 @@ import net.sf.jmyspaceiml.packet.MediaMessage;
 import net.sf.jmyspaceiml.packet.ProfileMessage;
 import net.sf.jmyspaceiml.packet.StatusMessage;
 import net.sf.jmyspaceiml.packet.ErrorMessage;
-import net.sf.kraken.protocols.msn.MSNTransport;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;

@@ -220,6 +220,7 @@ public class TransportInstance implements PropertyEventListener {
         return transport;
     }
 
+    @SuppressWarnings("unchecked")
     public void propertySet(String property, Map params) {
         if (property.startsWith("plugin.gateway.")) {
             if (property.equals("plugin.gateway."+this.type.toString()+".enabled")) {
@@ -248,6 +249,7 @@ public class TransportInstance implements PropertyEventListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void propertyDeleted(String property, Map params) {
         if (property.startsWith("plugin.gateway.")) {
             if (property.equals("plugin.gateway."+this.type.toString()+".enabled")) {
@@ -268,10 +270,12 @@ public class TransportInstance implements PropertyEventListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void xmlPropertySet(String property, Map params) {
         propertySet(property, params);
     }
 
+    @SuppressWarnings("unchecked")
     public void xmlPropertyDeleted(String property, Map params) {
         propertyDeleted(property, params);
     }

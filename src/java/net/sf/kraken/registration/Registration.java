@@ -18,12 +18,8 @@ import org.jivesoftware.database.JiveID;
 import org.jivesoftware.database.SequenceManager;
 import org.jivesoftware.openfire.auth.AuthFactory;
 import org.jivesoftware.util.NotFoundException;
-import org.jivesoftware.util.cache.ExternalizableUtil;
 import org.xmpp.packet.JID;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.sql.*;
 import java.util.Date;
 

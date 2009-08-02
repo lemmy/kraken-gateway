@@ -2347,6 +2347,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      *
      * @see org.jivesoftware.openfire.interceptor.PacketInterceptor#interceptPacket(org.xmpp.packet.Packet, org.jivesoftware.openfire.session.Session, boolean, boolean)
      */
+    @SuppressWarnings("unchecked")
     public void interceptPacket(Packet packet, Session session, boolean incoming, boolean processed) {
         // If not IQ, return immediately.
         if (!(packet instanceof IQ)) {

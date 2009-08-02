@@ -98,7 +98,8 @@ public class SimpleSession extends TransportSession {
      * @param transport The transport that created this session.
      * @param priority Priority of this session.
 	 */
-	public SimpleSession(Registration registration, JID jid, BaseTransport transport, Integer priority) {
+	@SuppressWarnings("unchecked")
+    public SimpleSession(Registration registration, JID jid, BaseTransport transport, Integer priority) {
 		super(registration, jid, transport, priority);
 		
 		// Initialize local variable first!
@@ -620,11 +621,13 @@ public class SimpleSession extends TransportSession {
 			this.content           = content;
 		}
 		
-		public ContentTypeHeader getContentTypeHeader() {
+		@SuppressWarnings("unused")
+        public ContentTypeHeader getContentTypeHeader() {
 			return this.contentTypeHeader;
 		}
 		
-		public String getContent() {
+		@SuppressWarnings("unused")
+        public String getContent() {
 			return this.content;
 		}
 	}
@@ -647,7 +650,8 @@ public class SimpleSession extends TransportSession {
 	 *                  Leave it <code>null</code> if no dialog is associated with this request.
      * @throws javax.sip.SipException Unable to communicate.
 	 */
-	private void sendRequest(Request request, String transport, Dialog dialog) throws SipException {
+	@SuppressWarnings("unchecked")
+    private void sendRequest(Request request, String transport, Dialog dialog) throws SipException {
 		for (Iterator sipProviders = sipStack.getSipProviders(); sipProviders.hasNext(); ) {
 			SipProvider provider = (SipProvider) sipProviders.next();
 			if (provider.getListeningPoint(transport) != null) {

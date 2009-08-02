@@ -62,6 +62,7 @@ public class IRCListener extends GenericAutoService {
         Log.debug("IRC: Received incoming state:"+state);
     }
 
+    @SuppressWarnings("unchecked")
     protected void updateCommand(InCommand inCommand) {
         Log.debug("IRC: Received incoming command:"+inCommand);
         if (inCommand instanceof CtcpMessage) {

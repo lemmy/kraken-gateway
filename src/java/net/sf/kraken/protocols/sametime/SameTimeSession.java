@@ -27,7 +27,6 @@ import com.lotus.sametime.community.CommunityService;
 import com.lotus.sametime.core.comparch.DuplicateObjectException;
 import com.lotus.sametime.core.comparch.STSession;
 import com.lotus.sametime.core.constants.ImTypes;
-import com.lotus.sametime.core.types.STUser;
 import com.lotus.sametime.im.Im;
 import com.lotus.sametime.im.InstantMessagingService;
 

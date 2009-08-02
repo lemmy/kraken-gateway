@@ -150,6 +150,7 @@ public class RegistrationManager {
      * @param transportType the transport type.
      * @return all registrations for the transport type.
      */
+    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations(TransportType transportType) {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -184,6 +185,7 @@ public class RegistrationManager {
      * @param jid the JID of the user.
      * @return all registrations for the JID.
      */
+    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations(JID jid) {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -224,6 +226,7 @@ public class RegistrationManager {
      * @param transportType the type of the transport.
      * @return all registrations for the JID of a particular transport type.
      */
+    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations(JID jid, TransportType transportType) {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -372,6 +375,7 @@ public class RegistrationManager {
      *
      * @return all registrations.
      */
+    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations() {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -454,6 +458,7 @@ public class RegistrationManager {
     /**
      * Converts a list of registration IDs into a Collection of Registrations.
      */
+    @SuppressWarnings("unchecked")
     private class RegistrationCollection extends AbstractCollection {
 
         private List<Long> registrationIDs;

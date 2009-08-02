@@ -84,6 +84,7 @@ public class LoginConnection extends AbstractFlapConnection {
 
     protected void handleSnacPacket(SnacPacketEvent e) { }
 
+    @SuppressWarnings("unchecked")
     protected void handleSnacResponse(SnacResponseEvent e) {
         SnacCommand cmd = e.getSnacCommand();
 
