@@ -52,7 +52,7 @@ public class FacebookAdapter {
 	/**
 	 * The url of the host
 	 */
-	private static String hostUrl = "http://" + JiveGlobals.getProperty("plugin.gateway.facebook.connecthost");
+	private static String hostUrl = "http://" + JiveGlobals.getProperty("plugin.gateway.facebook.connecthost", "www.facebook.com");
 	
 	/**
      * The url of the login page
@@ -201,7 +201,7 @@ public class FacebookAdapter {
         //DefaultRedirectHandler
         dhc.setRedirectHandler(new DefaultRedirectHandler());
         
-        if(JiveGlobals.getBooleanProperty("plugin.gateway.facebook.useproxy")) {
+        if(JiveGlobals.getBooleanProperty("plugin.gateway.facebook.useproxy", false)) {
            setUpProxy(dhc);
         }
         
@@ -1121,6 +1121,7 @@ public class FacebookAdapter {
         //else retry?
         return responseStr;
     }
+	
 	/**
 	 * The general facebook get method.
 	 * @param url the URL of the page we wanna get
@@ -1166,62 +1167,6 @@ public class FacebookAdapter {
         }
 
         return responseStr;
-    }
-
-    /**
-     * @Deprecated, use findChannel instead.
-     */
-    private void getChannel() {
-      if(post_form_id != null) {
-        String url = "http://www.facebook.com/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
-        logger.debug("@executing facebookGetChannel():" + url);
-        String responseStr = null;
-        
-        try {
-            HttpGet loginGet = new HttpGet(url);
-            HttpResponse response = httpClient.execute(loginGet);
-            HttpEntity entity = response.getEntity();
-            
-            logger.debug("facebookGetChannel: " + response.getStatusLine());
-            if (entity != null) {
-                responseStr = EntityUtils.toString(entity);
-                entity.consumeContent();
-            }
-            
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            /**
-             * @fixme I am not sure of if 200 is the only code that 
-             *  means "success"
-             */
-            if(statusCode != 200){
-                //error occured
-                logger.debug("Error Occured! Status Code = " + statusCode);
-                responseStr = null;
-            } else {
-              logger.debug("Get Channel Method done(" + statusCode+"), response string length: " + (responseStr==null? 0:responseStr.length()));
-              logger.debug("Get Channel Method responseStr : " + responseStr);
-
-              String hostPrefix = "\"host\":\"";
-              int hostBeginPos = responseStr.indexOf(hostPrefix) + hostPrefix.length();
-              if (hostBeginPos < hostPrefix.length()) {
-                logger.debug("Failed to parse channel");
-              } else {
-                logger.debug("channel host found.");
-                channel = responseStr.substring(hostBeginPos, responseStr.substring(hostBeginPos).indexOf("\"") + hostBeginPos);
-                logger.debug("channel: " + channel);
-              }
-            }
-
-        //} catch (HttpException e) {
-        //    logger.debug("Failed to get the page: " + url);
-        //    logger.debug(e.getMessage());
-        } catch (IOException e) {
-            logger.debug(e.getMessage());
-        //} catch (URISyntaxException e) {
-        //    logger.debug(e.getMessage());
-        }
-      }
     }
 
     /**

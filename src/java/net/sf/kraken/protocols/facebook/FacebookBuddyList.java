@@ -75,6 +75,7 @@ public class FacebookBuddyList
      * @param buddyList the buddy list we just got from the server
      * @throws JSONException
      */
+    @SuppressWarnings("unchecked")
     public void updateBuddyList(JSONObject buddyList) throws JSONException
     {
         logger.info("Facebook: Updating buddy list..."+buddyList.toString());
@@ -149,7 +150,7 @@ public class FacebookBuddyList
         while(cacheIt.hasNext())
         {
             Map.Entry entry=(Map.Entry)cacheIt.next();
-            String uid = (String)entry.getKey();
+            //String uid = (String)entry.getKey();
             FacebookUser user=(FacebookUser)entry.getValue();
             FacebookBuddy buddy;
             try {
