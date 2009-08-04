@@ -82,13 +82,13 @@ public class GaduGaduBuddy extends TransportBuddy {
     public LocalUser toLocalUser() {
         LocalUser localUser = new LocalUser();
         localUser.setUin(Integer.parseInt(this.getName()));
-        localUser.setDisplayName(this.getNickname());
+        localUser.setDisplayName(this.getNickname() != null ? this.getNickname() : this.getName());
         Collection<String> groups = this.getGroups();
         if (groups.size() > 0) {
             localUser.setGroup((String)groups.toArray()[0]);
         }
         localUser.setEmailAddress(this.getGaduEmailAddress());
-        localUser.setFirstName(this.getGaduFirstName());
+        localUser.setFirstName(this.getGaduFirstName() != null ? this.getGaduFirstName() : this.getName());
         localUser.setLastName(this.getGaduLastName());
         localUser.setNickName(this.getNickname());
         localUser.setTelephone(this.getGaduTelephone());
