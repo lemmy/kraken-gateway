@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import ymsg.network.StatusConstants;
 import ymsg.network.YahooUser;
 import ymsg.network.event.SessionAdapter;
+import ymsg.network.event.SessionAuthorizationEvent;
 import ymsg.network.event.SessionChatEvent;
 import ymsg.network.event.SessionConferenceEvent;
 import ymsg.network.event.SessionErrorEvent;
@@ -348,6 +349,16 @@ public class YahooListener extends SessionAdapter {
      */
     public void chatConnectionClosed(SessionEvent event) {
         Log.debug(event.toString());
+    }
+    
+    /**
+     * @see org.openymsg.network.event.SessionAdapter#authorizationReceived(org.openymsg.network.event.SessionAuthorizationEvent)
+     */
+    public void authorizationReceived(SessionAuthorizationEvent event) {
+        Presence p = new Presence(Presence.Type.subscribe);
+        p.setTo(getSession().getJID());
+        p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
+        getSession().getTransport().sendPacket(p);
     }
 
 }

@@ -781,6 +781,13 @@ public abstract class TransportSession implements Runnable {
     public abstract void updateContact(TransportBuddy contact);
 
     /**
+     * Accept a legacy contact's add friend request.
+     *
+     * @param contact Transport buddy item associated with the legacy contact.
+     */
+    public abstract void acceptAddContact(TransportBuddy contact);
+
+    /**
      * Sends an outgoing message through the legacy service.
      *
      * @param jid JID associated with the target contact.

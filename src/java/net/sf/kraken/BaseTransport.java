@@ -504,6 +504,11 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         p.setFrom(to);
                         sendPacket(p);
                     }
+                    else if (packet.getType() == Presence.Type.subscribed) {
+                        // Accept add contact request
+                        TransportBuddy buddy = session.getBuddyManager().getBuddy(to);
+                        session.acceptAddContact(buddy);
+                    }
                     else {
                         // Anything else we will ignore for now.
                     }

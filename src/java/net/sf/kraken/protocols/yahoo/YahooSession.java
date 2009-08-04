@@ -35,6 +35,7 @@ import ymsg.network.Session;
 import ymsg.network.StatusConstants;
 import ymsg.network.YahooGroup;
 import ymsg.network.YahooUser;
+import ymsg.network.event.SessionAuthorizationEvent;
 
 import java.io.IOException;
 import java.util.*;
@@ -298,6 +299,22 @@ public class YahooSession extends TransportSession {
         }
         catch (NotFoundException e) {
             Log.debug("Yahoo: Updated buddy not found in buddy manager: "+yahooContact);
+        }
+    }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(net.sf.kraken.roster.TransportBuddy)
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        try {
+            String login = yahooSession.getLoginIdentity().getId();
+            String yahooContact = getTransport().convertJIDToID(contact.getJID());
+
+            SessionAuthorizationEvent ev = new SessionAuthorizationEvent(
+                    (Object)this, login, "", "", "", "");
+            yahooSession.acceptFriendAuthorization(ev, yahooContact);
+        } catch (IOException e) {
+            Log.debug("Yahoo: Failed to accept add contact request.");
         }
     }
 

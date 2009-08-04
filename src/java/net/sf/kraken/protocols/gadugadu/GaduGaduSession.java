@@ -239,6 +239,13 @@ public class GaduGaduSession extends TransportSession {
             Log.debug("GaduGadu: Error while uploading contact list during update:", e);
         }
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)

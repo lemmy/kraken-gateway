@@ -341,6 +341,13 @@ public class MSNSession extends TransportSession {
             Log.debug("MSN: Newly added buddy not found in buddy manager: "+email.getEmailAddress());
         }
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     /**
      * Given a legacy contact and a list of groups, makes sure that the list is in sync with

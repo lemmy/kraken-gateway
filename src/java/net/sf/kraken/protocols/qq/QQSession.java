@@ -119,6 +119,13 @@ public class QQSession extends TransportSession {
     public void updateContact(TransportBuddy transportBuddy) {
     	// There's nothing to change here currently.
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     public void sendMessage(JID jID, String message) {
         try {

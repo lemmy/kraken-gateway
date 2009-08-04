@@ -427,6 +427,13 @@ public class XMPPSession extends TransportSession {
             }
         }
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
@@ -445,9 +452,7 @@ public class XMPPSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID, net.sf.kraken.type.ChatStateType)
      */
     public void sendChatState(JID jid, ChatStateType chatState) {
-        Chat chat =
-conn.getChatManager().createChat(getTransport().convertJIDToID(jid),
-listener);
+        Chat chat = conn.getChatManager().createChat(getTransport().convertJIDToID(jid), listener);
         try {
             ChatState state = ChatState.active;
             switch (chatState) {

@@ -261,6 +261,13 @@ public class IRCSession extends TransportSession {
 //            connection.sendCommand(new IsonCommand(ircContact));
         }
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     public void sendMessage(JID jid, String message) {
         connection.sendCommand(new MessageCommand(getTransport().convertJIDToID(jid), message));

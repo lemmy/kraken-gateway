@@ -451,6 +451,13 @@ public class OSCARSession extends TransportSession {
         // Syncing takes care of all of the dirty work.
         syncContactGroupsAndNickname(legacyId, nickname, (List<String>)contact.getGroups());
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)

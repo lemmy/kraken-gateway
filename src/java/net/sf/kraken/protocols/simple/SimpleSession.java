@@ -368,6 +368,13 @@ public class SimpleSession extends TransportSession {
             Log.debug("SIMPLE: Newly added buddy not found in buddy manager: "+destId);
         }
     }
+    
+    /**
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     */
+    public void acceptAddContact(TransportBuddy contact) {
+        // TODO: Currently unimplemented
+    }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
