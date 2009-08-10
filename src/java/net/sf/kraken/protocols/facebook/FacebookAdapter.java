@@ -14,23 +14,10 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import org.apache.http.*;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthState;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
 import org.apache.http.client.methods.*;
-import org.apache.http.client.params.*;
-import org.apache.http.conn.*;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.conn.scheme.*;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.*;
-import org.apache.http.impl.conn.tsccm.*;
 import org.apache.http.message.*;
-import org.apache.http.params.*;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -65,18 +52,7 @@ public class FacebookAdapter {
 	/**
 	 * The http client we use to simulate a browser.
 	 */
-	private HttpClient httpClient;
-	/**
-     * The default parameters.
-     * Instantiated in {@link #setup setup}.
-     */
-    private static HttpParams defaultParameters = null;
-
-    /**
-     * The scheme registry.
-     * Instantiated in {@link #setup setup}.
-     */
-    private static SchemeRegistry supportedSchemes;
+	private FacebookHttpClient facebookHttpClient;
 	/**
 	 * Timeout until connection established
 	 * 0 means infinite waiting
@@ -141,9 +117,8 @@ public class FacebookAdapter {
 	 * @param session The session this adapter is attached to.
 	 */
 	public FacebookAdapter(FacebookSession session){
-		//initialize the http client
-	    setup();
-	    httpClient = createHttpClient();
+		//get the http client
+		facebookHttpClient = new FacebookHttpClient();
 	    
 		msgIDCollection = new HashSet<String>();
 		msgIDCollection.clear();
@@ -152,79 +127,7 @@ public class FacebookAdapter {
 		isClientRunning = true;
 		logger.trace("Facebook: FacebookAdapter() begin");
 	}
-	/**
-     * Performs general setup.
-     * This should be called only once.
-     */
-    private final static void setup() {
 
-        supportedSchemes = new SchemeRegistry();
-
-        // Register the "http" and "https" protocol schemes, they are
-        // required by the default operator to look up socket factories.
-        SocketFactory sf = PlainSocketFactory.getSocketFactory();
-        supportedSchemes.register(new Scheme("http", sf, 80));
-        sf = SSLSocketFactory.getSocketFactory();
-        supportedSchemes.register(new Scheme("https", sf, 443));
-
-        // prepare parameters
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(params, "UTF-8");
-        HttpProtocolParams.setUseExpectContinue(params, true);
-        HttpProtocolParams.setHttpElementCharset(params, "UTF-8");
-        HttpProtocolParams.setUserAgent(params, "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/2008052906 Firefox/3.0");
-        defaultParameters = params;
-    } // setup
-    /**
-     * Get default http client parameters
-     * @return default http client parameters
-     */
-    private final static HttpParams getParams() {
-        return defaultParameters;
-    }
-    /**
-     * Creat a http client with default settings
-     * @return a http client with default settings
-     */
-    private final HttpClient createHttpClient() {
-
-        ClientConnectionManager ccm =
-            new ThreadSafeClientConnManager(getParams(), supportedSchemes);
-
-        DefaultHttpClient dhc =
-            new DefaultHttpClient(ccm, getParams());
-        
-        dhc.getParams().setParameter(
-            ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-        
-        //DefaultRedirectHandler
-        dhc.setRedirectHandler(new DefaultRedirectHandler());
-        
-        if(JiveGlobals.getBooleanProperty("plugin.gateway.facebook.useproxy", false)) {
-           setUpProxy(dhc);
-        }
-        
-        return dhc;
-    }
-    /**
-     * Set up proxy according to the proxy setting consts
-     * @param dhc the http client we're setting up.
-     */
-    private void setUpProxy(DefaultHttpClient dhc){
-        final HttpHost proxy =
-            new HttpHost(JiveGlobals.getProperty("plugin.gateway.facebook.proxyhost"), Integer.valueOf(JiveGlobals.getProperty("plugin.gateway.facebook.proxyport")), "http");
-        
-        dhc.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-        AuthState authState = new AuthState();
-        authState.setAuthScope(new AuthScope(proxy.getHostName(), 
-            proxy.getPort()));
-        AuthScope authScope = authState.getAuthScope();
-        
-        Credentials creds = new UsernamePasswordCredentials(JiveGlobals.getProperty("plugin.gateway.facebook.proxylogin"), JiveGlobals.getProperty("plugin.gateway.facebook.proxypass"));
-        dhc.getCredentialsProvider().setCredentials(authScope, creds);
-        logger.trace("Facebook: executing request via " + proxy);
-    }
 	/**
 	 * Update the buddy list from the given data(JSON Object)
 	 * @param buddyListJO the JSON Object that contains the buddy list
@@ -361,7 +264,7 @@ public class FacebookAdapter {
 	private int connectAndLogin(String email, String pass){
 		logger.trace("Facebook: =========connectAndLogin begin===========");
 
-		String httpResponseBody = facebookGetMethod(loginPageUrl);
+		String httpResponseBody = facebookHttpClient.getMethod(loginPageUrl);
 		if(httpResponseBody == null){
 		    //Why don't we try again?
 		    try
@@ -372,14 +275,14 @@ public class FacebookAdapter {
             {
                 logger.trace(e.getMessage());
             }
-		    httpResponseBody = facebookGetMethod(loginPageUrl);
+		    httpResponseBody = facebookHttpClient.getMethod(loginPageUrl);
 		}
 		logger.trace("Facebook: ========= get login page ResponseBody begin===========");
 		logger.trace(httpResponseBody);
 		logger.trace("Facebook: +++++++++ get login page ResponseBody end+++++++++");
 
 		logger.trace("Facebook: Initial cookies: ");
-		List<Cookie> cookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
+		List<Cookie> cookies = facebookHttpClient.getCookies();
         if (cookies.isEmpty()) {
             logger.trace("Facebook: None");
         } else {
@@ -404,7 +307,7 @@ public class FacebookAdapter {
             httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
             logger.info("Facebook: @executing post method to:" + loginPageUrl);
             
-            HttpResponse loginPostResponse = httpClient.execute(httpost);
+            HttpResponse loginPostResponse = facebookHttpClient.getHttpClient().execute(httpost);
             HttpEntity entity = loginPostResponse.getEntity();
 
             logger.trace("Facebook: Login form post: " + loginPostResponse.getStatusLine());
@@ -417,7 +320,7 @@ public class FacebookAdapter {
             }
 
             logger.trace("Facebook: Post logon cookies:");
-            cookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
+            cookies = facebookHttpClient.getCookies();
             if (cookies.isEmpty()) {
                 logger.trace("Facebook: None");
             } else {
@@ -480,7 +383,7 @@ public class FacebookAdapter {
 	 * @return
 	 */
 	private int doParseHomePage(){
-		String getMethodResponseBody = facebookGetMethod(homePageUrl);
+		String getMethodResponseBody = facebookHttpClient.getMethod(homePageUrl);
 		if(getMethodResponseBody == null){
             //Why don't we try again?
 		    try
@@ -491,7 +394,7 @@ public class FacebookAdapter {
             {
                 logger.trace("Facebook:", e);
             }
-		    getMethodResponseBody = facebookGetMethod(loginPageUrl);
+		    getMethodResponseBody = facebookHttpClient.getMethod(loginPageUrl);
         }
 		logger.trace("Facebook: =========HomePage: getMethodResponseBody begin=========");
 		logger.trace(getMethodResponseBody);
@@ -499,7 +402,7 @@ public class FacebookAdapter {
 
 		//deal with the cookies
 		logger.trace("Facebook: The final cookies:");
-		List<Cookie> finalCookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
+		List<Cookie> finalCookies = facebookHttpClient.getCookies();
         if (finalCookies.isEmpty()) {
             logger.trace("Facebook: None");
         } else {
@@ -592,7 +495,7 @@ public class FacebookAdapter {
         
 		try{
 			//String responseStr = facebookPostMethod(hostUrl, "/ajax/chat/buddy_list.php", nvps);
-		    String responseStr = facebookPostMethod(hostUrl, "/ajax/presence/update.php", nvps);
+		    String responseStr = facebookHttpClient.postMethod(hostUrl, "/ajax/presence/update.php", nvps);
 			
 			//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"buddy_list":{"listChanged":true,"availableCount":1,"nowAvailableList":{"UID1":{"i":false}},"wasAvailableIDs":[],"userInfos":{"UID1":{"name":"Buddy 1","firstName":"Buddy","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_default.gif","status":null,"statusTime":0,"statusTimeRel":""},"UID2":{"name":"Buddi 2","firstName":"Buddi","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_default.gif","status":null,"statusTime":0,"statusTimeRel":""}},"forcedRender":true},"time":1209560380000}}  
 			//for (;;);{"error":0,"errorSummary":"","errorDescription":"No error.","payload":{"time":1214626375000,"buddy_list":{"listChanged":true,"availableCount":1,"nowAvailableList":{},"wasAvailableIDs":[],"userInfos":{"1386786477":{"name":"\u5341\u4e00","firstName":"\u4e00","thumbSrc":"http:\/\/static.ak.fbcdn.net\/pics\/q_silhouette.gif","status":null,"statusTime":0,"statusTimeRel":""}},"forcedRender":null,"flMode":false,"flData":{}},"notifications":{"countNew":0,"count":1,"app_names":{"2356318349":"\u670b\u53cb"},"latest_notif":1214502420,"latest_read_notif":1214502420,"markup":"<div id=\"presence_no_notifications\" style=\"display:none\" class=\"no_notifications\">\u65e0\u65b0\u901a\u77e5\u3002<\/div><div class=\"notification clearfix notif_2356318349\" onmouseover=\"CSS.addClass(this, 'hover');\" onmouseout=\"CSS.removeClass(this, 'hover');\"><div class=\"icon\"><img src=\"http:\/\/static.ak.fbcdn.net\/images\/icons\/friend.gif?0:41046\" alt=\"\" \/><\/div><div class=\"notif_del\" onclick=\"return presenceNotifications.showHideDialog(this, 2356318349)\"><\/div><div class=\"body\"><a href=\"http:\/\/www.facebook.com\/profile.php?id=1190346972\"   >David Willer<\/a>\u63a5\u53d7\u4e86\u60a8\u7684\u670b\u53cb\u8bf7\u6c42\u3002 <span class=\"time\">\u661f\u671f\u56db<\/span><\/div><\/div>","inboxCount":"0"}},"bootload":[{"name":"js\/common.js.pkg.php","type":"js","src":"http:\/\/static.ak.fbcdn.net\/rsrc.php\/pkg\/60\/106715\/js\/common.js.pkg.php"}]}
@@ -631,7 +534,7 @@ public class FacebookAdapter {
 
 		logger.info("Facebook: @executeMethod PostMessage() ing... : posting facebook chat message to " + to);
 		// execute postMethod
-		String responseStr = facebookPostMethod(hostUrl, "/ajax/chat/send.php", nvps);
+		String responseStr = facebookHttpClient.postMethod(hostUrl, "/ajax/chat/send.php", nvps);
 		//TODO process the respons string
 		//if statusCode == 200: no error;(responsStr contains "errorDescription":"No error.")
 		//else retry?
@@ -708,7 +611,7 @@ public class FacebookAdapter {
             {
                 // get the old message between oldseq and seq
                 String msgResponseBody =
-                    facebookGetMethod(getMessageRequestingUrl(seq));
+                	facebookHttpClient.getMethod(getMessageRequestingUrl(seq));
 
                 logger.trace("Facebook: =========msgResponseBody begin=========");
                 logger.trace(msgResponseBody);
@@ -742,7 +645,7 @@ public class FacebookAdapter {
             try
             {
                 seqResponseBody =
-                    facebookGetMethod(getMessageRequestingUrl(-1));
+                	facebookHttpClient.getMethod(getMessageRequestingUrl(-1));
                 tempSeq = parseSeq(seqResponseBody);
                 logger.trace("Facebook: getSeq(): SEQ: " + tempSeq);
 
@@ -859,7 +762,7 @@ public class FacebookAdapter {
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
         logger.info("Facebook: @executeMethod setVisibility() ing ...");
         // we don't care the response string now
-        facebookPostMethod(hostUrl, "/ajax/chat/settings.php", nvps);
+        facebookHttpClient.postMethod(hostUrl, "/ajax/chat/settings.php", nvps);
 	}
 	/**
 	 * Set status message
@@ -891,7 +794,7 @@ public class FacebookAdapter {
         nvps.add(new BasicNameValuePair("post_form_id", post_form_id));
         logger.info("Facebook: @executeMethod setStatusMessage() ing ...");
         // we don't care the response string now
-        facebookPostMethod(hostUrl, "/updatestatus.php", nvps);
+        facebookHttpClient.postMethod(hostUrl, "/updatestatus.php", nvps);
     }
 
 	/**
@@ -916,7 +819,7 @@ public class FacebookAdapter {
         nvps.add(new BasicNameValuePair("confirm", "1"));
         logger.info("Facebook: @executeMethod Logout() ing ...");
         // we don't care the response string now
-        facebookPostMethod(hostUrl, "/logout.php", nvps);
+        facebookHttpClient.postMethod(hostUrl, "/logout.php", nvps);
     }
 	
 	/**
@@ -928,8 +831,8 @@ public class FacebookAdapter {
         // down.
 	    this.buddyListRequester = null;
 	    this.msgRequester = null;
-        this.httpClient.getConnectionManager().shutdown();
-        this.httpClient = null;
+        this.facebookHttpClient.getHttpClient().getConnectionManager().shutdown();
+        this.facebookHttpClient = null;
         this.msgIDCollection.clear();
         this.buddyList.clear();
     }
@@ -979,7 +882,7 @@ public class FacebookAdapter {
 
         logger.info("Facebook: @executeMethod PostMessage() ing... : posting TypingNotification to " + notifiedContact);
         // we don't care the response string now
-        facebookPostMethod(hostUrl, "/ajax/chat/typ.php", nvps);
+        facebookHttpClient.postMethod(hostUrl, "/ajax/chat/typ.php", nvps);
         // TODO process the respons string
         // if statusCode == 200: no error;(responsStr contains "errorDescription":"No error.")
         // else retry?
@@ -1021,7 +924,7 @@ public class FacebookAdapter {
 
         logger.info("Facebook: @executeMethod PostMessage() ing... : posting Poke to " + pokedContact);
         // we don't care the response string now
-        facebookPostMethod(hostUrl, "/ajax/poke.php", nvps);
+        facebookHttpClient.postMethod(hostUrl, "/ajax/poke.php", nvps);
         // TODO process the respons string
         // if statusCode == 200: no error;(responsStr contains "errorDescription":"No error.")
         // else retry?
@@ -1075,98 +978,8 @@ public class FacebookAdapter {
 	    
 	    //http://www.new.facebook.com/profile.php?id=1190346972&v=info&viewas=1190346972
         // http://www.new.facebook.com/profile.php?id=1386786477&v=info
-        return facebookGetMethod(hostUrl + "/profile.php?id="
+        return facebookHttpClient.getMethod(hostUrl + "/profile.php?id="
             + contactAddress + "&v=info");
-    }
-	/**
-	 * The general facebook post method.
-	 * @param host the host
-	 * @param urlPostfix the post fix of the URL
-	 * @param data the parameter
-	 * @return the response string
-	 */
-	private String facebookPostMethod(String host, String urlPostfix,
-        List<NameValuePair> nvps)
-    {
-        logger.info("Facebook: @executing facebookPostMethod():" + host + urlPostfix);
-        //nvps.add(new BasicNameValuePair("force_render", "false"));
-        String responseStr = null;
-        try
-        {
-            HttpPost httpost = new HttpPost(host + urlPostfix);
-            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
-            // execute postMethod
-            HttpResponse postResponse = httpClient.execute(httpost);
-            HttpEntity entity = postResponse.getEntity();
-
-            logger.trace("Facebook: facebookPostMethod: " + postResponse.getStatusLine());
-            if (entity != null)
-            {
-                responseStr = EntityUtils.toString(entity);
-                logger.trace("Facebook: "+responseStr);
-                entity.consumeContent();
-            }
-            logger.info("Facebook: Post Method done("
-                + postResponse.getStatusLine().getStatusCode()
-                + "), response string length: "
-                + (responseStr == null ? 0 : responseStr.length()));
-        }
-        catch (IOException e)
-        {
-            logger.warn("Facebook: ", e);
-        }
-        //TODO process the respons string
-        //if statusCode == 200: no error;(responsStr contains "errorDescription":"No error.")
-        //else retry?
-        return responseStr;
-    }
-	
-	/**
-	 * The general facebook get method.
-	 * @param url the URL of the page we wanna get
-	 * @return the response string
-	 */
-	private String facebookGetMethod(String url)
-    {
-        logger.info("Facebook: @executing facebookGetMethod():" + url);
-        String responseStr = null;
-
-        try
-        {
-            HttpGet loginGet = new HttpGet(url);
-            HttpResponse response = httpClient.execute(loginGet);
-            HttpEntity entity = response.getEntity();
-
-            logger.trace("Facebook: facebookGetMethod: " + response.getStatusLine());
-            if (entity != null)
-            {
-                responseStr = EntityUtils.toString(entity);
-                entity.consumeContent();
-            }
-
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            /**
-             * @fixme I am not sure of if 200 is the only code that means
-             *        "success"
-             */
-            if (statusCode != 200)
-            {
-                // error occured
-                logger.warn("Facebook: Error Occured! Status Code = " + statusCode);
-                responseStr = null;
-            }
-            logger.info("Facebook: Get Method done(" + statusCode
-                + "), response string length: "
-                + (responseStr == null ? 0 : responseStr.length()));
-        }
-        catch (IOException e)
-        {
-            logger.warn("Facebook: ", e);
-        }
-
-        return responseStr;
     }
 
     /**
@@ -1175,7 +988,7 @@ public class FacebookAdapter {
     private void findChannel() {
         if(post_form_id != null) {
             String url = hostUrl + "/ajax/presence/reconnect.php?reason=3&post_form_id=" + post_form_id;
-            String responseStr = facebookGetMethod(url);
+            String responseStr = facebookHttpClient.getMethod(url);
 
             if(responseStr == null) {
                 logger.warn("Facebook: Error getting the reconnect page needed to find the channel!");
