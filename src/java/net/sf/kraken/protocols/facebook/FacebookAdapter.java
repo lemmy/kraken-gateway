@@ -32,6 +32,7 @@ import org.json.*;
  * 
  * @author Dai Zhiwei
  * @author Daniel Henninger
+ * @author Maxime Chéramy
  *
  */
 public class FacebookAdapter {

@@ -37,6 +37,11 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 
+/**
+ * 
+ * @author Maxime Chéramy
+ *
+ */
 public class FacebookHttpClient {
 	
 	private static Logger logger = Logger.getLogger(FacebookAdapter.class);
@@ -230,10 +235,18 @@ public class FacebookHttpClient {
         return responseStr;
     }
 
+	/**
+	 * Gets the internal httpClient object. Should not be used (kept while FacebookAdapter still needs it).
+	 * @return the httpClient object
+	 */
 	public HttpClient getHttpClient() {
 		return httpClient;
 	}
 	
+	/**
+	 * Gets the cookies associated with the internal httpClient.
+	 * @return the cookies.
+	 */
     public List<Cookie> getCookies() {
     	return ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
     }

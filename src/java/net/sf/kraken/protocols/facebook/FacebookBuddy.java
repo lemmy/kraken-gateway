@@ -19,6 +19,7 @@ import java.util.Arrays;
 /**
  * @author Daniel Henninger
  * @author Patrick Li
+ * @author Maxime Chéramy
  */
 public class FacebookBuddy extends TransportBuddy {
     
@@ -37,6 +38,11 @@ public class FacebookBuddy extends TransportBuddy {
         return user;
     }
 
+    /**
+     * Download the photo from the given address.
+     * @param address the url
+     * @return a flow of bytes contening the photo
+     */
     public byte[] readUrlBytes(String address) {
     	FacebookHttpClient facebookHttpClient = new FacebookHttpClient();
     	
