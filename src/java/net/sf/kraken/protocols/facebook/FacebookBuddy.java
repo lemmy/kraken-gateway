@@ -46,10 +46,10 @@ public class FacebookBuddy extends TransportBuddy {
     public byte[] readUrlBytes(String address) {
     	FacebookHttpClient facebookHttpClient = new FacebookHttpClient();
     	
-    	String response = facebookHttpClient.getMethod(address);
+    	byte[] response = facebookHttpClient.getBytesMethod(address);
     	
     	if(response != null) {
-    		return response.getBytes();
+    		return response;
     	} else {
     		return null;
     	}

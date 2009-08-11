@@ -236,6 +236,53 @@ public class FacebookHttpClient {
     }
 
 	/**
+	 * The general facebook get method but return a byte array (needed to download an image for example).
+	 * @param url the URL of the page we wanna get
+	 * @return the response string
+	 */
+	public byte[] getBytesMethod(String url)
+    {
+        logger.info("Facebook: @executing facebookGetMethod():" + url);
+        byte[] responseBytes = null;
+
+        try
+        {
+            HttpGet loginGet = new HttpGet(url);
+            HttpResponse response = httpClient.execute(loginGet);
+            HttpEntity entity = response.getEntity();
+
+            logger.trace("Facebook: getBytesMethod: " + response.getStatusLine());
+            if (entity != null)
+            {
+            	responseBytes = EntityUtils.toByteArray(entity);
+                entity.consumeContent();
+            }
+
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            /**
+             * @fixme I am not sure of if 200 is the only code that means
+             *        "success"
+             */
+            if (statusCode != 200)
+            {
+                // error occured
+                logger.warn("Facebook: Error Occured! Status Code = " + statusCode);
+                responseBytes = null;
+            }
+            logger.info("Facebook: Get Bytes Method done(" + statusCode
+                + "), response bytes length: "
+                + (responseBytes == null ? 0 : responseBytes.length));
+        }
+        catch (IOException e)
+        {
+            logger.warn("Facebook: ", e);
+        }
+
+        return responseBytes;
+    }
+	
+	/**
 	 * Gets the internal httpClient object. Should not be used (kept while FacebookAdapter still needs it).
 	 * @return the httpClient object
 	 */
