@@ -16,6 +16,7 @@ import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.util.LocaleUtils;
 import org.xmpp.packet.JID;
 
