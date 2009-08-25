@@ -183,7 +183,7 @@ public class YahooTransport extends BaseTransport {
         }
         else {
             // Not something we handle, we're going to ignore it.
-            Log.warn("Yahoo: Unrecognized status "+longStatus+" received.");
+            Log.warn("Yahoo: Unrecognized status "+yahooStatus+" received.");
             return PresenceType.unknown;
         }
     }
