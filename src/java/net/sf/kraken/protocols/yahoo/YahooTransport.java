@@ -31,6 +31,8 @@ import ymsg.network.StatusConstants;
  */
 public class YahooTransport extends BaseTransport {
 
+    static Logger Log = Logger.getLogger(YahooTransport.class);
+
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
@@ -172,8 +174,15 @@ public class YahooTransport extends BaseTransport {
         else if (yahooStatus == StatusConstants.STATUS_STEPPEDOUT) {
             return PresenceType.away;
         }
+        else if (yahooStatus == StatusConstants.STATUS_INVISIBLE) {
+            return PresenceType.available;
+        }
+        else if (yahooStatus == StatusConstants.STATUS_CUSTOM) {
+            return PresenceType.available;
+        }
         else {
             // Not something we handle, we're going to ignore it.
+            Log.warn("Yahoo: Unrecognized status "+longStatus+" received.");
             return PresenceType.unknown;
         }
     }

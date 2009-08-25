@@ -336,7 +336,7 @@ public class TransportBuddy {
         if (newpresence.equals(PresenceType.unavailable)) {
             verboseStatus = "";
         }
-        if (!presence.equals(newpresence)) {
+        if (!presence.equals(newpresence) && newpresence != PresenceType.unknown) {
             Presence p = new Presence();
             p.setTo(getManager().getSession().getJID());
             p.setFrom(jid);
@@ -407,7 +407,7 @@ public class TransportBuddy {
         if (newpresence.equals(PresenceType.unavailable)) {
             newstatus = "";
         }
-        if (!presence.equals(newpresence) || !verboseStatus.equals(newstatus)) {
+        if ((!presence.equals(newpresence) && newpresence != PresenceType.unknown) || !verboseStatus.equals(newstatus)) {
             Presence p = new Presence();
             p.setTo(getManager().getSession().getJID());
             p.setFrom(jid);
@@ -432,6 +432,7 @@ public class TransportBuddy {
      * @param to JID to send presence updates to.
      */
     public void sendPresence(JID to) {
+        // TODO: Should figure out best way to handle unknown here.
         Presence p = new Presence();
         p.setTo(to);
         p.setFrom(jid);
