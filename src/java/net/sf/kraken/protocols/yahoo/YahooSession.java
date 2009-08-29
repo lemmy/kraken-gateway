@@ -256,7 +256,8 @@ public class YahooSession extends TransportSession {
         else {
             rosterItem = pseudoRoster.createItem(contact, nickname, null);
         }
-        YahooBuddy yBuddy = new YahooBuddy(getBuddyManager(), null, nickname, groups, rosterItem);
+        YahooUser yUser = (YahooUser)yahooSession.addUserbyID(contact); 
+        YahooBuddy yBuddy = new YahooBuddy(getBuddyManager(), yUser, nickname, groups, rosterItem);
         getBuddyManager().storeBuddy(yBuddy);
         syncContactGroups(yBuddy);
     }
