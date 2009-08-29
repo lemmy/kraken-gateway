@@ -84,7 +84,7 @@ public class FacebookUser
     public boolean isOnline;
 
     /**
-     * Creat a facebook user according to the given id and JSONObject.
+     * Create a facebook user according to the given id and JSONObject.
      * @param id
      * @param user
      * @throws JSONException
@@ -97,13 +97,16 @@ public class FacebookUser
         name = (String) user.get("name");
         firstName = (String) user.get("firstName");
         thumbSrc = (String) user.get("thumbSrc");
-        Object temp = user.get("status");
-        if(!temp.equals(org.json.JSONObject.NULL))
-			status = (String)temp;
-		else
-			status = "";
-        statusTime = (Number) user.get("statusTime");
-        statusTimeRel = (String) user.get("statusTimeRel");
+        status = "";
+        if (user.has("status")) {
+            Object temp = user.get("status");
+            if(!temp.equals(org.json.JSONObject.NULL))
+    			status = (String)temp;
+    		else
+    			status = "";
+        }
+        if (user.has("statusTime")) statusTime = (Number) user.get("statusTime");
+        if (user.has("statusTimeRel")) statusTimeRel = (String) user.get("statusTimeRel");
 
         lastSeen = new Date().getTime();
         isOnline = true;
