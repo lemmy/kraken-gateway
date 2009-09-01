@@ -23,7 +23,7 @@ smack.jar                | svn-20090707 (patched [#3])
 smackx.jar               | svn-20090707 (patched [#3])
 stcomm.jar               | 3.0
 xmlrpc.jar               | 1.0.1
-yahoo.jar                | unknown [#4]
+yahoo.jar                | svn-20090831
 
 
 
@@ -36,6 +36,3 @@ Patch Descriptions
 
 3) smack patches
 - patched to fix digest issues (from Eric Sessoms)
-
-4) yahoo library
-- updated old jymsg library from Damian Minkov
