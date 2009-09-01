@@ -1864,6 +1864,11 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             xEvent.addElement("composing");
             m.addChildElement("active", NameSpace.CHATSTATES);
         }
+        else if (type.equals(Message.Type.error)) {
+            // Error responses require error elements, even if we aren't going to do it "right" yet
+            // TODO: All -real- error handling
+            m.setError(Condition.undefined_condition);
+        }
         sendPacket(m);
     }
 

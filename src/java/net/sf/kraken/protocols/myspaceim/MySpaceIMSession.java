@@ -11,6 +11,7 @@
 package net.sf.kraken.protocols.myspaceim;
 
 import net.sf.jmyspaceiml.MSIMConnection;
+import net.sf.jmyspaceiml.MSIMException;
 import net.sf.jmyspaceiml.packet.InstantMessage;
 import net.sf.jmyspaceiml.packet.ActionMessage;
 import net.sf.jmyspaceiml.packet.StatusMessage;
@@ -66,14 +67,19 @@ public class MySpaceIMSession extends TransportSession {
     public void logIn(PresenceType presenceType, String verboseStatus) {
         setPendingPresenceAndStatus(presenceType, verboseStatus); 
         if (!isLoggedIn()) {  
-            connection = new MSIMConnection();
-            connection.connect();
-            connection.login(getRegistration().getUsername(), getRegistration().getPassword());
-            this.setLoginStatus(TransportLoginStatus.LOGGED_IN);
-            listener = new MySpaceIMListener(this);
-            connection.addMessageListener(listener);
-            connection.getContactManager().addContactListener(listener);
-            connection.getContactManager().requestContacts();
+            try {
+                connection = new MSIMConnection();
+                connection.connect();
+                connection.login(getRegistration().getUsername(), getRegistration().getPassword());
+                this.setLoginStatus(TransportLoginStatus.LOGGED_IN);
+                listener = new MySpaceIMListener(this);
+                connection.addMessageListener(listener);
+                connection.getContactManager().addContactListener(listener);
+                connection.getContactManager().requestContacts();
+            }
+            catch (MSIMException e) {
+                Log.error("Failure while logging in:", e);
+            }
         }
     }
 
