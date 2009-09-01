@@ -91,6 +91,7 @@ public class YahooListener extends SessionAdapter {
                 getSession().getTransport().convertIDToJID(event.getFrom()),
                 messageDecoder.decodeToText(event.getMessage())
         );
+
     }
 
     /**
@@ -134,12 +135,12 @@ public class YahooListener extends SessionAdapter {
      */
     public void friendsUpdateReceived(SessionFriendEvent event) {
         for (YahooUser user : event.getFriends()) {
+            Log.debug("Yahoo: Got status update: "+user);
             if (getSession().getBuddyManager().isActivated()) {
                 try {
                     YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
                     yahooBuddy.yahooUser = user;
                     yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
-    
                 }
                 catch (NotFoundException e) {
                     // Not in our list.

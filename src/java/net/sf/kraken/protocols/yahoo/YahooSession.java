@@ -80,7 +80,7 @@ public class YahooSession extends TransportSession {
     private Session yahooSession;
 
     /**
-     * Yahoo session listsner.
+     * Yahoo session listener.
      */
     private YahooListener yahooListener;
 
@@ -431,6 +431,13 @@ public class YahooSession extends TransportSession {
         catch (Exception e) {
             Log.debug("Unable to set Yahoo Status:", e);
         }
+    }
+    
+    /**
+     * Retrieve the actual Yahoo Session interface.
+     */
+    public Session getYahooSession() {
+        return yahooSession;
     }
 
 }
