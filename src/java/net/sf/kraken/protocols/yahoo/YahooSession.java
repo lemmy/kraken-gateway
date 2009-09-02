@@ -339,7 +339,7 @@ public class YahooSession extends TransportSession {
             if (!yahooGroups.containsKey(group)) {
                 try {
                     Log.debug("Yahoo: Adding contact "+yBuddy.getName()+" to non-existent group "+group);
-                    yahooSession.addFriend(yBuddy.yahooUser.toString(), group);
+                    yahooSession.addFriend(yBuddy.yahooUser.getId(), group);
                 }
                 catch (IOException e) {
                     Log.debug("Error while syncing Yahoo groups.");
@@ -352,7 +352,7 @@ public class YahooSession extends TransportSession {
                 if (!yahooGroup.getMembers().contains(yBuddy.yahooUser)) {
                     try {
                         Log.debug("Yahoo: Adding contact "+yBuddy.getName()+" to existing group "+yahooGroup.getName());
-                        yahooSession.addFriend(yBuddy.yahooUser.toString(), yahooGroup.getName());
+                        yahooSession.addFriend(yBuddy.yahooUser.getId(), yahooGroup.getName());
                     }
                     catch (IOException e) {
                         Log.debug("Error while syncing Yahoo groups.");
@@ -366,7 +366,7 @@ public class YahooSession extends TransportSession {
                 if (yahooGroup.getMembers().contains(yBuddy.yahooUser)) {
                     try {
                         Log.debug("Yahoo: Removing contact "+yBuddy.getName()+" from group "+yahooGroup.getName());
-                        yahooSession.removeFriend(yBuddy.yahooUser.toString(), yahooGroup.getName());
+                        yahooSession.removeFriend(yBuddy.yahooUser.getId(), yahooGroup.getName());
                     }
                     catch (IOException e) {
                         Log.debug("Error while syncing Yahoo groups.");
