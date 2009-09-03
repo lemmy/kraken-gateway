@@ -424,6 +424,11 @@ public class MSNListener extends MsnAdapter {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
             getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
         }
+        else if (throwable instanceof LoginException) {
+            // This can be a number of things, but generally it's a failed username and password.
+            getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
+        }
         else if (throwable instanceof MsnProtocolException) {
             Log.debug("MSN: Protocol exception: "+throwable.toString());
         }
