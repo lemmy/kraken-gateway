@@ -1989,6 +1989,8 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
+        Element xEvent = m.addChildElement("x", "jabber:x:event");
+        xEvent.addElement("id");
         m.addChildElement("paused", NameSpace.CHATSTATES);
         sendPacket(m);
     }
@@ -2007,6 +2009,8 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
+        Element xEvent = m.addChildElement("x", "jabber:x:event");
+        xEvent.addElement("id");
         m.addChildElement("inactive", NameSpace.CHATSTATES);
         sendPacket(m);
     }
@@ -2025,6 +2029,8 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
+        Element xEvent = m.addChildElement("x", "jabber:x:event");
+        xEvent.addElement("id");
         m.addChildElement("gone", NameSpace.CHATSTATES);
         sendPacket(m);
     }
