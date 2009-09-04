@@ -370,15 +370,7 @@ public class MSNSession extends TransportSession {
             return;
         }
 
-        if (groups == null || groups.isEmpty()) {
-            // No groups, we'll make sure they are in the "default group"
-            Log.debug("MSN: Found "+contact+" should belong to default group.");
-            MsnGroup defaultGroup = msnMessenger.getContactList().getDefaultGroup();
-            if (defaultGroup != null && !defaultGroup.containContact(msnContact)) {
-                msnMessenger.addFriend(msnContact.getEmail(), msnContact.getFriendlyName());
-            }
-        }
-        else {
+        if (groups != null && !groups.isEmpty()) {
             // Create groups that do not currently exist.
             for (String group : groups) {
                 if (!msnGroups.containsKey(group)) {
