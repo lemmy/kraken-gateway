@@ -24,18 +24,16 @@ import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.openymsg.network.AccountLockedException;
+import org.openymsg.network.AuthenticationState;
+import org.openymsg.network.DirectConnectionHandler;
+import org.openymsg.network.LoginRefusedException;
+import org.openymsg.network.Session;
+import org.openymsg.network.Status;
+import org.openymsg.network.YahooUser;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.apache.log4j.Logger;
-
-import ymsg.network.AccountLockedException;
-import ymsg.network.DirectConnectionHandler;
-import ymsg.network.LoginRefusedException;
-import ymsg.network.Session;
-import ymsg.network.StatusConstants;
-import ymsg.network.YahooGroup;
-import ymsg.network.YahooUser;
-import ymsg.network.event.SessionAuthorizationEvent;
 
 import java.io.IOException;
 import java.util.*;
@@ -100,7 +98,7 @@ public class YahooSession extends TransportSession {
             new Thread() {
                 public void run() {
                     try {
-                        yahooSession.setStatus(StatusConstants.STATUS_AVAILABLE);
+                        yahooSession.setStatus(Status.AVAILABLE);
                         yahooSession.login(registration.getUsername(), registration.getPassword());
                         setLoginStatus(TransportLoginStatus.LOGGED_IN);
 
@@ -111,14 +109,14 @@ public class YahooSession extends TransportSession {
                     catch (LoginRefusedException e) {
                         yahooSession.reset();
                         String reason = LocaleUtils.getLocalizedString("gateway.yahoo.loginrefused", "kraken");
-                        long state = e.getStatus();
-                        if (state == StatusConstants.STATUS_BADUSERNAME) {
+                        AuthenticationState state = e.getStatus();
+                        if (state == AuthenticationState.BADUSERNAME) {
                             reason = LocaleUtils.getLocalizedString("gateway.yahoo.unknownuser", "kraken");
                         }
-                        else if (state == StatusConstants.STATUS_BAD) {
+                        else if (state == AuthenticationState.BAD) {
                             reason = LocaleUtils.getLocalizedString("gateway.yahoo.badpassword", "kraken");
                         }
-                        else if (state == StatusConstants.STATUS_LOCKED) {
+                        else if (state == AuthenticationState.LOCKED) {
                             AccountLockedException e2 = (AccountLockedException)e;
                             if(e2.getWebPage() != null) {
                                 reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlockedwithurl", "kraken", Arrays.asList(e2.getWebPage().toString()));
@@ -193,28 +191,9 @@ public class YahooSession extends TransportSession {
     /**
      * Syncs up the yahoo roster with the jabber roster.
      */
-    @SuppressWarnings("unchecked")
     public void syncUsers() {
-        // First we need to get a good mapping of users to what groups they are in.
-        HashMap<String,ArrayList<String>> userToGroups = new HashMap<String,ArrayList<String>>();
-        for (YahooGroup group : yahooSession.getGroups()) {
-            for (Enumeration e = group.getMembers().elements(); e.hasMoreElements();) {
-                YahooUser user = (YahooUser)e.nextElement();
-                ArrayList<String> groups;
-                if (userToGroups.containsKey(user.getId())) {
-                    groups = userToGroups.get(user.getId());
-                }
-                else {
-                    groups = new ArrayList<String>();
-                }
-                if (!groups.contains(group.getName())) {
-                    groups.add(group.getName());
-                }
-                userToGroups.put(user.getId(), groups);
-            }
-        }
-        // Now we will run through the entire list of users and set up our sync group.
-        for (Object userObj : yahooSession.getUsers().values()) {
+        // Run through the entire list of users and set up our sync group.
+        for (Object userObj : yahooSession.getRoster().toArray()) {
             YahooUser user = (YahooUser)userObj;
             PseudoRosterItem rosterItem = pseudoRoster.getItem(user.getId());
             String nickname = null;
@@ -224,12 +203,7 @@ public class YahooSession extends TransportSession {
             if (nickname == null) {
                 nickname = user.getId();
             }
-            if (userToGroups.containsKey(user.getId()) && !userToGroups.get(user.getId()).get(0).equals("Transport Buddies")) {
-                getBuddyManager().storeBuddy(new YahooBuddy(this.getBuddyManager(), user, nickname, userToGroups.get(user.getId()), rosterItem));
-            }
-            else {
-                getBuddyManager().storeBuddy(new YahooBuddy(this.getBuddyManager(), user, nickname, null, rosterItem));
-            }
+            getBuddyManager().storeBuddy(new YahooBuddy(this.getBuddyManager(), user, nickname, user.getGroupIds(), rosterItem));
         }
         // Lets try the actual sync.
         try {
@@ -256,10 +230,13 @@ public class YahooSession extends TransportSession {
         else {
             rosterItem = pseudoRoster.createItem(contact, nickname, null);
         }
-        YahooUser yUser = (YahooUser)yahooSession.addUserbyID(contact); 
+        YahooUser yUser = new YahooUser(contact);
+        for (String grp : groups) {
+            yUser.addGroupId(grp);
+        }
+        yahooSession.getRoster().add(yUser); 
         YahooBuddy yBuddy = new YahooBuddy(getBuddyManager(), yUser, nickname, groups, rosterItem);
         getBuddyManager().storeBuddy(yBuddy);
-        syncContactGroups(yBuddy);
     }
 
     /**
@@ -267,16 +244,7 @@ public class YahooSession extends TransportSession {
      */
     public void removeContact(TransportBuddy contact) {
         String yahooContact = getTransport().convertJIDToID(contact.getJID());
-        for (YahooGroup yahooGroup : yahooSession.getGroups()) {
-            if (yahooGroup.getIndexOfFriend(yahooContact) >= 0) {
-                try {
-                    yahooSession.removeFriend(yahooContact, yahooGroup.getName());
-                }
-                catch (IOException e) {
-                    Log.debug("Failed to remove yahoo user "+yahooContact+" from group "+yahooGroup);
-                }
-            }
-        }
+        yahooSession.getRoster().remove(((YahooBuddy)contact).yahooUser);
         pseudoRoster.removeItem(yahooContact);
     }
 
@@ -296,7 +264,19 @@ public class YahooSession extends TransportSession {
         try {
             YahooBuddy yBuddy = (YahooBuddy)getBuddyManager().getBuddy(contact.getJID());
             yBuddy.pseudoRosterItem = rosterItem;
-            syncContactGroups(yBuddy);
+            for (String newGroup : yBuddy.getGroups()) {
+                if (!yBuddy.yahooUser.getGroupIds().contains(newGroup)) {
+                    // Add new group to user
+                    yBuddy.yahooUser.addGroupId(newGroup);
+                }
+            }
+            for (String oldGroup : yBuddy.yahooUser.getGroupIds()) {
+                if (!yBuddy.getGroups().contains(oldGroup)) {
+                    // Remove group from user
+                    // TODO: This needs to be implemented...
+                    //yBuddy.yahooUser.removeGroupId(oldGroup);
+                }
+            }
         }
         catch (NotFoundException e) {
             Log.debug("Yahoo: Updated buddy not found in buddy manager: "+yahooContact);
@@ -308,71 +288,10 @@ public class YahooSession extends TransportSession {
      */
     public void acceptAddContact(TransportBuddy contact) {
         try {
-            String login = yahooSession.getLoginIdentity().getId();
             String yahooContact = getTransport().convertJIDToID(contact.getJID());
-
-            SessionAuthorizationEvent ev = new SessionAuthorizationEvent(
-                    (Object)this, login, "", "", "", "");
-            yahooSession.acceptFriendAuthorization(ev, yahooContact);
+            yahooSession.acceptFriendAuthorization(yahooContact);
         } catch (IOException e) {
             Log.debug("Yahoo: Failed to accept add contact request.");
-        }
-    }
-
-    /**
-     * Given a legacy contact and a list of groups, makes sure that the list is in sync with
-     * the actual group list.
-     *
-     * @param yBuddy Yahoo buddy instance of contact.
-     */
-    public void syncContactGroups(YahooBuddy yBuddy) {
-        if (yBuddy.getGroups() == null || yBuddy.getGroups().size() == 0) {
-            yBuddy.setGroups(Arrays.asList("Transport Buddies"));
-        }
-        HashMap<String,YahooGroup> yahooGroups = new HashMap<String,YahooGroup>();
-        // Lets create a hash of these for easier reference.
-        for (YahooGroup yahooGroup : yahooSession.getGroups()) {
-            yahooGroups.put(yahooGroup.getName(), yahooGroup);
-        }
-        // Create groups(add user to them) that do not currently exist.
-        for (String group : yBuddy.groups) {
-            if (!yahooGroups.containsKey(group)) {
-                try {
-                    Log.debug("Yahoo: Adding contact "+yBuddy.getName()+" to non-existent group "+group);
-                    yahooSession.addFriend(yBuddy.yahooUser.getId(), group);
-                }
-                catch (IOException e) {
-                    Log.debug("Error while syncing Yahoo groups.");
-                }
-            }
-        }
-        // Now we handle adds, syncing the two lists.
-        for (YahooGroup yahooGroup : yahooSession.getGroups()) {
-            if (yBuddy.groups.contains(yahooGroup.getName())) {
-                if (!yahooGroup.getMembers().contains(yBuddy.yahooUser)) {
-                    try {
-                        Log.debug("Yahoo: Adding contact "+yBuddy.getName()+" to existing group "+yahooGroup.getName());
-                        yahooSession.addFriend(yBuddy.yahooUser.getId(), yahooGroup.getName());
-                    }
-                    catch (IOException e) {
-                        Log.debug("Error while syncing Yahoo groups.");
-                    }
-                }
-            }
-        }
-        // Now we handle removes, syncing the two lists. 
-        for (YahooGroup yahooGroup : yahooSession.getGroups()) {
-            if (!yBuddy.groups.contains(yahooGroup.getName())) {
-                if (yahooGroup.getMembers().contains(yBuddy.yahooUser)) {
-                    try {
-                        Log.debug("Yahoo: Removing contact "+yBuddy.getName()+" from group "+yahooGroup.getName());
-                        yahooSession.removeFriend(yBuddy.yahooUser.getId(), yahooGroup.getName());
-                    }
-                    catch (IOException e) {
-                        Log.debug("Error while syncing Yahoo groups.");
-                    }
-                }
-            }
         }
     }
 
@@ -392,8 +311,16 @@ public class YahooSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
     public void sendChatState(JID jid, ChatStateType chatState) { 
-        if (chatState.equals(ChatStateType.composing)) {
-            yahooSession.keyTyped(getTransport().convertJIDToID(jid));
+        try {
+            if (chatState.equals(ChatStateType.composing)) {
+                yahooSession.sendTypingNotification(getTransport().convertJIDToID(jid), true);
+            }
+            else {
+                yahooSession.sendTypingNotification(getTransport().convertJIDToID(jid), false); 
+            }
+        }
+        catch (IOException e) {
+            Log.debug("Failed to send typing notification to yahoo user.");
         }
     }
 

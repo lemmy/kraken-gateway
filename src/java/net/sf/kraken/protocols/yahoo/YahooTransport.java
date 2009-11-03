@@ -18,9 +18,8 @@ import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.LocaleUtils;
+import org.openymsg.network.Status;
 import org.xmpp.packet.JID;
-
-import ymsg.network.StatusConstants;
 
 /**
  * Yahoo Transport Interface.
@@ -110,27 +109,27 @@ public class YahooTransport extends BaseTransport {
      * @param xmppStatus Jabber presence type.
      * @return Yahoo status identifier.
      */
-    public long convertXMPPStatusToYahoo(PresenceType xmppStatus) {
+    public Status convertXMPPStatusToYahoo(PresenceType xmppStatus) {
         if (xmppStatus == PresenceType.available) {
-            return StatusConstants.STATUS_AVAILABLE;
+            return Status.AVAILABLE;
         }
         else if (xmppStatus == PresenceType.away) {
-            return StatusConstants.STATUS_BRB;
+            return Status.BRB;
         }
         else if (xmppStatus == PresenceType.xa) {
-            return StatusConstants.STATUS_STEPPEDOUT;
+            return Status.STEPPEDOUT;
         }
         else if (xmppStatus == PresenceType.dnd) {
-            return StatusConstants.STATUS_BUSY;
+            return Status.BUSY;
         }
         else if (xmppStatus == PresenceType.chat) {
-            return StatusConstants.STATUS_AVAILABLE;
+            return Status.AVAILABLE;
         }
         else if (xmppStatus == PresenceType.unavailable) {
-            return StatusConstants.STATUS_OFFLINE;
+            return Status.OFFLINE;
         }
         else {
-            return StatusConstants.STATUS_AVAILABLE;
+            return Status.AVAILABLE;
         }
     }
 
@@ -140,45 +139,45 @@ public class YahooTransport extends BaseTransport {
      * @param yahooStatus Yahoo StatusConstants constant.
      * @return XMPP presence type matching the Yahoo status.
      */
-    public PresenceType convertYahooStatusToXMPP(long yahooStatus) {
-        if (yahooStatus == StatusConstants.STATUS_AVAILABLE) {
+    public PresenceType convertYahooStatusToXMPP(Status yahooStatus) {
+        if (yahooStatus == Status.AVAILABLE) {
             // We're good, leave the type as blank for available.
             return PresenceType.available;
         }
-        else if (yahooStatus == StatusConstants.STATUS_BRB) {
+        else if (yahooStatus == Status.BRB) {
             return PresenceType.away;
         }
-        else if (yahooStatus == StatusConstants.STATUS_BUSY) {
+        else if (yahooStatus == Status.BUSY) {
             return PresenceType.dnd;
         }
-        else if (yahooStatus == StatusConstants.STATUS_IDLE) {
+        else if (yahooStatus == Status.IDLE) {
             return PresenceType.away;
         }
-        else if (yahooStatus == StatusConstants.STATUS_OFFLINE) {
+        else if (yahooStatus == Status.OFFLINE) {
             return PresenceType.unavailable;
         }
-        else if (yahooStatus == StatusConstants.STATUS_NOTATDESK) {
+        else if (yahooStatus == Status.NOTATDESK) {
             return PresenceType.away;
         }
-        else if (yahooStatus == StatusConstants.STATUS_NOTINOFFICE) {
+        else if (yahooStatus == Status.NOTINOFFICE) {
             return PresenceType.away;
         }
-        else if (yahooStatus == StatusConstants.STATUS_ONPHONE) {
+        else if (yahooStatus == Status.ONPHONE) {
             return PresenceType.away;
         }
-        else if (yahooStatus == StatusConstants.STATUS_ONVACATION) {
+        else if (yahooStatus == Status.ONVACATION) {
             return PresenceType.xa;
         }
-        else if (yahooStatus == StatusConstants.STATUS_OUTTOLUNCH) {
+        else if (yahooStatus == Status.OUTTOLUNCH) {
             return PresenceType.xa;
         }
-        else if (yahooStatus == StatusConstants.STATUS_STEPPEDOUT) {
+        else if (yahooStatus == Status.STEPPEDOUT) {
             return PresenceType.away;
         }
-        else if (yahooStatus == StatusConstants.STATUS_INVISIBLE) {
+        else if (yahooStatus == Status.INVISIBLE) {
             return PresenceType.available;
         }
-        else if (yahooStatus == StatusConstants.STATUS_CUSTOM) {
+        else if (yahooStatus == Status.CUSTOM) {
             return PresenceType.available;
         }
         else {

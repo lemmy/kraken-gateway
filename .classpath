@@ -23,7 +23,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/openfire"/>
 	<classpathentry kind="lib" path="/openfire/build/lib/dist/servlet.jar"/>
 	<classpathentry kind="lib" path="lib/jqql.jar"/>
-	<classpathentry kind="lib" path="/openfire/work/classes"/>
 	<classpathentry kind="lib" path="/openfire/build/lib/merge/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j.jar"/>
 	<classpathentry kind="lib" path="lib/stcomm.jar"/>
@@ -31,6 +30,7 @@
 	<classpathentry kind="lib" path="lib/httpcore.jar"/>
 	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient.jar"/>
-	<classpathentry kind="lib" path="lib/yahoo.jar"/>
+	<classpathentry kind="lib" path="lib/openymsg.jar"/>
+	<classpathentry kind="lib" path="/openfire/work/classes"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

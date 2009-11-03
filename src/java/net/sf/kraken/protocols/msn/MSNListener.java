@@ -412,7 +412,7 @@ public class MSNListener extends MsnAdapter {
      * Owner status has changed.
      */
     public void ownerStatusChanged(MsnMessenger messenger) {
-        getSession().setPresenceAndStatus(((MSNTransport)getSession().getTransport()).convertMSNStatusToXMPP(messenger.getOwner().getStatus()), messenger.getOwner().getPersonalMessage());
+        //getSession().setPresenceAndStatus(((MSNTransport)getSession().getTransport()).convertMSNStatusToXMPP(messenger.getOwner().getStatus()), messenger.getOwner().getPersonalMessage());
     }
 
     /**

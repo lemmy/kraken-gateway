@@ -16,7 +16,7 @@ import net.sf.kraken.roster.TransportBuddyManager;
 
 import java.util.Collection;
 
-import ymsg.network.YahooUser;
+import org.openymsg.network.YahooUser;
 
 /**
  * @author Daniel Henninger
