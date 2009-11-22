@@ -10,6 +10,8 @@
 
 package net.sf.kraken.protocols.facebook;
 
+import net.sf.jfacebookiml.FacebookAdapter;
+import net.sf.jfacebookiml.FacebookHttpClient;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
@@ -57,7 +59,7 @@ public class FacebookSession extends TransportSession {
     public void logIn(PresenceType presenceType, String verboseStatus) {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {
-            adapter = new FacebookAdapter(this);
+            adapter = new FacebookAdapter();
             adapter.initialize(getRegistration().getUsername(), getRegistration().getPassword());
             adapter.setVisibility(true);
             setLoginStatus(TransportLoginStatus.LOGGED_IN);
@@ -171,6 +173,23 @@ public class FacebookSession extends TransportSession {
             Log.error("Facebook: Unable to update status of user", e);
           }
         }
+    }
+    
+    /**
+     * Download the photo from the given address.
+     * @param address the url
+     * @return a flow of bytes contening the photo
+     */
+    public byte[] readUrlBytes(String address) {
+    	FacebookHttpClient facebookHttpClient = new FacebookHttpClient(adapter);
+    	
+    	byte[] response = facebookHttpClient.getBytesMethod(address);
+    	
+    	if(response != null) {
+    		return response;
+    	} else {
+    		return null;
+    	}
     }
 
 }

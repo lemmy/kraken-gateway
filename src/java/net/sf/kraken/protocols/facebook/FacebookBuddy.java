@@ -10,7 +10,7 @@
 
 package net.sf.kraken.protocols.facebook;
 
-import net.sf.kraken.avatars.Avatar;
+import net.sf.jfacebookiml.FacebookUser;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 
@@ -28,31 +28,10 @@ public class FacebookBuddy extends TransportBuddy {
     public FacebookBuddy(TransportBuddyManager manager, FacebookUser user) {
         super(manager, user.uid, user.name, Arrays.asList("Facebook"));
         this.user = user;
-        
-        // We also want to initialize their avatar picture here
-        Avatar avatar = new Avatar(getJID(), user.thumbSrc, readUrlBytes(user.thumbSrc));
-        setAvatar(avatar);
     }
     
     public FacebookUser getUser() {
         return user;
-    }
-
-    /**
-     * Download the photo from the given address.
-     * @param address the url
-     * @return a flow of bytes contening the photo
-     */
-    public byte[] readUrlBytes(String address) {
-    	FacebookHttpClient facebookHttpClient = new FacebookHttpClient();
-    	
-    	byte[] response = facebookHttpClient.getBytesMethod(address);
-    	
-    	if(response != null) {
-    		return response;
-    	} else {
-    		return null;
-    	}
     }
     
 }
