@@ -399,11 +399,11 @@ public class XMPPSession extends TransportSession {
                 if (!group.contains(user2Update)) {
                     try {
                         group.addEntry(user2Update);
-                        newgroups.remove(group.getName());
                     }
                     catch (XMPPException e) {
                         Log.debug("XMPP: Unable to add roster item to group.");
                     }
+                    newgroups.remove(group.getName());
                 }
             }
             else {
