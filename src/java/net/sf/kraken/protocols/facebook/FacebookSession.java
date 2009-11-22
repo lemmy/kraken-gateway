@@ -52,6 +52,9 @@ public class FacebookSession extends TransportSession {
 
     /* Adapter */
     private FacebookAdapter adapter;
+    
+    /* Listener */
+    private FacebookListener listener;
 
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
@@ -60,6 +63,8 @@ public class FacebookSession extends TransportSession {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {
             adapter = new FacebookAdapter();
+            listener = new FacebookListener(this);
+            adapter.addFacebookListener(listener);
             adapter.initialize(getRegistration().getUsername(), getRegistration().getPassword());
             adapter.setVisibility(true);
             setLoginStatus(TransportLoginStatus.LOGGED_IN);
@@ -84,6 +89,9 @@ public class FacebookSession extends TransportSession {
     public void cleanUp() {
         if (adapter != null)
             adapter.shutdown();
+    	if (listener != null)
+    		adapter.removeFacebookListener(listener);
+    	listener = null;
         adapter = null;
     }
 
