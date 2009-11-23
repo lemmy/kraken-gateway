@@ -98,43 +98,10 @@ public class FacebookTransport extends BaseTransport {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }
-
-    /**
-     * Converts a XMPP status to a Facebook status.
-     *
-     * @param jabStatus XMPP presence type.
-     * @param hasVerbose We have a verbose status so give me the appropriate status type.
-     * @return Facebook user status type.
-     */
-    public short convertXMPPStatusToFacebook(PresenceType jabStatus, Boolean hasVerbose) {
-        if (jabStatus == PresenceType.available) {
-        }
-        else if (jabStatus == PresenceType.away) {
-        }
-        else if (jabStatus == PresenceType.xa) {
-        }
-        else if (jabStatus == PresenceType.dnd) {
-        }
-        else if (jabStatus == PresenceType.chat) {
-        }
-        else if (jabStatus == PresenceType.unavailable) {
-        }
-        else {
-        }
-        return -1;
+    
+    static {
+        KrakenPlugin.setLoggerProperty("log4j.additivity.net.sf.jfacebookiml", "false");
+        KrakenPlugin.setLoggerProperty("log4j.logger.net.sf.jfacebookiml", "DEBUG, openfiredebug");
     }
-
-    /**
-     * Converts a Facebook status to an XMPP status.
-     *
-     * @param fbUserStatus Facebook user status constant.
-     * @return XMPP presence type.
-     */
-    public PresenceType convertFacebookStatusToXMPP(short fbUserStatus) {
-        switch (fbUserStatus) {
-            default:
-                return PresenceType.unknown;
-        }
-     }
 
 }
