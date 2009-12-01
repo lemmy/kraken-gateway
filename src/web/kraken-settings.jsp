@@ -334,7 +334,7 @@
     <div <%= ((!this.gwEnabled) ? " class='jive-gateway jive-gatewayDisabled'" : "class='jive-gateway'") %> id="jive<%= this.gatewayType.toString().toUpperCase() %>">
 		<label for="jive<%= this.gatewayType.toString().toUpperCase() %>checkbox">
 			<input type="checkbox" name="kraken" value="<%= this.gatewayType.toString().toLowerCase() %>" id="jive<%= this.gatewayType.toString().toUpperCase() %>checkbox" <%= ((this.gwEnabled) ? "checked" : "") %> onClick="ConfigManager.toggleTransport('<%= this.gatewayType.toString().toLowerCase() %>'); checkToggle(jive<%= this.gatewayType.toString().toUpperCase() %>); return true">
-			<img src="images/<%= this.gatewayType.toString().toLowerCase() %>.gif" alt="" border="0">
+			<img src="images/<%= this.gatewayType.toString().toLowerCase() %>.png" alt="" border="0">
 			<strong><%= this.description %></strong>
 		</label>
 		<div class="jive-gatewayButtons">

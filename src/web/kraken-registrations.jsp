@@ -558,73 +558,73 @@
             <div>
             <label for="filterAIMcheckbox">
                 <input type="checkbox" name="filter[]" value="aim" <%= ((filteropts.contains("aim")) ? "checked" : "") %> id="filterAIMcheckbox">
-                <img src="images/aim.gif" border="0" alt="<fmt:message key="gateway.aim.shortservice" />" title="<fmt:message key="gateway.aim.shortservice" />"/>
+                <img src="images/aim.png" border="0" alt="<fmt:message key="gateway.aim.shortservice" />" title="<fmt:message key="gateway.aim.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.aim.shortservice" /></span>-->
             </label>
             <label for="filterFACEBOOKcheckbox">
                 <input type="checkbox" name="filter[]" value="facebook" <%= ((filteropts.contains("facebook")) ? "checked" : "") %> id="filterFACEBOOKcheckbox">
-                <img src="images/facebook.gif" border="0" alt="<fmt:message key="gateway.facebook.shortservice" />" title="<fmt:message key="gateway.facebook.shortservice" />"/>
+                <img src="images/facebook.png" border="0" alt="<fmt:message key="gateway.facebook.shortservice" />" title="<fmt:message key="gateway.facebook.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.facebook.shortservice" /></span>-->
             </label>
             <label for="filterGADUGADUcheckbox">
                 <input type="checkbox" name="filter[]" value="gadugadu" <%= ((filteropts.contains("gadugadu")) ? "checked" : "") %> id="filterGADUGADUcheckbox">
-                <img src="images/gadugadu.gif" border="0" alt="<fmt:message key="gateway.gadugadu.shortservice" />" title="<fmt:message key="gateway.gadugadu.shortservice" />"/>
+                <img src="images/gadugadu.png" border="0" alt="<fmt:message key="gateway.gadugadu.shortservice" />" title="<fmt:message key="gateway.gadugadu.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.gadugadu.shortservice" /></span>-->
             </label>
             <label for="filterGTALKcheckbox">
                 <input type="checkbox" name="filter[]" value="gtalk" <%= ((filteropts.contains("gtalk")) ? "checked" : "") %> id="filterGTALKcheckbox">
-                <img src="images/gtalk.gif" border="0" alt="<fmt:message key="gateway.gtalk.shortservice" />" title="<fmt:message key="gateway.gtalk.shortservice" />"/>
+                <img src="images/gtalk.png" border="0" alt="<fmt:message key="gateway.gtalk.shortservice" />" title="<fmt:message key="gateway.gtalk.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.gtalk.shortservice" /></span>-->
             </label>
             <label for="filterICQcheckbox">
                 <input type="checkbox" name="filter[]" value="icq" <%= ((filteropts.contains("icq")) ? "checked" : "") %> id="filterICQcheckbox">
-                <img src="images/icq.gif" border="0" alt="<fmt:message key="gateway.icq.shortservice" />" title="<fmt:message key="gateway.icq.shortservice" />"/>
+                <img src="images/icq.png" border="0" alt="<fmt:message key="gateway.icq.shortservice" />" title="<fmt:message key="gateway.icq.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.icq.shortservice" /></span>-->
             </label>
             <label for="filterIRCcheckbox">
                 <input type="checkbox" name="filter[]" value="irc" <%= ((filteropts.contains("irc")) ? "checked" : "") %> id="filterIRCcheckbox">
-                <img src="images/irc.gif" border="0" alt="<fmt:message key="gateway.irc.shortservice" />" title="<fmt:message key="gateway.irc.shortservice" />"/>
+                <img src="images/irc.png" border="0" alt="<fmt:message key="gateway.irc.shortservice" />" title="<fmt:message key="gateway.irc.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.irc.shortservice" /></span>-->
             </label>
             <label for="filterLIVEJOURNALcheckbox">
                 <input type="checkbox" name="filter[]" value="livejournal" <%= ((filteropts.contains("livejournal")) ? "checked" : "") %> id="filterLIVEJOURNALcheckbox">
-                <img src="images/livejournal.gif" border="0" alt="<fmt:message key="gateway.livejournal.shortservice" />" title="<fmt:message key="gateway.livejournal.shortservice" />"/>
+                <img src="images/livejournal.png" border="0" alt="<fmt:message key="gateway.livejournal.shortservice" />" title="<fmt:message key="gateway.livejournal.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.livejournal.shortservice" /></span>-->
             </label>
             <label for="filterMSNcheckbox">
                 <input type="checkbox" name="filter[]" value="msn" <%= ((filteropts.contains("msn")) ? "checked" : "") %> id="filterMSNcheckbox">
-                <img src="images/msn.gif" border="0" alt="<fmt:message key="gateway.msn.shortservice" />" title="<fmt:message key="gateway.msn.shortservice" />"/>
+                <img src="images/msn.png" border="0" alt="<fmt:message key="gateway.msn.shortservice" />" title="<fmt:message key="gateway.msn.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.msn.shortservice" /></span>-->
             </label>
             <br />
             <label for="filterMYSPACEIMcheckbox">
                 <input type="checkbox" name="filter[]" value="myspaceim" <%= ((filteropts.contains("myspaceim")) ? "checked" : "") %> id="filterMYSPACEIMcheckbox">
-                <img src="images/myspaceim.gif" border="0" alt="<fmt:message key="gateway.myspaceim.shortservice" />" title="<fmt:message key="gateway.myspaceim.shortservice" />"/>
+                <img src="images/myspaceim.png" border="0" alt="<fmt:message key="gateway.myspaceim.shortservice" />" title="<fmt:message key="gateway.myspaceim.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.myspaceim.shortservice" /></span>-->
             </label>
             <label for="filterQQcheckbox">
                 <input type="checkbox" name="filter[]" value="qq" <%= ((filteropts.contains("qq")) ? "checked" : "") %> id="filterQQcheckbox">
-                <img src="images/qq.gif" border="0" alt="<fmt:message key="gateway.qq.shortservice" />" title="<fmt:message key="gateway.qq.shortservice" />"/>
+                <img src="images/qq.png" border="0" alt="<fmt:message key="gateway.qq.shortservice" />" title="<fmt:message key="gateway.qq.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.qq.shortservice" /></span>-->
             </label>
             <label for="filterSAMETIMEcheckbox">
                 <input type="checkbox" name="filter[]" value="sametime" <%= ((filteropts.contains("sametime")) ? "checked" : "") %> id="filterSAMETIMEcheckbox">
-                <img src="images/sametime.gif" border="0" alt="<fmt:message key="gateway.sametime.shortservice" />" title="<fmt:message key="gateway.sametime.shortservice" />"/>
+                <img src="images/sametime.png" border="0" alt="<fmt:message key="gateway.sametime.shortservice" />" title="<fmt:message key="gateway.sametime.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.sametime.shortservice" /></span>-->
             </label>
             <label for="filterSIMPLEcheckbox">
                 <input type="checkbox" name="filter[]" value="simple" <%= ((filteropts.contains("simple")) ? "checked" : "") %> id="filterSIMPLEcheckbox">
-                <img src="images/simple.gif" border="0" alt="<fmt:message key="gateway.simple.shortservice" />" title="<fmt:message key="gateway.simple.shortservice" />"/>
+                <img src="images/simple.png" border="0" alt="<fmt:message key="gateway.simple.shortservice" />" title="<fmt:message key="gateway.simple.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.simple.shortservice" /></span>-->
             </label>
             <label for="filterXMPPcheckbox">
                 <input type="checkbox" name="filter[]" value="xmpp" <%= ((filteropts.contains("xmpp")) ? "checked" : "") %> id="filterXMPPcheckbox">
-                <img src="images/xmpp.gif" border="0" alt="<fmt:message key="gateway.xmpp.shortservice" />" title="<fmt:message key="gateway.xmpp.shortservice" />"/>
+                <img src="images/xmpp.png" border="0" alt="<fmt:message key="gateway.xmpp.shortservice" />" title="<fmt:message key="gateway.xmpp.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.xmpp.shortservice" /></span>-->
             </label>
             <label for="filterYAHOOcheckbox">
                 <input type="checkbox" name="filter[]" value="yahoo" <%= ((filteropts.contains("yahoo")) ? "checked" : "") %> id="filterYAHOOcheckbox">
-                <img src="images/yahoo.gif" border="0" alt="<fmt:message key="gateway.yahoo.shortservice" />" title="<fmt:message key="gateway.yahoo.shortservice" />"/>
+                <img src="images/yahoo.png" border="0" alt="<fmt:message key="gateway.yahoo.shortservice" />" title="<fmt:message key="gateway.yahoo.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.yahoo.shortservice" /></span>-->
             </label>
             </div>

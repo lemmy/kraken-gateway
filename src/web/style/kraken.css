@@ -339,127 +339,127 @@ a.jive-gatewayButtonOn {
 	padding: 1px 0 2px 25px;
 	}
 .jive-gateway-AIMon {
-	background-image: url(../images/aim.gif);
+	background-image: url(../images/aim.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-AIMoff {
-	background-image: url(../images/aim-gray.gif);
+	background-image: url(../images/aim-gray.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-GADUGADUon {
-	background-image: url(../images/gadugadu.gif);
+	background-image: url(../images/gadugadu.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-GADUGADUoff {
-	background-image: url(../images/gadugadu-gray.gif);
+	background-image: url(../images/gadugadu-gray.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-GTALKon {
-	background: url(../images/gtalk.gif) no-repeat left;
+	background: url(../images/gtalk.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-GTALKoff {
-	background: url(../images/gtalk-gray.gif) no-repeat left;
+	background: url(../images/gtalk-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-ICQon {
-	background-image: url(../images/icq.gif);
+	background-image: url(../images/icq.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-ICQoff {
-	background-image: url(../images/icq-gray.gif);
+	background-image: url(../images/icq-gray.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-IRCon {
-	background-image: url(../images/irc.gif);
+	background-image: url(../images/irc.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-IRCoff {
-	background-image: url(../images/irc-gray.gif);
+	background-image: url(../images/irc-gray.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-MSNon {
-	background-image: url(../images/msn.gif);
+	background-image: url(../images/msn.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-MSNoff {
-	background-image: url(../images/msn-gray.gif);
+	background-image: url(../images/msn-gray.png);
     background-repeat: no-repeat;
 	background-position: 2px 1px;
 	}
 .jive-gateway-XMPPon {
-	background: url(../images/xmpp.gif) no-repeat left;
+	background: url(../images/xmpp.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-XMPPoff {
-	background: url(../images/xmpp-gray.gif) no-repeat left;
+	background: url(../images/xmpp-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-LIVEJOURNALon {
-	background: url(../images/livejournal.gif) no-repeat left;
+	background: url(../images/livejournal.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-LIVEJOURNALoff {
-	background: url(../images/livejournal-gray.gif) no-repeat left;
+	background: url(../images/livejournal-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-SIMPLEon {
-    background: url(../images/simple.gif) no-repeat left;
+    background: url(../images/simple.png) no-repeat left;
     background-position: 2px 1px;
     }
 .jive-gateway-SIMPLEoff {
-    background: url(../images/simple-gray.gif) no-repeat left;
+    background: url(../images/simple-gray.png) no-repeat left;
     background-position: 2px 1px;
     }
 .jive-gateway-YAHOOon {
-	background-image: url(../images/yahoo.gif);
+	background-image: url(../images/yahoo.png);
     background-repeat: no-repeat;
 	background-position: 0 1px;
 	}
 .jive-gateway-YAHOOoff {
-	background-image: url(../images/yahoo-gray.gif);
+	background-image: url(../images/yahoo-gray.png);
     background-repeat: no-repeat;
 	background-position: 0 1px;
 	}
 .jive-gateway-QQon {
-	background: url(../images/qq.gif) no-repeat left;
+	background: url(../images/qq.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-QQoff {
-	background: url(../images/qq-gray.gif) no-repeat left;
+	background: url(../images/qq-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-SAMETIMEon {
-	background: url(../images/sametime.gif) no-repeat left;
+	background: url(../images/sametime.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-SAMETIMEoff {
-	background: url(../images/sametime-gray.gif) no-repeat left;
+	background: url(../images/sametime-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-FACEBOOKon {
-	background: url(../images/facebook.gif) no-repeat left;
+	background: url(../images/facebook.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-FACEBOOKoff {
-	background: url(../images/facebook-gray.gif) no-repeat left;
+	background: url(../images/facebook-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-MYSPACEon {
-	background: url(../images/myspace.gif) no-repeat left;
+	background: url(../images/myspaceim.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 .jive-gateway-MYSPACEoff {
-	background: url(../images/myspace-gray.gif) no-repeat left;
+	background: url(../images/myspaceim-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
 	
