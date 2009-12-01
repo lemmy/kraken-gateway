@@ -11,8 +11,8 @@ jainsipri.jar            | 1.2 (nightly 2007-06-05)
 jfacebookiml.jar         | svn-20091121
 jggapi.jar               | cvs-20090802
 jml.jar                  | svn-20091102
-joscar-common.jar        | svn-20071204 (patched [#2])
-joscar-protocol.jar      | svn-20071204 (patched [#2])
+joscar-common.jar        | svn-20091130
+joscar-protocol.jar      | svn-20091130
 jqql.jar                 | svn-20081124
 jsocks.jar               | 1.01 (patched [#1])
 json.jar                 | 1.0
@@ -21,8 +21,8 @@ martyr.jar               | svn-20070908
 msim.jar                 | svn-20090125
 openymsg.jar             | svn-20091122
 servlet.jar              | 2.5
-smack.jar                | svn-20090707 (patched [#3])
-smackx.jar               | svn-20090707 (patched [#3])
+smack.jar                | svn-20090707 (patched [#2])
+smackx.jar               | svn-20090707 (patched [#2])
 stcomm.jar               | 3.0
 xmlrpc.jar               | 1.0.1
 
@@ -33,8 +33,5 @@ Patch Descriptions
 1) jsocks patches
 - patched by Keith Lea of the joscar project, I don't know details
 
-2) joscar patches
-- patched to fix issue with russian icq users
-
-3) smack patches
+2) smack patches
 - patched to fix digest issues (from Eric Sessoms)
