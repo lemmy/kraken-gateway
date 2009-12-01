@@ -76,5 +76,33 @@ public class StringUtils {
         str = org.jivesoftware.util.StringUtils.unescapeFromXML(str);
         return str;
     }
+    
+    /**
+     * This method ensures that the output String has only valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see the
+     * standard. This method will return an empty String if the input is null or empty.
+     *
+     * @author Donoiu Cristian, GPL
+     * @param  The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public static String removeInvalidXMLCharacters(String s) {
+        StringBuilder out = new StringBuilder();                // Used to hold the output.
+    	int codePoint;                                          // Used to reference the current character.
+		int i=0;
+    	while(i<s.length()) {
+    		codePoint = s.codePointAt(i);                       // This is the unicode code of the character.
+			if ((codePoint == 0x9) ||          				    // Consider testing larger ranges first to improve speed. 
+					(codePoint == 0xA) ||
+					(codePoint == 0xD) ||
+					((codePoint >= 0x20) && (codePoint <= 0xD7FF)) ||
+					((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) ||
+					((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
+				out.append(Character.toChars(codePoint));
+			}				
+			i+= Character.charCount(codePoint);                 // Increment with the number of code units(java chars) needed to represent a Unicode char.  
+    	}
+    	return out.toString();
+    } 
 
 }

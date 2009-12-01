@@ -1857,7 +1857,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         m.setType(type);
         m.setFrom(from);
         m.setTo(to);
-        m.setBody(msg);
+        m.setBody(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(msg));
         if (type.equals(Message.Type.chat) || type.equals(Message.Type.normal)) {
             Element xEvent = m.addChildElement("x", "jabber:x:event");
 //            xEvent.addElement("id");
@@ -1900,7 +1900,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         m.setType(type);
         m.setFrom(from);
         m.setTo(to);
-        m.setBody(msg);
+        m.setBody(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(msg));
         Element delay = m.addChildElement("delay", NameSpace.DELAY);
 //        delay.addAttribute("from", from.toBareJID());
         delay.addAttribute("stamp", UTC_FORMAT.format(time));
