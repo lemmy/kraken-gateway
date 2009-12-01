@@ -250,7 +250,7 @@ public class IRCListener extends GenericAutoService {
                 m.setType(Message.Type.groupchat);
                 m.setTo(getSession().getJID());
                 m.setFrom(mucTransport.convertIDToJID(channel.getName(), channel.getTopicAuthor()));
-                m.setSubject(channel.getTopic());
+                m.setSubject(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(channel.getTopic()));
                 mucTransport.sendPacket(m);
             }
         }
@@ -263,7 +263,7 @@ public class IRCListener extends GenericAutoService {
                 m.setType(Message.Type.groupchat);
                 m.setTo(getSession().getJID());
                 m.setFrom(mucTransport.convertIDToJID(channel.getName(), channel.getTopicAuthor()));
-                m.setSubject(channel.getTopic());
+                m.setSubject(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(channel.getTopic()));
                 mucTransport.sendPacket(m);
             }
         }
