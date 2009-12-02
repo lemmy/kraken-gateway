@@ -16,6 +16,7 @@ import pl.mn.communicator.LocalUser;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Daniel Henninger
@@ -102,4 +103,13 @@ public class GaduGaduBuddy extends TransportBuddy {
     public void setGaduEmailAddress(String gaduEmailAddress) {
         this.gaduEmailAddress = gaduEmailAddress;
     }
+    
+    public void setBuddyGroups(List<String> groups) {
+    	this.groups = groups;
+    }
+    
+    public void setBuddyNickname(String nickname) {
+    	this.nickname = nickname;
+    }
+    
 }

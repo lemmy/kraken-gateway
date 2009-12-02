@@ -220,12 +220,12 @@ public class GaduGaduSession extends TransportSession {
         for (TransportBuddy buddy : getBuddyManager().getBuddies()) {
             if (buddy.getJID().equals(contact.getJID())) {
                 if (!buddy.getNickname().equals(contact.getNickname())) {
-                    buddy.setNickname(contact.getNickname());
+                	((GaduGaduBuddy)buddy).setBuddyNickname(contact.getNickname());
                 }
                 String newGroup = (String)contact.getGroups().toArray()[0];
                 String origGroup = (String)buddy.getGroups().toArray()[0];
                 if (!origGroup.equals(newGroup)) {
-                    buddy.setGroups(Arrays.asList(newGroup));
+                    ((GaduGaduBuddy)buddy).setBuddyGroups(Arrays.asList(newGroup));
                 }
             }
             LocalUser localUser = ((GaduGaduBuddy)buddy).toLocalUser();
