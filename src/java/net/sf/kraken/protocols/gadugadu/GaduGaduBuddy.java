@@ -25,7 +25,7 @@ public class GaduGaduBuddy extends TransportBuddy {
     public GaduGaduBuddy(TransportBuddyManager manager, LocalUser localUser) {
         super(manager, Integer.toString(localUser.getUin()), localUser.getDisplayName(), null);
         if (localUser.getGroup() != null) {
-            this.setGroups(Arrays.asList(localUser.getGroup()));
+            this.groups = Arrays.asList(localUser.getGroup());
         }
         gaduFirstName = localUser.getFirstName();
         gaduLastName = localUser.getLastName();
@@ -37,7 +37,7 @@ public class GaduGaduBuddy extends TransportBuddy {
     public GaduGaduBuddy(TransportBuddyManager manager, String uin, String nickname, String group) {
         super(manager, uin, nickname, null);
         if (group != null) {
-            this.setGroups(Arrays.asList(group));
+            this.groups = Arrays.asList(group);
         }
     }
 
