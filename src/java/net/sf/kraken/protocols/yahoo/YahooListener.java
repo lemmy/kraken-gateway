@@ -10,6 +10,7 @@
 
 package net.sf.kraken.protocols.yahoo;
 
+import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.jivesoftware.util.LocaleUtils;
@@ -142,8 +143,20 @@ public class YahooListener extends SessionAdapter {
                 yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
             }
             catch (NotFoundException e) {
-                // Not in our list.
-                Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
+                // Not in our list, lets change that.
+                PseudoRosterItem rosterItem = getSession().getPseudoRoster().getItem(user.getId());
+                String nickname = null;
+                if (rosterItem != null) {
+                    nickname = rosterItem.getNickname();
+                }
+                if (nickname == null) {
+                    nickname = user.getId();
+                }
+                YahooBuddy yahooBuddy = new YahooBuddy(getSession().getBuddyManager(), user, nickname, user.getGroupIds(), rosterItem);
+                getSession().getBuddyManager().storeBuddy(yahooBuddy);
+                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+                //TODO: Something is amiss with openymsg-- telling us we have our full buddy list too early
+                //Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
             }
         }
         else {
@@ -209,6 +222,7 @@ public class YahooListener extends SessionAdapter {
      */
     public void listReceived(SessionEvent event) {
         // We just got the entire contact list.  Lets sync up.
+        //TODO: Something is amiss with openymsg-- telling us we have our full buddy list too early
         getSession().syncUsers();
     }
 
