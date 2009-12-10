@@ -14,7 +14,7 @@ import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.permissions.PermissionManager;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.type.TransportType;
-
+import net.sf.kraken.session.TransportSession;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.user.UserManager;
@@ -300,5 +300,34 @@ public class ConfigManager {
             return LocaleUtils.getLocalizedString("gateway.web.registrations.regnotfound", "kraken");
         }
     }
+	
+	/**
+     * Logs out session via the web interface.
+     *
+     *
+     * @param registrationID ID number associated with registration to log off.
+     * @return registration ID on success, -1 on failure (-1 so that js cb_logoutSession knows which Div to edit)
+    */
+	
+	public Integer logoutSession(Integer registrationID)
+	{
+		try
+		{
+			PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
+			KrakenPlugin plugin = (KrakenPlugin)pluginManager.getPlugin("kraken");
+			Registration registration = new Registration(registrationID);
+			if (!plugin.getTransportInstance(registration.getTransportType().toString()).isEnabled()) {
+                return -1;
+            }
+			JID jid = registration.getJID();
+			TransportSession session = plugin.getTransportInstance(registration.getTransportType().toString()).getTransport().getSessionManager().getSession(jid);
+			plugin.getTransportInstance(registration.getTransportType().toString()).getTransport().registrationLoggedOut(session);
+			return registrationID;
+		}
+		catch(NotFoundException e)
+		{
+			return -1;
+		}
+	}
 
 }
