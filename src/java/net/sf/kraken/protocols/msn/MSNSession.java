@@ -104,7 +104,12 @@ public class MSNSession extends TransportSession {
             msnMessenger = MsnMessengerFactory.createMsnMessenger(registration.getUsername(), registration.getPassword());
             msnSessionListener = new MSNSessionListener(this);
             ((BasicMessenger)msnMessenger).addSessionListener(msnSessionListener);
-            msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP15 });
+            if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.uselegacyprotocol", true)) {
+            	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP10 });
+            }
+            else {
+            	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP15 });
+            }
             if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.avatars", true) && getAvatar() != null) {
                 try {
                     msnMessenger.getOwner().setInitDisplayPicture(MsnObject.getInstance(
