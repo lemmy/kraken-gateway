@@ -27,6 +27,7 @@ import org.xmpp.packet.Presence;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -83,6 +84,7 @@ public class TransportBuddy {
                 // Ok then, no avatar, no worries.
             }
         }
+        lastActivityTimestamp = new Date().getTime();
     }
 
     /**
@@ -143,6 +145,34 @@ public class TransportBuddy {
      * Has the avatar been set?
      */
     public Boolean avatarSet = false;
+    
+    /**
+     * Timestamp of last activity
+     */
+    public Long lastActivityTimestamp = null;
+    
+    /**
+     * Retrieves timestamp of last activity.
+     * 
+     * @return Timestamp in milliseconds since the epoch.
+     */
+    public Long getLastActivityTimestamp() {
+		return lastActivityTimestamp;
+	}
+
+    /**
+     * Retrieves text event of last activity or null if no event text.
+     * 
+     * @return Text of last event.
+     */
+	public String getLastActivityEvent() {
+		return lastActivityEvent;
+	}
+
+	/**
+     * Text of last activity
+     */
+    public String lastActivityEvent = null;
 
     /**
      * Retrieves the name of the contact.
@@ -352,6 +382,7 @@ public class TransportBuddy {
             getManager().sendPacket(p);
         }
         presence = newpresence;
+        lastActivityTimestamp = new Date().getTime();
     }
 
     /**
@@ -388,6 +419,8 @@ public class TransportBuddy {
             getManager().sendPacket(p);
         }
         verboseStatus = newstatus;
+        lastActivityTimestamp = new Date().getTime();
+        lastActivityEvent = verboseStatus;
     }
 
     /**
@@ -424,6 +457,8 @@ public class TransportBuddy {
         }
         presence = newpresence;
         verboseStatus = newstatus;
+        lastActivityTimestamp = new Date().getTime();
+        lastActivityEvent = verboseStatus;
     }
 
     /**

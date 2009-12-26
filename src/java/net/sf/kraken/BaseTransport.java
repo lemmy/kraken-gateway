@@ -577,6 +577,9 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             // No reason to 'argue' about this one.  Return success.
             reply.add(IQ.createResultIQ(packet));
         }
+        else if (xmlns.equals(NameSpace.IQ_LAST)) { 
+        	reply.addAll(handleIQLast(packet));
+        }
         else {
             Log.debug("Unable to handle iq request: " + xmlns);
             IQ error = IQ.createResultIQ(packet);
@@ -616,6 +619,8 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         .addAttribute("var", NameSpace.IQ_REGISTER);
                 response.addElement("feature")
                         .addAttribute("var", NameSpace.IQ_VERSION);
+                response.addElement("feature")
+                		.addAttribute("var", NameSpace.IQ_LAST);
                 response.addElement("feature")
                         .addAttribute("var", NameSpace.VCARD_TEMP);
                 if (RegistrationManager.getInstance().isRegistered(from, this.transportType)) {
@@ -711,6 +716,50 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 }
                 catch (NotFoundException e) {
                     Log.debug("Contact not found while retrieving vcard for: "+from);
+                    result.setError(Condition.item_not_found);
+                }
+            }
+            else {
+                result.setError(Condition.feature_not_implemented);
+            }
+            reply.add(result);
+        }
+        else if (packet.getType() == IQ.Type.set) {
+            IQ result = IQ.createResultIQ(packet);
+            result.setError(Condition.forbidden);
+            reply.add(result);
+        }
+
+        return reply;
+    }
+
+    /**
+     * Handle last request.
+     *
+     * @param packet An IQ packet in the jabber:iq:last namespace.
+     * @return A list of IQ packets to be returned to the user.
+     */
+    private List<Packet> handleIQLast(IQ packet) {
+        List<Packet> reply = new ArrayList<Packet>();
+        JID from = packet.getFrom();
+        JID to = packet.getTo();
+
+        if (packet.getType() == IQ.Type.get) {
+            IQ result = IQ.createResultIQ(packet);
+            if (from.getNode() != null) {
+                try {
+                    TransportSession session = sessionManager.getSession(from);
+                    Element response = DocumentHelper.createElement(QName.get("query", NameSpace.IQ_LAST)); 
+                    Long timestamp = session.getBuddyManager().getBuddy(to).getLastActivityTimestamp();
+                    String lastevent = session.getBuddyManager().getBuddy(to).getLastActivityEvent();
+                    response.addAttribute("seconds", new Long(new Date().getTime() - timestamp).toString());
+                    if (lastevent != null) {
+                    	response.addCDATA(lastevent);
+                    }
+                    result.setChildElement(response);
+                }
+                catch (NotFoundException e) {
+                    Log.debug("Contact not found while retrieving last activity for: "+from);
                     result.setError(Condition.item_not_found);
                 }
             }

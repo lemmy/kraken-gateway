@@ -21,6 +21,7 @@ public class NameSpace {
     public static final String DISCO_ITEMS = "http://jabber.org/protocol/disco#items";
     public static final String IQ_GATEWAY = "jabber:iq:gateway";
     public static final String IQ_GATEWAY_REGISTER = "jabber:iq:gateway:register";
+    public static final String IQ_LAST = "jabber:iq:last";
     public static final String IQ_REGISTER = "jabber:iq:register";
     public static final String IQ_REGISTERED = "jabber:iq:registered";
     public static final String IQ_ROSTER = "jabber:iq:roster";

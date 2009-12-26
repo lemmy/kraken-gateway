@@ -27,6 +27,7 @@ import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.openymsg.network.AccountLockedException;
 import org.openymsg.network.AuthenticationState;
 import org.openymsg.network.DirectConnectionHandler;
+import org.openymsg.network.FailedLoginException;
 import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
@@ -109,6 +110,19 @@ public class YahooSession extends TransportSession {
                         yahooSession.setStatus(((YahooTransport)getTransport()).convertXMPPStatusToYahoo(getPresence()));
 
                         syncUsers();
+                    }
+                    catch (FailedLoginException e) {
+                        yahooSession.reset();
+                        String reason = LocaleUtils.getLocalizedString("gateway.yahoo.loginrefused", "kraken");
+                        Log.debug("Yahoo login failure for "+getJID()+": "+reason);
+
+                        getTransport().sendMessage(
+                                getJID(),
+                                getTransport().getJID(),
+                                reason,
+                                Message.Type.error
+                        );
+                        setLoginStatus(TransportLoginStatus.LOGGED_OUT);
                     }
                     catch (LoginRefusedException e) {
                         yahooSession.reset();
