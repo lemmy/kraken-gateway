@@ -454,11 +454,11 @@ a.jive-gatewayButtonOn {
 	background: url(../images/facebook-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
-.jive-gateway-MYSPACEon {
+.jive-gateway-MYSPACEIMon {
 	background: url(../images/myspaceim.png) no-repeat left;
 	background-position: 2px 1px;
 	}
-.jive-gateway-MYSPACEoff {
+.jive-gateway-MYSPACEIMoff {
 	background: url(../images/myspaceim-gray.png) no-repeat left;
 	background-position: 2px 1px;
 	}
