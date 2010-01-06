@@ -105,7 +105,7 @@ public class MSNSession extends TransportSession {
             msnSessionListener = new MSNSessionListener(this);
             ((BasicMessenger)msnMessenger).addSessionListener(msnSessionListener);
             if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.uselegacyprotocol", true)) {
-            	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP10 });
+            	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP11 });
             }
             else {
             	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP15 });
