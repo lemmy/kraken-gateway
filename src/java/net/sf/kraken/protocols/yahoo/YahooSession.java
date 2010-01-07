@@ -79,6 +79,10 @@ public class YahooSession extends TransportSession {
      */
     private PseudoRoster pseudoRoster;
 
+    public PseudoRoster getPseudoRoster() {
+        return pseudoRoster;
+    }
+
     /**
      * Yahoo session
      */
