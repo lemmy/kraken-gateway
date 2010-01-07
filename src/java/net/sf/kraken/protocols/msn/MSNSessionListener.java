@@ -51,10 +51,12 @@ public class MSNSessionListener extends SessionAdapter {
         return msnSessionRef.get();
     }
 
+    @Override
     public void exceptionCaught(Session arg0, Throwable t) throws Exception{
         Log.debug("MSN: Session exceptionCaught for "+getSession().getRegistration().getUsername()+" : "+t);
     }
 
+    @Override
     public void messageReceived(Session arg0, Message message) throws Exception {
         Log.debug("MSN: Session messageReceived for "+getSession().getRegistration().getUsername()+" : "+message);
         // TODO: Kinda hacky, would like to improve on this later.
@@ -70,23 +72,27 @@ public class MSNSessionListener extends SessionAdapter {
         }
     }
 
+    @Override
     public void messageSent(Session arg0, Message message) throws Exception {
         Log.debug("MSN: Session messageSent for "+getSession().getRegistration().getUsername()+" : "+message);
     }
 
+    @Override
     public void sessionIdle(Session session) throws Exception {
     }
 
+    @Override
     public void sessionEstablished(Session session) {
         Log.debug("MSN: Session established for "+getSession().getRegistration().getUsername());
     }
 
+    @Override
     public void sessionTimeout(Session session) {
         // This is used to handle regular pings to the MSN server.  No need to mention it.
     }
 
+    @Override
     public void sessionClosed(Session session) {
         Log.debug("MSN: Session closed for "+getSession().getRegistration().getUsername());
     }
-
 }

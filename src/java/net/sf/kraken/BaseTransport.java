@@ -505,17 +505,23 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         sendPacket(p);
                     }
                     else if (packet.getType() == Presence.Type.subscribed) {
-                        // Accept add contact request
-                        TransportBuddy buddy = session.getBuddyManager().getBuddy(to);
-                        session.acceptAddContact(buddy);
+                    	try {
+                    		// Accept add contact request
+                        	TransportBuddy buddy = session.getBuddyManager().getBuddy(to);
+                            session.acceptAddContact(buddy);
+                    	} catch (NotFoundException e) {
+                    		// A transport probably did not add the user to the buddy-list when it received the incoming subscription request.
+                    		Log.warn("Cannot accept-add because user is not in buddymanager. Cannot succesfully parse: " + packet.toXML());
+                    	}
                     }
                     else {
                         // Anything else we will ignore for now.
                     }
-                }
-                catch (NotFoundException e) {
-                    // Well we just don't care then.
-                }
+				} catch (NotFoundException e) {
+					// Well we just don't care then.
+					Log.debug("User not found while processing "
+							+ "presence stanza: " + packet.toXML(), e);
+				}
             }
         }
         catch (Exception e) {

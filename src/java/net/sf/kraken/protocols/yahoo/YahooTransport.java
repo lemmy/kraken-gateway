@@ -139,8 +139,13 @@ public class YahooTransport extends BaseTransport {
      * @param yahooStatus Yahoo StatusConstants constant.
      * @return XMPP presence type matching the Yahoo status.
      */
-    public PresenceType convertYahooStatusToXMPP(Status yahooStatus) {
-        if (yahooStatus == Status.AVAILABLE) {
+    public PresenceType convertYahooStatusToXMPP(Status yahooStatus, String customAvailable) {
+    	if (customAvailable.equals("0")) {
+            return PresenceType.available;
+    	} else if (customAvailable.equals("1")) {
+    		return PresenceType.dnd;
+    	} 
+    	else if (yahooStatus == Status.AVAILABLE) {
             // We're good, leave the type as blank for available.
             return PresenceType.available;
         }

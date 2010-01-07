@@ -32,7 +32,7 @@ public class YahooBuddy extends TransportBuddy {
             this.verboseStatus = custommsg;
         }
 
-        this.setPresenceAndStatus(((YahooTransport)getManager().getSession().getTransport()).convertYahooStatusToXMPP(yahooUser.getStatus()), yahooUser.getCustomStatusMessage());
+        this.setPresenceAndStatus(((YahooTransport)getManager().getSession().getTransport()).convertYahooStatusToXMPP(yahooUser.getStatus(), yahooUser.getCustomStatus()), yahooUser.getCustomStatusMessage());
     }
 
     public YahooUser yahooUser = null;

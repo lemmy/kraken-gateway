@@ -10,12 +10,17 @@
 
 package net.sf.kraken.protocols.yahoo;
 
-import net.sf.kraken.pseudoroster.PseudoRosterItem;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import net.sf.kraken.type.TransportLoginStatus;
 
+import org.apache.log4j.Logger;
+import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
-import org.jivesoftware.util.JiveGlobals;
 import org.openymsg.network.Status;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
@@ -27,15 +32,13 @@ import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionFileTransferEvent;
 import org.openymsg.network.event.SessionFriendEvent;
+import org.openymsg.network.event.SessionFriendRejectedEvent;
+import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionNewMailEvent;
 import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.support.MessageDecoder;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
-import org.apache.log4j.Logger;
-
-import java.util.Arrays;
-import java.lang.ref.WeakReference;
 
 /**
  * Handles incoming packets from Yahoo.
@@ -85,6 +88,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#messageReceived(org.openymsg.network.event.SessionEvent)
      */
+    @Override
     public void messageReceived(SessionEvent event) {
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
@@ -97,6 +101,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#offlineMessageReceived(org.openymsg.network.event.SessionEvent)
      */
+    @Override
     public void offlineMessageReceived(SessionEvent event) {
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
@@ -108,6 +113,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#newMailReceived(org.openymsg.network.event.SessionNewMailEvent)
      */
+    @Override
     public void newMailReceived(SessionNewMailEvent event) {
         if (JiveGlobals.getBooleanProperty("plugin.gateway.yahoo.mailnotifications", true) && (emailInitialized || event.getMailCount() > 0)) {
             if (!emailInitialized) {
@@ -133,6 +139,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
      */
+    @Override
     public void friendsUpdateReceived(SessionFriendEvent event) {
         YahooUser user = event.getUser();
         Log.debug("Yahoo: Got status update: "+user);
@@ -140,7 +147,8 @@ public class YahooListener extends SessionAdapter {
             try {
                 YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
                 yahooBuddy.yahooUser = user;
-                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus(), user.getCustomStatusMessage());
+
             }
             catch (NotFoundException e) {
                 // Not in our list, lets change that.
@@ -154,19 +162,21 @@ public class YahooListener extends SessionAdapter {
                 }
                 YahooBuddy yahooBuddy = new YahooBuddy(getSession().getBuddyManager(), user, nickname, user.getGroupIds(), rosterItem);
                 getSession().getBuddyManager().storeBuddy(yahooBuddy);
-                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus(), user.getCustomStatusMessage());
                 //TODO: Something is amiss with openymsg-- telling us we have our full buddy list too early
                 //Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
             }
         }
         else {
-            getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(user.getId()), ((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus()), user.getCustomStatusMessage());
+            getSession().getBuddyManager().storePendingStatus(getSession().getTransport().convertIDToJID(user.getId()), ((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus()), user.getCustomStatusMessage());
+
         }
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendAddedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
+    @Override
     public void friendAddedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- added is now added, do we want to use this
 //        Presence p = new Presence(Presence.Type.subscribe);
@@ -178,6 +188,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendRemovedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
+    @Override
     public void friendRemovedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- removed is now gone, do we want to use this
 //        Presence p = new Presence(Presence.Type.unsubscribe);
@@ -189,18 +200,21 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatJoinReceived(org.openymsg.network.event.SessionChatEvent)
      */
+    @Override
     public void chatJoinReceived(SessionChatEvent sessionChatEvent) {
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatExitReceived(org.openymsg.network.event.SessionChatEvent)
      */
+    @Override
     public void chatExitReceived(SessionChatEvent sessionChatEvent) {
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#connectionClosed(org.openymsg.network.event.SessionEvent)
      */
+    @Override
     public void connectionClosed(SessionEvent event) {
         Log.debug(event == null ? "closed event is null":event.toString());
         if (getSession().isLoggedIn()) {
@@ -212,23 +226,25 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#fileTransferReceived(org.openymsg.network.event.SessionFileTransferEvent)
      */
+    @Override
     public void fileTransferReceived(SessionFileTransferEvent event) {
         Log.debug(event.toString());
     }
 
 
     /**
-     * @see org.openymsg.network.event.SessionAdapter#listReceived(org.openymsg.network.event.SessionEvent)
+     * @see org.openymsg.network.event.SessionAdapter#listReceived(org.openymsg.network.event.SessionListEvent)
      */
-    public void listReceived(SessionEvent event) {
+    @Override
+    public void listReceived(SessionListEvent event) {
         // We just got the entire contact list.  Lets sync up.
-        //TODO: Something is amiss with openymsg-- telling us we have our full buddy list too early
         getSession().syncUsers();
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#buzzReceived(org.openymsg.network.event.SessionEvent)
      */
+    @Override
     public void buzzReceived(SessionEvent event) {
         getSession().getTransport().sendBuzzNotification(
                 getSession().getJID(),
@@ -240,6 +256,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#errorPacketReceived(org.openymsg.network.event.SessionErrorEvent)
      */
+    @Override
     public void errorPacketReceived(SessionErrorEvent event) {
         Log.debug("Error from yahoo: "+event.getMessage()+", Code:"+event.getCode());
         getSession().getTransport().sendMessage(
@@ -253,6 +270,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#inputExceptionThrown(org.openymsg.network.event.SessionExceptionEvent)
      */
+    @Override
     public void inputExceptionThrown(SessionExceptionEvent event) {
         Log.debug("Input error from yahoo: "+event.getMessage(), event.getException());
         // Lets keep this silent for now.  Not bother the end user with it.
@@ -267,6 +285,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#notifyReceived(org.openymsg.network.event.SessionNotifyEvent)
      */
+    @Override
     public void notifyReceived(SessionNotifyEvent event) {
         Log.debug(event.toString());
         if (event.isTyping()) {
@@ -288,7 +307,23 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#contactRequestReceived(org.openymsg.network.event.SessionEvent)
      */
+    @Override
     public void contactRequestReceived(SessionEvent event) {
+    	
+    	// TODO we're creating a user in the default group here, as every (non-chatroom) user on a Yahoo roster MUST be in a group. Verify that this is corrected later on in the process flow.
+    	final Set<String> groups = new HashSet<String>();
+    	groups.add(YahooSession.DEFAULT_GROUPNAME);
+    	
+		final YahooUser user = new YahooUser(event.getFrom(), YahooSession.DEFAULT_GROUPNAME);
+    	    	
+    	// TODO clean up this code. This implementation of constructor for YahooBuddy seems to be inappropriate here.
+    	final YahooBuddy buddy = new YahooBuddy(getSession().getBuddyManager(), user, null, groups, null);
+
+    	// TODO For the next line to be correct, the following should hold true: 
+    	// "adding someone to the buddy manager should explicitly not imply that a mutual subscription exists."
+    	// We either need to document this, or modify the existing implementation to include 'subscription state'. 
+    	getSession().getBuddyManager().storeBuddy(buddy);
+    	
         Presence p = new Presence(Presence.Type.subscribe);
         p.setTo(getSession().getJID());
         p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
@@ -296,9 +331,10 @@ public class YahooListener extends SessionAdapter {
     }
 
     /**
-     * @see org.openymsg.network.event.SessionAdapter#contactRejectionReceived(org.openymsg.network.event.SessionEvent)
+     * @see org.openymsg.network.event.SessionAdapter#contactRejectionReceived(org.openymsg.network.event.SessionFriendRejectedEvent)
      */
-    public void contactRejectionReceived(SessionEvent event) {
+    @Override
+    public void contactRejectionReceived(SessionFriendRejectedEvent event) {
         // TODO: Is this correct?  unsubscribed for a rejection?
         Log.debug(event.toString());
         Presence p = new Presence(Presence.Type.unsubscribed);
@@ -310,6 +346,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#conferenceInviteReceived(org.openymsg.network.event.SessionConferenceEvent)
      */
+    @Override
     public void conferenceInviteReceived(SessionConferenceEvent event) {
         Log.debug(event.toString());
     }
@@ -317,6 +354,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#conferenceInviteDeclinedReceived(org.openymsg.network.event.SessionConferenceEvent)
      */
+    @Override
     public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
         Log.debug(event.toString());
     }
@@ -324,6 +362,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#conferenceLogonReceived(org.openymsg.network.event.SessionConferenceEvent)
      */
+    @Override
     public void conferenceLogonReceived(SessionConferenceEvent event) {
         Log.debug(event.toString());
     }
@@ -331,6 +370,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#conferenceLogoffReceived(org.openymsg.network.event.SessionConferenceEvent)
      */
+    @Override
     public void conferenceLogoffReceived(SessionConferenceEvent event) {
         Log.debug(event.toString());
     }
@@ -338,6 +378,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#conferenceMessageReceived(org.openymsg.network.event.SessionConferenceEvent)
      */
+    @Override
     public void conferenceMessageReceived(SessionConferenceEvent event) {
         Log.debug(event.toString());
     }
@@ -345,6 +386,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatMessageReceived(org.openymsg.network.event.SessionChatEvent)
      */
+    @Override
     public void chatMessageReceived(SessionChatEvent event) {
         Log.debug(event.toString());
     }
@@ -352,6 +394,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatUserUpdateReceived(org.openymsg.network.event.SessionChatEvent)
      */
+    @Override
     public void chatUserUpdateReceived(SessionChatEvent event) {
         Log.debug(event.toString());
     }
@@ -359,6 +402,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatConnectionClosed(org.openymsg.network.event.SessionEvent)
      */
+    @Override
     public void chatConnectionClosed(SessionEvent event) {
         Log.debug(event.toString());
     }
@@ -366,6 +410,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#authorizationReceived(org.openymsg.network.event.SessionAuthorizationEvent)
      */
+    @Override
     public void authorizationReceived(SessionAuthorizationEvent event) {
         Presence p = new Presence(Presence.Type.subscribe);
         p.setTo(getSession().getJID());

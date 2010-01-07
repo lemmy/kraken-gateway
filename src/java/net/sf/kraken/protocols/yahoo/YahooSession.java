@@ -50,7 +50,13 @@ import java.util.*;
  */
 public class YahooSession extends TransportSession {
 
-    static Logger Log = Logger.getLogger(YahooSession.class);
+	/**
+	 * Yahoo requires every contact to be in at least one group. If no groups
+	 * are supplied by XMPP, we'll add the user to a group with this name.
+	 */
+	public static final String DEFAULT_GROUPNAME = "Friends";
+
+	static Logger Log = Logger.getLogger(YahooSession.class);
 
     /**
      * Create a Yahoo Session instance.
@@ -73,11 +79,7 @@ public class YahooSession extends TransportSession {
      */
     private PseudoRoster pseudoRoster;
 
-    public PseudoRoster getPseudoRoster() {
-		return pseudoRoster;
-	}
-
-	/**
+    /**
      * Yahoo session
      */
     private Session yahooSession;
@@ -144,7 +146,7 @@ public class YahooSession extends TransportSession {
                             }
                         }
 
-                        Log.debug("Yahoo login failed for "+getJID()+": "+reason);
+                        Log.debug("Yahoo login refused for "+getJID()+": "+reason);
 
                         getTransport().sendMessage(
                                 getJID(),
@@ -238,6 +240,15 @@ public class YahooSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
+    	// OpenYMSG requires a user to be in at least one group.
+    	if (groups == null ) {
+    		groups = new ArrayList<String>();
+    	}
+    	if (groups.isEmpty()) {
+    		// add the default Yahoo group
+    		groups.add(DEFAULT_GROUPNAME);
+    	}
+    	
         // Syncing will take care of add.
         String contact = getTransport().convertJIDToID(jid);
         PseudoRosterItem rosterItem;
@@ -246,7 +257,7 @@ public class YahooSession extends TransportSession {
             rosterItem.setNickname(nickname);
         }
         else {
-            rosterItem = pseudoRoster.createItem(contact, nickname, null);
+            rosterItem = pseudoRoster.createItem(contact, nickname, groups);
         }
         YahooUser yUser = new YahooUser(contact);
         for (String grp : groups) {
@@ -270,6 +281,13 @@ public class YahooSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
     public void updateContact(TransportBuddy contact) {
+    	// Yahoo requires each user to be in at least one group.
+    	if (contact.getGroups() == null || contact.getGroups().isEmpty()) {
+    		List<String> defaultGroup = new ArrayList<String>();
+    		defaultGroup.add(DEFAULT_GROUPNAME);
+    		contact.setGroups(defaultGroup);
+    	}
+    	
         String yahooContact = getTransport().convertJIDToID(contact.getJID());
         PseudoRosterItem rosterItem;
         if (pseudoRoster.hasItem(yahooContact)) {
@@ -305,6 +323,7 @@ public class YahooSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#acceptAddContact(net.sf.kraken.roster.TransportBuddy)
      */
     public void acceptAddContact(TransportBuddy contact) {
+        Log.debug("Yahoo: accept add contact " + contact.toString());
         try {
             String yahooContact = getTransport().convertJIDToID(contact.getJID());
             yahooSession.acceptFriendAuthorization(yahooContact);

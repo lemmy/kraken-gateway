@@ -351,7 +351,16 @@ public class MSNSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
      */
     public void acceptAddContact(TransportBuddy contact) {
-        // TODO: Currently unimplemented
+    	Log.debug("MSN: accept-adding " + contact); 
+		// According to a packet dump made with Wireshark, 'accepting' a
+		// contact-add is done by adding the contact yourself (using an outgoing
+		// ADL).
+        final Email email = Email.parseStr(contact.getName());
+        if (email == null) {
+            Log.warn("MSN: Unable to accept-add this illegal contact "+contact.getJID());
+            return;
+        }
+    	msnMessenger.addFriend(email, contact.getNickname());
     }
 
     /**
@@ -454,6 +463,7 @@ public class MSNSession extends TransportSession {
             try {
                 msnMessenger.getOwner().setPersonalMessage(verboseStatus);
                 msnMessenger.getOwner().setStatus(((MSNTransport)getTransport()).convertXMPPStatusToMSN(presenceType));
+                setPresenceAndStatus(presenceType, verboseStatus);
             }
             catch (IllegalStateException e) {
 //                // Hrm, not logged in?  Lets fix that.
