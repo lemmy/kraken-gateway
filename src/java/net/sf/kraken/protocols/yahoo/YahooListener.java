@@ -147,7 +147,7 @@ public class YahooListener extends SessionAdapter {
             try {
                 YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
                 yahooBuddy.yahooUser = user;
-                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus(), user.getCustomStatusMessage());
+                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus()), user.getCustomStatusMessage());
 
             }
             catch (NotFoundException e) {
@@ -162,7 +162,7 @@ public class YahooListener extends SessionAdapter {
                 }
                 YahooBuddy yahooBuddy = new YahooBuddy(getSession().getBuddyManager(), user, nickname, user.getGroupIds(), rosterItem);
                 getSession().getBuddyManager().storeBuddy(yahooBuddy);
-                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus(), user.getCustomStatusMessage());
+                yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus()), user.getCustomStatusMessage());
                 //TODO: Something is amiss with openymsg-- telling us we have our full buddy list too early
                 //Log.debug("Yahoo: Received presense notification for contact we don't care about: "+event.getFrom());
             }
