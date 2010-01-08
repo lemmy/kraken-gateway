@@ -87,6 +87,9 @@ public class StringUtils {
      * @return The in String, stripped of non-valid characters.
      */
     public static String removeInvalidXMLCharacters(String s) {
+        if (s == null) {
+            return "";
+        }
         StringBuilder out = new StringBuilder();                // Used to hold the output.
     	int codePoint;                                          // Used to reference the current character.
 		int i=0;

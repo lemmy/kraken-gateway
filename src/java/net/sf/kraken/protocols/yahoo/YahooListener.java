@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.kraken.type.TransportLoginStatus;
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
+import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
@@ -25,13 +25,13 @@ import org.jivesoftware.util.NotFoundException;
 import org.openymsg.network.Status;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
-import org.openymsg.network.event.SessionAuthorizationEvent;
 import org.openymsg.network.event.SessionChatEvent;
 import org.openymsg.network.event.SessionConferenceEvent;
 import org.openymsg.network.event.SessionErrorEvent;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionFileTransferEvent;
+import org.openymsg.network.event.SessionFriendAcceptedEvent;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.SessionFriendRejectedEvent;
 import org.openymsg.network.event.SessionListEvent;
@@ -310,22 +310,7 @@ public class YahooListener extends SessionAdapter {
      */
     @Override
     public void contactRequestReceived(SessionEvent event) {
-    	
-    	// TODO we're creating a user in the default group here, as every (non-chatroom) user on a Yahoo roster MUST be in a group. Verify that this is corrected later on in the process flow.
-    	final Set<String> groups = new HashSet<String>();
-    	groups.add(YahooSession.DEFAULT_GROUPNAME);
-    	
-		final YahooUser user = new YahooUser(event.getFrom(), YahooSession.DEFAULT_GROUPNAME);
-    	    	
-    	// TODO clean up this code. This implementation of constructor for YahooBuddy seems to be inappropriate here.
-    	final YahooBuddy buddy = new YahooBuddy(getSession().getBuddyManager(), user, null, groups, null);
-
-    	// TODO For the next line to be correct, the following should hold true: 
-    	// "adding someone to the buddy manager should explicitly not imply that a mutual subscription exists."
-    	// We either need to document this, or modify the existing implementation to include 'subscription state'. 
-    	getSession().getBuddyManager().storeBuddy(buddy);
-    	
-        Presence p = new Presence(Presence.Type.subscribe);
+        final Presence p = new Presence(Presence.Type.subscribe);
         p.setTo(getSession().getJID());
         p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
         getSession().getTransport().sendPacket(p);
@@ -401,22 +386,29 @@ public class YahooListener extends SessionAdapter {
     }
 
     /**
+     * A contact has accepted our subscription request
+     */
+    @Override
+    public void contactAcceptedReceived(SessionFriendAcceptedEvent event) {
+        final Set<String> groups = new HashSet<String>();
+        groups.add(event.getGroupName());
+        final YahooUser user = new YahooUser(event.getFrom(), YahooSession.DEFAULT_GROUPNAME);
+        // TODO clean up the next line. This implementation of constructor for YahooBuddy seems to be inappropriate here.
+        final YahooBuddy buddy = new YahooBuddy(getSession().getBuddyManager(), user, null, groups, null);
+        getSession().getBuddyManager().storeBuddy(buddy);
+       
+        final Presence p = new Presence(Presence.Type.subscribed);
+        p.setTo(getSession().getJID());
+        p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
+        getSession().getTransport().sendPacket(p);
+    }
+
+    /**
      * @see org.openymsg.network.event.SessionAdapter#chatConnectionClosed(org.openymsg.network.event.SessionEvent)
      */
     @Override
     public void chatConnectionClosed(SessionEvent event) {
         Log.debug(event.toString());
-    }
-    
-    /**
-     * @see org.openymsg.network.event.SessionAdapter#authorizationReceived(org.openymsg.network.event.SessionAuthorizationEvent)
-     */
-    @Override
-    public void authorizationReceived(SessionAuthorizationEvent event) {
-        Presence p = new Presence(Presence.Type.subscribe);
-        p.setTo(getSession().getJID());
-        p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
-        getSession().getTransport().sendPacket(p);
     }
 
 }
