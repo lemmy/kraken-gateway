@@ -101,14 +101,15 @@ public class MSNSession extends TransportSession {
     public void logIn(PresenceType presenceType, String verboseStatus) {
         if (!isLoggedIn()) {
             Log.debug("Creating MSN session for " + registration.getUsername());
+            setPendingPresenceAndStatus(presenceType, verboseStatus);
             msnMessenger = MsnMessengerFactory.createMsnMessenger(registration.getUsername(), registration.getPassword());
             msnSessionListener = new MSNSessionListener(this);
             ((BasicMessenger)msnMessenger).addSessionListener(msnSessionListener);
             if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.uselegacyprotocol", true)) {
-            	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP11 });
+                msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP11 });
             }
             else {
-            	msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP15 });
+                msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP15 });
             }
             if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.avatars", true) && getAvatar() != null) {
                 try {
@@ -351,16 +352,16 @@ public class MSNSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
      */
     public void acceptAddContact(TransportBuddy contact) {
-    	Log.debug("MSN: accept-adding " + contact); 
-		// According to a packet dump made with Wireshark, 'accepting' a
-		// contact-add is done by adding the contact yourself (using an outgoing
-		// ADL).
+        Log.debug("MSN: accept-adding " + contact); 
+        // According to a packet dump made with Wireshark, 'accepting' a
+        // contact-add is done by adding the contact yourself (using an outgoing
+        // ADL).
         final Email email = Email.parseStr(contact.getName());
         if (email == null) {
             Log.warn("MSN: Unable to accept-add this illegal contact "+contact.getJID());
             return;
         }
-    	msnMessenger.addFriend(email, contact.getNickname());
+        msnMessenger.addFriend(email, contact.getNickname());
     }
 
     /**

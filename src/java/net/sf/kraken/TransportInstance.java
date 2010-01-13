@@ -33,17 +33,17 @@ import java.util.Map;
  */
 public class TransportInstance implements PropertyEventListener {
 
-    static Logger Log = Logger.getLogger(TransportInstance.class);
+    final static Logger Log = Logger.getLogger(TransportInstance.class);
 
-    private ComponentManager componentManager;
-    private String description = null;
-    private String nameOfClass = null;
+    private final ComponentManager componentManager;
+    private final String description = null;
+    private final String nameOfClass = null;
     public BaseTransport transport = null;
-    private TransportType type = null;
-    private Boolean enabled = false;
-    private Boolean running = false;
+    private final TransportType type = null;
+    private boolean enabled = false;
+    private boolean running = false;
     private String subDomain;
-    private TransportSessionRouter sessionRouter;
+    private final TransportSessionRouter sessionRouter;
 
     /**
      *  Creates a new transport instance.
@@ -78,7 +78,7 @@ public class TransportInstance implements PropertyEventListener {
      *
      *  @return true or false if instance is enabled
      */
-    public Boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
@@ -87,7 +87,7 @@ public class TransportInstance implements PropertyEventListener {
      *
      *  @return true or false if instance is currently running
      */
-    public Boolean isRunning() {
+    public boolean isRunning() {
         return running;
     }
 
@@ -147,7 +147,7 @@ public class TransportInstance implements PropertyEventListener {
         // Automatically kill any current s2s connections with the JID we want to use.
         SessionManager sessionManager = SessionManager.getInstance();
         String fullJID = this.subDomain+"."+XMPPServer.getInstance().getServerInfo().getXMPPDomain();
-        Boolean pause = false;
+        boolean pause = false;
         try {
             for (Session sess : sessionManager.getIncomingServerSessions(fullJID)) {
                 sess.close();

@@ -10,9 +10,11 @@
 
 package net.sf.kraken.web;
 
+import net.sf.kraken.BaseTransport;
 import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.permissions.PermissionManager;
 import net.sf.kraken.registration.Registration;
+import net.sf.kraken.registration.RegistrationHandler;
 import net.sf.kraken.type.TransportType;
 import net.sf.kraken.session.TransportSession;
 import org.jivesoftware.openfire.container.PluginManager;
@@ -223,7 +225,8 @@ public class ConfigManager {
             return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "kraken");
         }
         try {
-            plugin.getTransportInstance(transportType).getTransport().addNewRegistration(jid, legacyUsername, legacyPassword, legacyNickname, false);
+            final BaseTransport transport = plugin.getTransportInstance(transportType).getTransport();
+            new RegistrationHandler(transport).addNewRegistration(jid, legacyUsername, legacyPassword, legacyNickname, false);
             return null;
         }
         catch (UserNotFoundException e) {
@@ -254,7 +257,8 @@ public class ConfigManager {
             if (!plugin.getTransportInstance(reg.getTransportType().toString()).isEnabled()) {
                 return LocaleUtils.getLocalizedString("gateway.web.registrations.notenabled", "kraken");
             }
-            plugin.getTransportInstance(reg.getTransportType().toString()).getTransport().deleteRegistration(reg.getJID());
+            final BaseTransport transport = plugin.getTransportInstance(reg.getTransportType().toString()).getTransport();
+            new RegistrationHandler(transport).deleteRegistration(reg.getJID());
             return null;
         }
         catch (NotFoundException e) {

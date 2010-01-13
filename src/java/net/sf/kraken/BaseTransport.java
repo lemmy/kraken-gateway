@@ -14,6 +14,7 @@ import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.muc.BaseMUCTransport;
 import net.sf.kraken.permissions.PermissionManager;
 import net.sf.kraken.registration.Registration;
+import net.sf.kraken.registration.RegistrationHandler;
 import net.sf.kraken.registration.RegistrationManager;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
@@ -28,6 +29,7 @@ import org.dom4j.QName;
 import org.jivesoftware.openfire.RemotePacketRouter;
 import org.jivesoftware.openfire.SessionManager;
 import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.auth.UnauthorizedException;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.event.SessionEventDispatcher;
 import org.jivesoftware.openfire.event.SessionEventListener;
@@ -505,23 +507,23 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         sendPacket(p);
                     }
                     else if (packet.getType() == Presence.Type.subscribed) {
-                    	try {
-                    		// Accept add contact request
-                        	TransportBuddy buddy = session.getBuddyManager().getBuddy(to);
+                        try {
+                            // Accept add contact request
+                            TransportBuddy buddy = session.getBuddyManager().getBuddy(to);
                             session.acceptAddContact(buddy);
-                    	} catch (NotFoundException e) {
-                    		// A transport probably did not add the user to the buddy-list when it received the incoming subscription request.
-                    		Log.warn("Cannot accept-add because user is not in buddymanager. Cannot succesfully parse: " + packet.toXML());
-                    	}
+                        } catch (NotFoundException e) {
+                            // A transport probably did not add the user to the buddy-list when it received the incoming subscription request.
+                            Log.warn("Cannot accept-add because user is not in buddymanager. Cannot succesfully parse: " + packet.toXML());
+                        }
                     }
                     else {
                         // Anything else we will ignore for now.
                     }
-				} catch (NotFoundException e) {
-					// Well we just don't care then.
-					Log.debug("User not found while processing "
-							+ "presence stanza: " + packet.toXML(), e);
-				}
+                } catch (NotFoundException e) {
+                    // Well we just don't care then.
+                    Log.debug("User not found while processing "
+                            + "presence stanza: " + packet.toXML(), e);
+                }
             }
         }
         catch (Exception e) {
@@ -571,7 +573,24 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             reply.addAll(handleIQGateway(packet));
         }
         else if (xmlns.equals(NameSpace.IQ_REGISTER)) {
-            reply.addAll(handleIQRegister(packet));
+            // TODO if all handling is going to be offloaded to
+            // ChannelHandler-like constructs, the exception handling
+            // could/should be made more generic.
+            try {
+                // note that this handler does not make use of the reply-queue.
+                // Instead, it sends packets directly.
+                new RegistrationHandler(this).process(packet);
+            } catch (UnauthorizedException ex) {
+                final IQ result = IQ.createResultIQ(packet);
+                result.setError(Condition.forbidden);
+                reply.add(result);
+                final Message em = new Message();
+                em.setType(Message.Type.error);
+                em.setTo(packet.getFrom());
+                em.setFrom(packet.getTo());
+                em.setBody(ex.getMessage());
+                reply.add(em);
+            }
         }
         else if (xmlns.equals(NameSpace.IQ_VERSION)) {
             reply.addAll(handleIQVersion(packet));
@@ -584,7 +603,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             reply.add(IQ.createResultIQ(packet));
         }
         else if (xmlns.equals(NameSpace.IQ_LAST)) { 
-        	reply.addAll(handleIQLast(packet));
+            reply.addAll(handleIQLast(packet));
         }
         else {
             Log.debug("Unable to handle iq request: " + xmlns);
@@ -626,7 +645,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 response.addElement("feature")
                         .addAttribute("var", NameSpace.IQ_VERSION);
                 response.addElement("feature")
-                		.addAttribute("var", NameSpace.IQ_LAST);
+                        .addAttribute("var", NameSpace.IQ_LAST);
                 response.addElement("feature")
                         .addAttribute("var", NameSpace.VCARD_TEMP);
                 if (RegistrationManager.getInstance().isRegistered(from, this.transportType)) {
@@ -760,7 +779,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                     String lastevent = session.getBuddyManager().getBuddy(to).getLastActivityEvent();
                     response.addAttribute("seconds", new Long(new Date().getTime() - timestamp).toString());
                     if (lastevent != null) {
-                    	response.addCDATA(lastevent);
+                        response.addCDATA(lastevent);
                     }
                     result.setChildElement(response);
                 }
@@ -783,280 +802,6 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         return reply;
     }
 
-    /**
-     * Handle registration request.
-     *
-     * @param packet An IQ packet in the iq registration namespace.
-     * @return A list of IQ packets to be returned to the user.
-     */
-    private List<Packet> handleIQRegister(IQ packet) {
-        List<Packet> reply = new ArrayList<Packet>();
-        JID from = packet.getFrom();
-        JID to = packet.getTo();
-
-        Element remove = packet.getChildElement().element("remove");
-        if (remove != null) {
-            // User wants to unregister.  =(
-            // this.convinceNotToLeave() ... kidding.
-            IQ result = IQ.createResultIQ(packet);
-
-            if (packet.getChildElement().elements().size() != 1) {
-                result.setError(Condition.bad_request);
-                reply.add(result);
-                return reply;
-            }
-
-            // Tell the end user the transport went byebye.
-            Presence unavailable = new Presence(Presence.Type.unavailable);
-            unavailable.setTo(from);
-            unavailable.setFrom(to);
-            reply.add(unavailable);
-
-            try {
-                this.deleteRegistration(from);
-            }
-            catch (UserNotFoundException e) {
-                Log.debug("Error cleaning up contact list of: " + from);
-                result.setError(Condition.registration_required);
-            }
-
-            reply.add(result);
-        }
-        else {
-            // User wants to register with the transport.
-            String username = null;
-            String password = null;
-            String nickname = null;
-
-            try {
-                DataForm form = new DataForm(packet.getChildElement().element("x"));
-                List<FormField> fields = form.getFields();
-                for (FormField field : fields) {
-                    String var = field.getVariable();
-                    if (var.equals("username")) {
-                        username = field.getValues().get(0);
-                    }
-                    else if (var.equals("password")) {
-                        password = field.getValues().get(0);
-                    }
-                    else if (var.equals("nick")) {
-                        nickname = field.getValues().get(0);
-                    }
-
-                }
-            }
-            catch (Exception e) {
-                // No with data form apparently
-            }
-
-            if (packet.getType() == IQ.Type.set) {
-                Boolean registered = false;
-                Collection<Registration> registrations = RegistrationManager.getInstance().getRegistrations(from, this.transportType);
-                if (registrations.iterator().hasNext()) {
-                    registered = true;
-                }
-
-                if (!registered && !permissionManager.hasAccess(from)) {
-                    // User does not have permission to register with transport.
-                    // We want to allow them to change settings if they are already registered.
-                    IQ result = IQ.createResultIQ(packet);
-                    result.setError(Condition.forbidden);
-                    reply.add(result);
-                    Message em = new Message();
-                    em.setType(Message.Type.error);
-                    em.setTo(packet.getFrom());
-                    em.setFrom(packet.getTo());
-                    em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyacls", "kraken"));
-                    reply.add(em);
-                    return reply;
-                }
-
-                Element userEl = packet.getChildElement().element("username");
-                Element passEl = packet.getChildElement().element("password");
-                Element nickEl = packet.getChildElement().element("nick");
-
-                if (userEl != null) {
-                    username = userEl.getTextTrim();
-                }
-
-                if (passEl != null) {
-                    password = passEl.getTextTrim();
-                }
-
-                if (nickEl != null) {
-                    nickname = nickEl.getTextTrim();
-                }
-
-                username = (username == null || username.equals("")) ? null : username;
-                password = (password == null || password.equals("")) ? null : password;
-                nickname = (nickname == null || nickname.equals("")) ? null : nickname;
-
-                if (    username == null
-                        || (isPasswordRequired() && password == null)
-                        || (isNicknameRequired() && nickname == null)) {
-                    // Invalid information from stanza, lets yell.
-                    IQ result = IQ.createResultIQ(packet);
-                    result.setError(Condition.bad_request);
-                    reply.add(result);
-                }
-                else {
-                    boolean rosterlessMode = false;
-                    Element x = packet.getChildElement().element("x");
-                    if (x != null && x.getNamespaceURI() != null && x.getNamespaceURI().equals(NameSpace.IQ_GATEWAY_REGISTER)) {
-                        rosterlessMode = true;
-                        Log.info("Registered " + packet.getFrom() + " as " + username + " in rosterless mode.");
-                    }
-                    else {
-                        Log.info("Registered " + packet.getFrom() + " as " + username);
-                    }
-
-                    try {
-                        this.addNewRegistration(from, username, password, nickname, rosterlessMode);
-                        IQ result = IQ.createResultIQ(packet);
-                        // I believe this shouldn't be included.  Leaving it around just in case.
-//                        Element response = DocumentHelper.createElement(QName.get("query", IQ_REGISTER));
-//                        result.setChildElement(response);
-                        reply.add(result);
-                    }
-                    catch (UserNotFoundException e) {
-                        Log.warn("Someone attempted to register with the gateway who is not registered with the server: " + from);
-                        IQ eresult = IQ.createResultIQ(packet);
-                        eresult.setError(Condition.forbidden);
-                        reply.add(eresult);
-                        Message em = new Message();
-                        em.setType(Message.Type.error);
-                        em.setTo(packet.getFrom());
-                        em.setFrom(packet.getTo());
-                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniednoacct", "kraken"));
-                        reply.add(em);
-                    }
-                    catch (IllegalAccessException e) {
-                        Log.warn("Someone who is not a user of this server tried to register with the transport: "+from);
-                        IQ eresult = IQ.createResultIQ(packet);
-                        eresult.setError(Condition.forbidden);
-                        reply.add(eresult);
-                        Message em = new Message();
-                        em.setType(Message.Type.error);
-                        em.setTo(packet.getFrom());
-                        em.setFrom(packet.getTo());
-                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyhost", "kraken"));
-                        reply.add(em);
-                    }
-                    catch (IllegalArgumentException e) {
-                        Log.warn("Someone attempted to register with the gateway with an invalid username: " + from);
-                        IQ eresult = IQ.createResultIQ(packet);
-                        eresult.setError(Condition.bad_request);
-                        reply.add(eresult);
-                        Message em = new Message();
-                        em.setType(Message.Type.error);
-                        em.setTo(packet.getFrom());
-                        em.setFrom(packet.getTo());
-                        em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbadusername", "kraken"));
-                        reply.add(em);
-                    }
-                }
-            }
-            else if (packet.getType() == IQ.Type.get) {
-                Element response = DocumentHelper.createElement(QName.get("query", NameSpace.IQ_REGISTER));
-                IQ result = IQ.createResultIQ(packet);
-
-                String curUsername = null;
-                String curPassword = null;
-                String curNickname = null;
-                Boolean registered = false;
-                Collection<Registration> registrations = RegistrationManager.getInstance().getRegistrations(from, this.transportType);
-                if (registrations.iterator().hasNext()) {
-                    Registration registration = registrations.iterator().next();
-                    curUsername = registration.getUsername();
-                    curPassword = registration.getPassword();
-                    curNickname = registration.getNickname();
-                    registered = true;
-                }
-
-                if (!registered && !permissionManager.hasAccess(from)) {
-                    // User does not have permission to register with transport.
-                    // We want to allow them to change settings if they are already registered.
-                    result.setError(Condition.forbidden);
-                    reply.add(result);
-                    Message em = new Message();
-                    em.setType(Message.Type.error);
-                    em.setTo(packet.getFrom());
-                    em.setFrom(packet.getTo());
-                    em.setBody(LocaleUtils.getLocalizedString("gateway.base.registrationdeniedbyacls", "kraken"));
-                    reply.add(em);
-                    return reply;
-                }
-
-                DataForm form = new DataForm(DataForm.Type.form);
-                form.addInstruction(getTerminologyRegistration());
-
-                FormField usernameField = form.addField();
-                usernameField.setLabel(getTerminologyUsername());
-                usernameField.setVariable("username");
-                usernameField.setType(FormField.Type.text_single);
-                if (curUsername != null) {
-                    usernameField.addValue(curUsername);
-                }
-
-                FormField passwordField = form.addField();
-                passwordField.setLabel(getTerminologyPassword());
-                passwordField.setVariable("password");
-                passwordField.setType(FormField.Type.text_private);
-                if (curPassword != null) {
-                    passwordField.addValue(curPassword);
-                }
-
-                String nicknameTerm = getTerminologyNickname();
-                if (nicknameTerm != null) {
-                    FormField nicknameField = form.addField();
-                    nicknameField.setLabel(nicknameTerm);
-                    nicknameField.setVariable("nick");
-                    nicknameField.setType(FormField.Type.text_single);
-                    if (curNickname != null) {
-                        nicknameField.addValue(curNickname);
-                    }
-                }
-
-                response.add(form.getElement());
-
-                response.addElement("instructions").addText(getTerminologyRegistration());
-                if (registered) {
-                    response.addElement("registered");
-                    response.addElement("username").addText(curUsername);
-                    if (curPassword == null) {
-                        response.addElement("password");
-                    }
-                    else {
-                        response.addElement("password").addText(curPassword);
-                    }
-                    if (nicknameTerm != null) {
-                        if (curNickname == null) {
-                            response.addElement("nick");
-                        }
-                        else {
-                            response.addElement("nick").addText(curNickname);
-                        }
-                    }
-                }
-                else {
-                    response.addElement("username");
-                    response.addElement("password");
-                    if (nicknameTerm != null) {
-                        response.addElement("nick");
-                    }
-                }
-
-                // Add special indicator for rosterless gateway handling.
-                response.addElement("x").addNamespace("", NameSpace.IQ_GATEWAY_REGISTER);
-
-                result.setChildElement(response);
-
-                reply.add(result);
-            }
-        }
-
-        return reply;
-    }
 
     /**
      * Handle version request.
@@ -1336,10 +1081,15 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @throws UserNotFoundException if userjid not found.
      */
     public void addOrUpdateRosterItem(JID userjid, JID contactjid, String nickname, Collection<String> groups, RosterItem.SubType subtype, RosterItem.AskType asktype) throws UserNotFoundException {
+        Log.debug("add or update roster item " + contactjid + " for: "
+                + userjid);
         try {
-            Roster roster = rosterManager.getRoster(userjid.getNode());
+            final Roster roster = rosterManager.getRoster(userjid.getNode());
             try {
                 RosterItem gwitem = roster.getRosterItem(contactjid);
+                Log.debug("Found existing roster item " + contactjid + " for: "
+                        + userjid + ". We will update if required.");
+
                 boolean changed = false;
                 if (gwitem.getSubStatus() != subtype) {
                     gwitem.setSubStatus(subtype);
@@ -1378,7 +1128,12 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                     }
                 }
                 if (changed) {
+                    Log.debug("Updating existing roster item " + contactjid + " for: "
+                            + userjid);
                     roster.updateRosterItem(gwitem);
+                } else {
+                    Log.debug("Update of existing roster item " + contactjid + " for: "
+                            + userjid + " can be skipped - nothing changed.");
                 }
             }
             catch (UserNotFoundException e) {
@@ -1386,7 +1141,9 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                     // Create new roster item for the gateway service or legacy contact. Only
                     // roster items related to the gateway service will be persistent. Roster
                     // items of legacy users are never persisted in the DB.  (unless tweak enabled)
-                    RosterItem gwitem =
+                    Log.debug("Creating new roster item " + contactjid + " for: "
+                            + userjid + ". No existing item was found.");
+                    final RosterItem gwitem =
                             roster.createRosterItem(contactjid, false, contactjid.getNode() == null || JiveGlobals.getBooleanProperty("plugin.gateway.tweak.persistentroster", false));
                     gwitem.setSubStatus(subtype);
                     gwitem.setAskStatus(asktype);
@@ -1648,130 +1405,6 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         }
         catch (UserNotFoundException e) {
             throw new UserNotFoundException("Could not find roster for " + userjid.toString());
-        }
-    }
-
-    /**
-     * Adds a registration with this transport, or updates an existing one.
-     *
-     * @param jid JID of user to add registration to.
-     * @param username Legacy username of registration.
-     * @param password Legacy password of registration.
-     * @param nickname Legacy nickname of registration.
-     * @param noRosterItem True if the transport is not to show up in the user's roster.
-     * @throws UserNotFoundException if registration or roster not found.
-     * @throws IllegalAccessException if jid is not from this server.
-     * @throws IllegalArgumentException if username is not valid for this transport type.
-     */
-    public void addNewRegistration(JID jid, String username, String password, String nickname, Boolean noRosterItem) throws UserNotFoundException, IllegalAccessException {
-        if (!XMPPServer.getInstance().isLocal(jid)) {
-            throw new IllegalAccessException("Domain of jid registering does not match domain of server.");
-        }
-
-        if (!isUsernameValid(username)) {
-            throw new IllegalArgumentException("Username specified is not valid for this transport type.");
-        }
-
-        Collection<Registration> registrations = RegistrationManager.getInstance().getRegistrations(jid, this.transportType);
-        Boolean foundReg = false;
-        Boolean triggerRestart = false;
-        for (Registration registration : registrations) {
-            if (!registration.getUsername().equals(username)) {
-                RegistrationManager.getInstance().deleteRegistration(registration);
-            }
-            else {
-                if (    (registration.getPassword() != null && password == null) ||
-                        (registration.getPassword() == null && password != null) ||
-                        (registration.getPassword() != null && password != null && !registration.getPassword().equals(password))) {
-                    registration.setPassword(password);
-                    triggerRestart = true;
-                }
-                if (    (registration.getNickname() != null && nickname == null) ||
-                        (registration.getNickname() == null && nickname != null) ||
-                        (registration.getNickname() != null && nickname != null && !registration.getNickname().equals(nickname))) {
-                    registration.setNickname(nickname);
-                    triggerRestart = true;
-                }
-                foundReg = true;
-            }
-            if (triggerRestart) {
-                try {
-                    TransportSession relatedSession = sessionManager.getSession(registration.getJID().getNode());
-                    this.registrationLoggedOut(relatedSession);
-                }
-                catch (NotFoundException e) {
-                    // No worries, move on.
-                }
-            }
-        }
-
-        if (!foundReg) {
-            RegistrationManager.getInstance().createRegistration(jid, this.transportType, username, password, nickname);
-            triggerRestart = true;
-        }
-
-        if (triggerRestart) {
-            // Clean up any leftover roster items from other transports.
-            try {
-                cleanUpRoster(jid, !noRosterItem);
-            }
-            catch (UserNotFoundException ee) {
-                throw new UserNotFoundException("Unable to find roster.");
-            }
-        }
-
-        if (!noRosterItem) {
-            try {
-                addOrUpdateRosterItem(jid, this.getJID(), this.getDescription(), "Transports");
-            }
-            catch (UserNotFoundException e) {
-                throw new UserNotFoundException("User not registered with server.");
-            }
-        }
-
-        // Lets ask them what their presence is, maybe log them in immediately.
-        Presence p = new Presence(Presence.Type.probe);
-        p.setTo(jid);
-        p.setFrom(getJID());
-        sendPacket(p);
-    }
-
-    /**
-     * Removes a registration from this transport.
-     *
-     * @param jid JID of user to add registration to.
-     * @throws UserNotFoundException if registration or roster not found.
-     */
-    public void deleteRegistration(JID jid) throws UserNotFoundException {
-        Collection<Registration> registrations = RegistrationManager.getInstance().getRegistrations(jid, this.transportType);
-        if (registrations.isEmpty()) {
-            throw new UserNotFoundException("User was not registered.");
-        }
-
-
-        // Log out any active sessions.
-        try {
-            TransportSession session = sessionManager.getSession(jid);
-            if (session.isLoggedIn()) {
-                this.registrationLoggedOut(session);
-            }
-            sessionManager.removeSession(jid);
-        }
-        catch (NotFoundException e) {
-            // Ok then.
-        }
-        
-        // For now, we're going to have to just nuke all of these.  Sorry.
-        for (Registration reg : registrations) {
-            RegistrationManager.getInstance().deleteRegistration(reg);
-        }
-
-        // Clean up the user's contact list.
-        try {
-            cleanUpRoster(jid, false, true);
-        }
-        catch (UserNotFoundException e) {
-            throw new UserNotFoundException("Unable to find roster.");
         }
     }
 
@@ -2210,9 +1843,9 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      */
     public void userDeleting(User user, Map<String,Object> params) {
         try {
-            deleteRegistration(XMPPServer.getInstance().createJID(user.getUsername(), null));
-        }
-        catch (UserNotFoundException e) {
+            new RegistrationHandler(this).deleteRegistration(XMPPServer
+                    .getInstance().createJID(user.getUsername(), null));
+        } catch (UserNotFoundException e) {
             // Not our problem then.
         }
     }
@@ -2295,7 +1928,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @see org.jivesoftware.openfire.event.SessionEventListener#resourceBound(org.jivesoftware.openfire.session.Session)
      */
     public void resourceBound(Session session) {
-    	// Do nothing.
+        // Do nothing.
     }
 
     /**

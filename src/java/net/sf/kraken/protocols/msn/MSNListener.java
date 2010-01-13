@@ -382,14 +382,9 @@ public class MSNListener extends MsnAdapter {
      */
     @Override
     public void contactAddedMe(MsnMessenger messenger, MsnContact friend) {
-    	JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
-
-    	// TODO For the next line to be correct, the following should hold true: 
-    	// "adding someone to the buddy manager should explicitly not imply that a mutual subscription exists."
-    	// We either need to document this, or modify the existing implementation to include 'subscription state'. 
-        getSession().getBuddyManager().storeBuddy(new MSNBuddy(getSession().getBuddyManager(), friend));
+    	final JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
         
-        Presence p = new Presence();
+        final Presence p = new Presence();
         p.setType(Presence.Type.subscribe);
         p.setTo(getSession().getJID());
         p.setFrom(from);
