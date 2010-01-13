@@ -36,10 +36,10 @@ public class TransportInstance implements PropertyEventListener {
     final static Logger Log = Logger.getLogger(TransportInstance.class);
 
     private final ComponentManager componentManager;
-    private final String description = null;
-    private final String nameOfClass = null;
+    private final String description;
+    private final String nameOfClass;
     public BaseTransport transport = null;
-    private final TransportType type = null;
+    private final TransportType type;
     private boolean enabled = false;
     private boolean running = false;
     private String subDomain;
