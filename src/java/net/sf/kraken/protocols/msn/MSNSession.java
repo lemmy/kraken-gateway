@@ -50,7 +50,7 @@ public class MSNSession extends TransportSession {
     /**
      * Create a MSN Session instance.
      *
-     * @param registration Registration informationed used for logging in.
+     * @param registration Registration information used for logging in.
      * @param jid JID associated with this session.
      * @param transport Transport instance associated with this session.
      * @param priority Priority of this session.
@@ -66,7 +66,7 @@ public class MSNSession extends TransportSession {
             m.setBody(LocaleUtils.getLocalizedString("gateway.msn.illegalaccount", "kraken")+" "+registration.getUsername());
             getTransport().sendPacket(m);
             // TODO: this should probably be generic and done within base transport for -all- transports
-            // TODO: Also, ths Email.parseStr could be used in the "is this a valid username" check
+            // TODO: Also, this Email.parseStr could be used in the "is this a valid username" check
         }
     }
 
@@ -79,11 +79,6 @@ public class MSNSession extends TransportSession {
      * MSN listener
      */
     private MSNListener msnListener = null;
-
-    /**
-     * MSN session listener
-     */
-    private MSNSessionListener msnSessionListener = null;
 
     /**
      * MSN groups.
@@ -103,8 +98,8 @@ public class MSNSession extends TransportSession {
             Log.debug("Creating MSN session for " + registration.getUsername());
             setPendingPresenceAndStatus(presenceType, verboseStatus);
             msnMessenger = MsnMessengerFactory.createMsnMessenger(registration.getUsername(), registration.getPassword());
-            msnSessionListener = new MSNSessionListener(this);
-            ((BasicMessenger)msnMessenger).addSessionListener(msnSessionListener);
+            msnListener = new MSNListener(this);
+            ((BasicMessenger)msnMessenger).addSessionListener(msnListener);
             if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.uselegacyprotocol", true)) {
                 msnMessenger.setSupportedProtocol(new MsnProtocol[] { MsnProtocol.MSNP11 });
             }
@@ -130,8 +125,11 @@ public class MSNSession extends TransportSession {
                 msnMessenger.getOwner().setInitPersonalMessage(verboseStatus);
                 msnMessenger.setLogIncoming(false);
                 msnMessenger.setLogOutgoing(false);
-                msnListener = new MSNListener(this);
-                msnMessenger.addListener(msnListener);
+                msnMessenger.addContactListListener(msnListener);
+                msnMessenger.addEmailListener(msnListener);
+                msnMessenger.addMessageListener(msnListener);
+                msnMessenger.addMessengerListener(msnListener);
+                msnMessenger.addSwitchboardListener(msnListener);
                 ((BasicMessenger)msnMessenger).login(
                         JiveGlobals.getProperty("plugin.gateway.msn.connecthost", "messenger.hotmail.com"),
                         JiveGlobals.getIntProperty("plugin.gateway.msn.connectport", 1863));
@@ -155,11 +153,13 @@ public class MSNSession extends TransportSession {
      */
     public void cleanUp() {
         if (msnMessenger != null) {
-            if (msnSessionListener != null) {
-                ((BasicMessenger)msnMessenger).removeSessionListener(msnSessionListener);
-            }
             if (msnListener != null) {
-                msnMessenger.removeListener(msnListener);
+                ((BasicMessenger)msnMessenger).removeSessionListener(msnListener);
+                msnMessenger.removeContactListListener(msnListener);
+                msnMessenger.removeEmailListener(msnListener);
+                msnMessenger.removeMessageListener(msnListener);
+                msnMessenger.removeMessengerListener(msnListener);
+                msnMessenger.removeSwitchboardListener(msnListener);
             }
             try {
                 msnMessenger.getOwner().setPersonalMessage("");
@@ -177,9 +177,6 @@ public class MSNSession extends TransportSession {
                 // No problem, we tried our best to do it smoothly.
             }
             msnListener = null;
-        }
-        if (msnSessionListener != null) {
-            msnSessionListener = null;
         }
     }
 

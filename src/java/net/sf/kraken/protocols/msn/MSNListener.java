@@ -19,12 +19,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.jml.DisplayPictureListener;
 import net.sf.jml.MsnContact;
+import net.sf.jml.MsnContactPending;
 import net.sf.jml.MsnGroup;
 import net.sf.jml.MsnList;
 import net.sf.jml.MsnMessenger;
 import net.sf.jml.MsnObject;
 import net.sf.jml.MsnSwitchboard;
-import net.sf.jml.event.MsnAdapter;
+import net.sf.jml.event.MsnContactListListener;
+import net.sf.jml.event.MsnEmailListener;
+import net.sf.jml.event.MsnMessageListener;
+import net.sf.jml.event.MsnMessengerListener;
+import net.sf.jml.event.MsnSwitchboardListener;
 import net.sf.jml.exception.IncorrectPasswordException;
 import net.sf.jml.exception.LoginException;
 import net.sf.jml.exception.MsgNotSendException;
@@ -41,6 +46,9 @@ import net.sf.jml.message.MsnInstantMessage;
 import net.sf.jml.message.MsnSystemMessage;
 import net.sf.jml.message.MsnUnknownMessage;
 import net.sf.jml.message.p2p.DisplayPictureRetrieveWorker;
+import net.sf.jml.message.p2p.MsnP2PMessage;
+import net.sf.jml.net.Session;
+import net.sf.jml.net.SessionListener;
 import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -60,7 +68,8 @@ import org.xmpp.packet.Presence;
  *
  * @author Daniel Henninger
  */
-public class MSNListener extends MsnAdapter {
+public class MSNListener implements MsnContactListListener, MsnMessageListener, MsnMessengerListener,
+									MsnSwitchboardListener, MsnEmailListener, SessionListener {
 
     static Logger Log = Logger.getLogger(MSNListener.class);
 
@@ -115,7 +124,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Handles incoming messages from MSN users.
      */
-    @Override
     public void instantMessageReceived(MsnSwitchboard switchboard, MsnInstantMessage message, MsnContact friend) {
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
@@ -130,7 +138,6 @@ public class MSNListener extends MsnAdapter {
      * @param switchboard Switchboard session the message is associated with.
      * @param message MSN message.
      */
-    @Override
     public void systemMessageReceived(MsnMessenger messenger, MsnSystemMessage message) {    
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
@@ -142,7 +149,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Handles incoming control messages from MSN.
      */
-    @Override
     public void controlMessageReceived(MsnSwitchboard switchboard, MsnControlMessage message, MsnContact friend) {
         if (message.getTypingUser() != null) {
             getSession().getTransport().sendComposingNotification(
@@ -159,7 +165,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Handles incoming datacast messages from MSN.
      */
-    @Override
     public void datacastMessageReceived(MsnSwitchboard switchboard, MsnDatacastMessage message, MsnContact friend) {
         if (message.getId() == 1) {
             getSession().getTransport().sendMessage(
@@ -185,12 +190,10 @@ public class MSNListener extends MsnAdapter {
     /**
      * Handles incoming unknown messages from MSN.
      */
-    @Override
     public void unknownMessageReceived(MsnSwitchboard switchboard, MsnUnknownMessage message, MsnContact friend) {
         Log.debug("MSN: Received unknown message to " + switchboard + " from " + friend + ": " + message);
     }
 
-    @Override
     public void initialEmailNotificationReceived(MsnSwitchboard switchboard, MsnEmailInitMessage message, MsnContact contact) {
         Log.debug("MSN: Got init email notify "+message.getInboxUnread()+" unread message(s)");
         if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.mailnotifications", true) && message.getInboxUnread() > 0) {
@@ -203,7 +206,6 @@ public class MSNListener extends MsnAdapter {
         }
     }
 
-    @Override
     public void initialEmailDataReceived(MsnSwitchboard switchboard, MsnEmailInitEmailData message, MsnContact contact) {
         Log.debug("MSN: Got init email data "+message.getInboxUnread()+" unread message(s)");
         if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.mailnotifications", true) && message.getInboxUnread() > 0) {
@@ -216,7 +218,6 @@ public class MSNListener extends MsnAdapter {
         }
     }
 
-    @Override
     public void newEmailNotificationReceived(MsnSwitchboard switchboard, MsnEmailNotifyMessage message, MsnContact contact) {
         Log.debug("MSN: Got new email notification from "+message.getFrom()+" <"+message.getFromAddr()+">");
         if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.mailnotifications", true)) {
@@ -229,7 +230,6 @@ public class MSNListener extends MsnAdapter {
         }
     }
 
-    @Override
     public void activityEmailNotificationReceived(MsnSwitchboard switchboard, MsnEmailActivityMessage message, MsnContact contact) {
         Log.debug("MSN: Got email activity notification "+message.getSrcFolder()+" to "+message.getDestFolder());
     }
@@ -237,7 +237,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * The user's login has completed and was accepted.
      */
-    @Override
     public void loginCompleted(MsnMessenger messenger) {
         Log.debug("MSN: Login completed for "+messenger.getOwner().getEmail());
         getSession().setLoginStatus(TransportLoginStatus.LOGGED_IN);
@@ -246,7 +245,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Contact list has been synced.
      */
-    @Override
     public void contactListSyncCompleted(MsnMessenger messenger) {
         Log.debug("MSN: Contact list sync for "+messenger.getOwner().getEmail());
     }
@@ -254,7 +252,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Contact list initialization has completed.
      */
-    @Override
     public void contactListInitCompleted(MsnMessenger messenger) {
         for (MsnGroup msnGroup : messenger.getContactList().getGroups()) {
             Log.debug("MSN: Got group "+msnGroup);
@@ -314,7 +311,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * A friend for this user has changed status.
      */
-    @Override
     public void contactStatusChanged(MsnMessenger messenger, MsnContact friend) {
         if (!friend.isInList(MsnList.FL) || friend.getEmail() == null) {
             // Not in our buddy list, don't care, or null email address.  We need that.
@@ -380,7 +376,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Someone added us to their contact list.
      */
-    @Override
     public void contactAddedMe(MsnMessenger messenger, MsnContact friend) {
     	final JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
         
@@ -395,7 +390,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Someone removed us from their contact list.
      */
-    @Override
     public void contactRemovedMe(MsnMessenger messenger, MsnContact friend) {
         Presence p = new Presence();
         p.setType(Presence.Type.unsubscribe);
@@ -408,7 +402,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * A contact we added has been added to the server.
      */
-    @Override
     public void contactAddCompleted(MsnMessenger messenger, MsnContact contact, MsnList list) {
         Log.debug("MSN: Contact add completed: "+contact);
 //        Presence p = new Presence();
@@ -422,7 +415,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * A contact we removed has been removed from the server.
      */
-    @Override
     public void contactRemoveCompleted(MsnMessenger messenger, MsnContact contact, MsnList list) {
         Log.debug("MSN: Contact remove completed: "+contact);
 //        Presence p = new Presence();
@@ -435,7 +427,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * A group we added has been added to the server.
      */
-    @Override
     public void groupAddCompleted(MsnMessenger messenger, MsnGroup group) {
         Log.debug("MSN: Group add completed: "+group);
         getSession().storeGroup(group);
@@ -445,7 +436,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * A group we removed has been removed from the server.
      */
-    @Override
     public void groupRemoveCompleted(MsnMessenger messenger, MsnGroup group) {
         Log.debug("MSN: Group remove completed: "+group);
         getSession().unstoreGroup(group);
@@ -454,7 +444,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Owner status has changed.
      */
-    @Override
     public void ownerStatusChanged(MsnMessenger messenger) {
         //getSession().setPresenceAndStatus(((MSNTransport)getSession().getTransport()).convertMSNStatusToXMPP(messenger.getOwner().getStatus()), messenger.getOwner().getPersonalMessage());
     }
@@ -462,7 +451,6 @@ public class MSNListener extends MsnAdapter {
     /**
      * Catches MSN exceptions.
      */
-    @Override
     public void exceptionCaught(MsnMessenger messenger, Throwable throwable) {
         Log.debug("MSN: Exception occurred for "+messenger.getOwner().getEmail()+" : "+throwable);        
         if (throwable instanceof IncorrectPasswordException) {
@@ -566,6 +554,110 @@ public class MSNListener extends MsnAdapter {
      */
     public SessionReaper getSessionReaper() {
         return sessionReaper;
+    }
+
+	public void contactAddInGroupCompleted(MsnMessenger arg0, MsnContact arg1,
+			MsnGroup arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void contactAddedMe(MsnMessenger arg0, MsnContactPending[] arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void contactPersonalMessageChanged(MsnMessenger arg0, MsnContact arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void contactRemoveFromGroupCompleted(MsnMessenger arg0,
+			MsnContact arg1, MsnGroup arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void ownerDisplayNameChanged(MsnMessenger arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void offlineMessageReceived(String arg0, String arg1, String arg2,
+			MsnContact arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void p2pMessageReceived(MsnSwitchboard arg0, MsnP2PMessage arg1,
+			MsnContact arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void logout(MsnMessenger arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void contactJoinSwitchboard(MsnSwitchboard arg0, MsnContact arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void contactLeaveSwitchboard(MsnSwitchboard arg0, MsnContact arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void switchboardClosed(MsnSwitchboard arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void switchboardStarted(MsnSwitchboard arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+    public void exceptionCaught(Session arg0, Throwable t) throws Exception{
+        Log.debug("MSN: Session exceptionCaught for "+getSession().getRegistration().getUsername()+" : "+t);
+    }
+
+    public void messageReceived(Session arg0, net.sf.jml.net.Message message) throws Exception {
+        Log.debug("MSN: Session messageReceived for "+getSession().getRegistration().getUsername()+" : "+message);
+        // TODO: Kinda hacky, would like to improve on this later.
+        if (message.toString().startsWith("OUT OTH")) {
+            // Forced disconnect because account logged in elsewhere
+            getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.otherloggedin", "kraken"));
+        }
+        else if (message.toString().startsWith("OUT SDH")) {
+            // Forced disconnect from server for maintenance
+            getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "kraken"));
+        }
+    }
+    
+    public void messageSent(Session arg0, net.sf.jml.net.Message message) throws Exception {
+        Log.debug("MSN: Session messageSent for "+getSession().getRegistration().getUsername()+" : "+message);
+    }
+
+
+
+    public void sessionIdle(Session session) throws Exception {
+    }
+
+    public void sessionEstablished(Session session) {
+        Log.debug("MSN: Session established for "+getSession().getRegistration().getUsername());
+    }
+
+    public void sessionTimeout(Session session) {
+        // This is used to handle regular pings to the MSN server.  No need to mention it.
+    }
+
+    public void sessionClosed(Session session) {
+        Log.debug("MSN: Session closed for "+getSession().getRegistration().getUsername());
     }
 
 }
