@@ -202,7 +202,7 @@ public class XMLRPCConduit {
          if (!verifyPassword(password)) {
              return Collections.emptyList();
          }
-         JID jid;
+         JID jid; 
          if (user.contains("@")) {
              jid = new JID(user);
          }
@@ -223,5 +223,30 @@ public class XMLRPCConduit {
          }
          return result;
     }
+    /**
+     * Lists  the currently registered transports for all Users.
+     * @param password Auth password for making changes
+     * @return a Map of <user,Collection of RegistrationBeans>. In XML-RPC, this will convert into an array of structs.
+     */
+     public Map<String, Collection<RegistrationBean>> getAllRegistrations(String password) {
+          /*
+           * the redstone xml-rpc library can convert collections into xml-rpc arrays and
+           * load all properties from a java bean into an xml-rpc struct
+           */
+          if (!verifyPassword(password)) {
+              return null;
+          }
+          Collection<Registration> registrations = RegistrationManager.getInstance().getRegistrations();
+          Map<String, Collection<RegistrationBean>> result = new HashMap<String, Collection<RegistrationBean>>();
 
+          for(Registration reg : registrations) {
+              Collection<RegistrationBean> coll = result.get(reg.getJID().getNode()); 
+              if(coll == null) {
+                  coll = new LinkedList<RegistrationBean>();
+                  result.put(reg.getJID().getNode(), coll);
+              }
+              coll.add(new RegistrationBean(reg));
+          }
+          return result;
+     }
 }
