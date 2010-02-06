@@ -10,7 +10,7 @@ jainsipapi.jar           | 1.2 (nightly 2007-06-05)
 jainsipri.jar            | 1.2 (nightly 2007-06-05)
 jfacebookiml.jar         | svn-20100127
 jggapi.jar               | cvs-20090802
-jml.jar                  | svn-20100113
+jml.jar                  | svn-20100206
 joscar-common.jar        | svn-20091130
 joscar-protocol.jar      | svn-20091130
 jqql.jar                 | svn-20081124
