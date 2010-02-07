@@ -1946,7 +1946,12 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @see org.jivesoftware.openfire.event.SessionEventListener#anonymousSessionDestroyed(org.jivesoftware.openfire.session.Session)
      */
     public void anonymousSessionDestroyed(Session session) {
-        // Don't care
+        try {
+            new RegistrationHandler(this).deleteRegistration(XMPPServer
+                    .getInstance().createJID(session.getAddress().getNode(), null));
+        } catch (UserNotFoundException e) {
+            // Not our problem then.
+        }
     }
 
     /**
