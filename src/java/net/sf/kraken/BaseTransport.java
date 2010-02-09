@@ -50,8 +50,6 @@ import org.jivesoftware.util.*;
 import org.jivesoftware.util.cache.CacheFactory;
 import org.xmpp.component.Component;
 import org.xmpp.component.ComponentManager;
-import org.xmpp.forms.DataForm;
-import org.xmpp.forms.FormField;
 import org.xmpp.packet.*;
 import org.xmpp.packet.PacketError.Condition;
 
@@ -507,14 +505,12 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         sendPacket(p);
                     }
                     else if (packet.getType() == Presence.Type.subscribed) {
-                        try {
-                            // Accept add contact request
-                            TransportBuddy buddy = session.getBuddyManager().getBuddy(to);
-                            session.acceptAddContact(buddy);
-                        } catch (NotFoundException e) {
-                            // A transport probably did not add the user to the buddy-list when it received the incoming subscription request.
-                            Log.warn("Cannot accept-add because user is not in buddymanager. Cannot succesfully parse: " + packet.toXML());
-                        }
+                        final String legacyContact = this.convertJIDToID(packet.getTo());
+                        final TransportBuddy buddy = new TransportBuddy(session.getBuddyManager(), legacyContact, null, null);
+                        session.getBuddyManager().storeBuddy(buddy);
+                        
+                        // let the legacy domain know that the contact was accepted.
+                        session.acceptAddContact(buddy);
                     }
                     else {
                         // Anything else we will ignore for now.
@@ -1062,6 +1058,10 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @throws UserNotFoundException if userjid not found.
      */
     public void addOrUpdateRosterItem(JID userjid, JID contactjid, String nickname, Collection<String> groups) throws UserNotFoundException {
+        // SubTypes "FROM" and "BOTH" should be avoided for legacy user contacts. Instead, use "TO". The gateway
+        // component itself does have a "BOTH" subscription. This cuts down on needless traffic: the gateway component
+        // will broadcast presence changes to every legacy contact - there's no need for the local domain to 
+        // address each and every legacy contact independently.
         RosterItem.SubType subType = (contactjid.getNode() == null ? RosterItem.SUB_BOTH : RosterItem.SUB_TO);
         RosterItem.AskType askType = RosterItem.ASK_NONE;
         addOrUpdateRosterItem(userjid, contactjid, nickname, groups, subType, askType);

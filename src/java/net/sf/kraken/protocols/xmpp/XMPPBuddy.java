@@ -10,20 +10,30 @@
 
 package net.sf.kraken.protocols.xmpp;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 
-import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterEntry;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.jivesoftware.smack.RosterGroup;
 
 /**
+ * Apart from the functionality provided by {@link TransportBuddy}, XMPPBuddy
+ * instances keep track of which resources a legacy user is using.
+ * 
  * @author Daniel Henninger
  */
 public class XMPPBuddy extends TransportBuddy {
+    
+    public final RosterEntry rosterEntry;
 
+    public XMPPBuddy(TransportBuddyManager manager, String username) {
+        this(manager, username, null, Collections.EMPTY_SET, null);
+    }
+    
     public XMPPBuddy(TransportBuddyManager manager, String username, String nickname, Collection<RosterGroup> groups, RosterEntry entry) {
         super(manager, username, nickname, null);
         ArrayList<String> groupList = new ArrayList<String>();
@@ -33,7 +43,4 @@ public class XMPPBuddy extends TransportBuddy {
         this.setGroups(groupList);
         this.rosterEntry = entry;
     }
-
-    public RosterEntry rosterEntry = null;
-
 }

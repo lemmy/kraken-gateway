@@ -31,47 +31,54 @@ import org.xmpp.packet.JID;
  */
 public class XMPPTransport extends BaseTransport {
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
+	@Override
     public String getTerminologyUsername() {
         return LocaleUtils.getLocalizedString("gateway."+getType().toString()+".username", "kraken");
     }
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
+	@Override
     public String getTerminologyPassword() {
         return LocaleUtils.getLocalizedString("gateway.xmpp.password", "kraken");
     }
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
+	@Override
     public String getTerminologyNickname() {
         return null;
     }
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
+	@Override
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway."+getType().toString()+".registration", "kraken");
     }
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
+	@Override
     public Boolean isPasswordRequired() { return true; }
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
+	@Override
     public Boolean isNicknameRequired() { return false; }
 
-    /**
+    /*
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
+	@Override
     public Boolean isUsernameValid(String username) {
         return true;
     }
@@ -84,6 +91,7 @@ public class XMPPTransport extends BaseTransport {
      * @param presenceType Type of presence.
      * @param verboseStatus Longer status description.
      */
+	@Override
     public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
         TransportSession session = new XMPPSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
@@ -96,6 +104,7 @@ public class XMPPTransport extends BaseTransport {
      *
      * @param session The session to be disconnected.
      */
+	@Override
     public void registrationLoggedOut(TransportSession session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();

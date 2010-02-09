@@ -290,7 +290,7 @@ public class MSNSession extends TransportSession {
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
         Email contact = Email.parseStr(getTransport().convertJIDToID(jid));
         if (contact == null) {
-            Log.debug("MSN: Unable to update illegal contact "+jid);
+            Log.debug("MSN: Unable to add illegal contact "+jid);
             return;
         }
         msnMessenger.addFriend(contact, nickname);
@@ -302,7 +302,7 @@ public class MSNSession extends TransportSession {
     public void removeContact(TransportBuddy contact) {
         Email email = Email.parseStr(getTransport().convertJIDToID(contact.getJID()));
         if (email == null) {
-            Log.debug("MSN: Unable to update illegal contact "+contact.getJID());
+            Log.debug("MSN: Unable to remove illegal contact "+contact.getJID());
             return;
         }
         msnMessenger.removeFriend(email, false);

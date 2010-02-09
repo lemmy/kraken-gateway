@@ -377,6 +377,8 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
      * Someone added us to their contact list.
      */
     public void contactAddedMe(MsnMessenger messenger, MsnContact friend) {
+        Log.debug("MSN: Contact added me: "+ friend.getFriendlyName());
+    	
     	final JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
         
         final Presence p = new Presence();
@@ -391,6 +393,8 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
      * Someone removed us from their contact list.
      */
     public void contactRemovedMe(MsnMessenger messenger, MsnContact friend) {
+        Log.debug("MSN: Contact removed me: "+ friend.getFriendlyName());
+
         Presence p = new Presence();
         p.setType(Presence.Type.unsubscribe);
         p.setTo(getSession().getJID());

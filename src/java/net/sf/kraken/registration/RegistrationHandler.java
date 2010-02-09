@@ -158,8 +158,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
         } catch (UserNotFoundException e) {
             Log.debug("Error cleaning up contact list of: " + from);
             result.setError(Condition.registration_required);
-            parent.sendPacket(result);
         }
+        parent.sendPacket(result);
     }
 
     /**

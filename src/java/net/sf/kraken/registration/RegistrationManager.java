@@ -150,7 +150,6 @@ public class RegistrationManager {
      * @param transportType the transport type.
      * @return all registrations for the transport type.
      */
-    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations(TransportType transportType) {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -185,7 +184,6 @@ public class RegistrationManager {
      * @param jid the JID of the user.
      * @return all registrations for the JID.
      */
-    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations(JID jid) {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -226,7 +224,6 @@ public class RegistrationManager {
      * @param transportType the type of the transport.
      * @return all registrations for the JID of a particular transport type.
      */
-    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations(JID jid, TransportType transportType) {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -375,7 +372,6 @@ public class RegistrationManager {
      *
      * @return all registrations.
      */
-    @SuppressWarnings("unchecked")
     public Collection<Registration> getRegistrations() {
         List<Long> registrationIDs = new ArrayList<Long>();
         Connection con = null;
@@ -459,9 +455,9 @@ public class RegistrationManager {
      * Converts a list of registration IDs into a Collection of Registrations.
      */
     @SuppressWarnings("unchecked")
-    private class RegistrationCollection extends AbstractCollection {
+    private static class RegistrationCollection extends AbstractCollection<Registration> {
 
-        private List<Long> registrationIDs;
+        private final List<Long> registrationIDs;
 
         /**
          * Constructs a new query results object.
@@ -472,11 +468,11 @@ public class RegistrationManager {
             this.registrationIDs = registrationIDs;
         }
 
-        public Iterator iterator() {
+        public Iterator<Registration> iterator() {
             final Iterator<Long> regIterator = registrationIDs.iterator();
             return new Iterator() {
 
-                private Object nextElement = null;
+                private Registration nextElement = null;
 
                 public boolean hasNext() {
                     if (nextElement == null) {
@@ -488,8 +484,8 @@ public class RegistrationManager {
                     return true;
                 }
 
-                public Object next() {
-                    Object element;
+                public Registration next() {
+                    Registration element;
                     if (nextElement != null) {
                         element = nextElement;
                         nextElement = null;
@@ -507,7 +503,7 @@ public class RegistrationManager {
                     throw new UnsupportedOperationException();
                 }
 
-                private Object getNextElement() {
+                private Registration getNextElement() {
                     if (!regIterator.hasNext()) {
                         return null;
                     }

@@ -10,36 +10,58 @@
 
 package net.sf.kraken.protocols.xmpp;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import net.sf.kraken.avatars.Avatar;
-import net.sf.kraken.protocols.xmpp.packet.*;
+import net.sf.kraken.protocols.xmpp.packet.BuzzExtension;
+import net.sf.kraken.protocols.xmpp.packet.GoogleMailBoxPacket;
+import net.sf.kraken.protocols.xmpp.packet.GoogleMailNotifyExtension;
+import net.sf.kraken.protocols.xmpp.packet.GoogleNewMailExtension;
+import net.sf.kraken.protocols.xmpp.packet.GoogleRelayExtension;
+import net.sf.kraken.protocols.xmpp.packet.GoogleSharedStatusExtension;
+import net.sf.kraken.protocols.xmpp.packet.GoogleUserSettingExtension;
+import net.sf.kraken.protocols.xmpp.packet.IQWithPacketExtension;
+import net.sf.kraken.protocols.xmpp.packet.ProbePacket;
+import net.sf.kraken.protocols.xmpp.packet.VCardUpdateExtension;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
-import net.sf.kraken.type.*;
+import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.NameSpace;
+import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.TransportLoginStatus;
+import net.sf.kraken.type.TransportType;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.RosterGroup;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.packet.VCard;
 import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
+import org.jivesoftware.smackx.packet.VCard;
 import org.jivesoftware.util.Base64;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.JID;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Handles XMPP transport session.
@@ -105,6 +127,12 @@ public class XMPPSession extends TransportSession {
      */
     private XMPPListener listener = null;
 
+	/**
+	 * Instance that will handle all presence stanzas sent from the legacy
+	 * domain
+	 */
+	private XMPPPresenceHandler presenceHandler = null;
+    
     /*
      * XMPP connection configuration
      */
@@ -195,17 +223,19 @@ public class XMPPSession extends TransportSession {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!this.isLoggedIn()) {
             listener = new XMPPListener(this);
+            presenceHandler = new XMPPPresenceHandler(this);
             new Thread() {
                 public void run() {
                     String userName = generateUsername(registration.getUsername());
                     conn = new XMPPConnection(config);
                     try {
+                        Roster.setDefaultSubscriptionMode(SubscriptionMode.manual);
                         conn.connect();
                         conn.addConnectionListener(listener);
                         try {
                             conn.login(userName, registration.getPassword(), StringUtils.randomString(10));
-                            conn.getRoster().addRosterListener(listener);
                             conn.getChatManager().addChatListener(listener);
+                            conn.addPacketListener(presenceHandler, new PacketTypeFilter(org.jivesoftware.smack.packet.Presence.class));
                             // Use this to filter out anything we don't care about
                             conn.addPacketListener(listener, new OrFilter(
                                     new PacketTypeFilter(GoogleMailBoxPacket.class),
@@ -296,6 +326,7 @@ public class XMPPSession extends TransportSession {
             catch (Exception e) {
                 // Ignore
             }
+            
             try {
                 conn.removePacketListener(listener);
             }
@@ -303,10 +334,9 @@ public class XMPPSession extends TransportSession {
                 // Ignore
             }
             try {
-                conn.getRoster().removeRosterListener(listener);
-            }
-            catch (Exception e) {
-                // Ignore
+            	conn.removePacketListener(presenceHandler);
+            } catch (Exception e) {
+            	// Ignore
             }
             try {
                 conn.getChatManager().removeChatListener(listener);
@@ -323,6 +353,7 @@ public class XMPPSession extends TransportSession {
         }
         conn = null;
         listener = null;
+        presenceHandler = null;
     }
 
     /**
@@ -432,7 +463,11 @@ public class XMPPSession extends TransportSession {
      * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
      */
     public void acceptAddContact(TransportBuddy contact) {
-        // TODO: Currently unimplemented
+        Log.debug("XMPP: accept add contact " + contact.toString());
+        final String legacyContact = getTransport().convertJIDToID(contact.getJID());
+        final Presence accept = new Presence(Type.subscribed);
+        accept.setTo(legacyContact);
+        conn.sendPacket(accept);
     }
 
     /**
