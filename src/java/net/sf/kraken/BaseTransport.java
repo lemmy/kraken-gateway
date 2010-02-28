@@ -1638,6 +1638,33 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
 //        m.addChildElement("attention", "http://www.xmpp.org/extensions/xep-0224.html#ns");
         sendPacket(m);
     }
+    
+    /**
+     * Sends a active chat session notification through the component manager.
+     * Note that this type of state is also included in chat messages with a
+     * body. Take care to avoid sending duplicate 'active' state messages. This
+     * method is intended to be used only for those (rare) occurrances, where
+     * the legacy domain wishes to express that a contact is activly taking part
+     * in a conversation, without sending an actual chat message.
+     *
+     * This will check whether the person supports typing notifications before
+     * sending. TODO: actually check for typing notification support
+     *
+     * @param to
+     *            Who the notification is for.
+     * @param from
+     *            Who the notification is from.
+     */
+    public void sendChatActiveNotification(JID to, JID from) {
+        final Message m = new Message();
+        m.setType(Message.Type.chat);
+        m.setTo(to);
+        m.setFrom(from);
+        final Element xEvent = m.addChildElement("x", "jabber:x:event");
+        xEvent.addElement("id");
+        m.addChildElement("active", NameSpace.CHATSTATES);
+        sendPacket(m);
+    }
 
     /**
      * Sends a typing notification through the component manager.
