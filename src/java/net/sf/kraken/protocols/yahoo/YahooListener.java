@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.kraken.BaseTransport;
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -22,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
-import org.openymsg.network.Status;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionChatEvent;
@@ -38,6 +38,7 @@ import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionNewMailEvent;
 import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.support.MessageDecoder;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
 
@@ -290,17 +291,15 @@ public class YahooListener extends SessionAdapter {
     public void notifyReceived(SessionNotifyEvent event) {
         Log.debug(event.toString());
         if (event.isTyping()) {
-            if (event.getStatus() == Status.TYPING.getValue()) {
-                getSession().getTransport().sendComposingNotification(
-                        getSession().getJID(),
-                        getSession().getTransport().convertIDToJID(event.getFrom())
-                );
+            final BaseTransport<YahooBuddy> transport = getSession().getTransport();
+            final JID localJid = getSession().getJID();
+            final JID legacyJid = transport.convertIDToJID(event.getFrom());
+
+            if (event.isOn()) {
+                transport.sendComposingNotification(localJid, legacyJid);
             }
             else {
-                getSession().getTransport().sendComposingPausedNotification(
-                        getSession().getJID(),
-                        getSession().getTransport().convertIDToJID(event.getFrom())
-                );
+                transport.sendComposingPausedNotification(localJid, legacyJid);
             }
         }
     }
