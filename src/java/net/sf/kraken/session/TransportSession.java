@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Daniel Henninger
  */
-public abstract class TransportSession<B extends TransportBuddy> implements Runnable {
+public abstract class TransportSession<B extends TransportBuddy> {
 
     static Logger Log = Logger.getLogger(TransportSession.class);
 
@@ -93,11 +93,6 @@ public abstract class TransportSession<B extends TransportBuddy> implements Runn
      * Current highest resource.
      */
     public String highestResource = null;
-
-    /**
-     * Is this session valid?  Set to false when session is done.
-     */
-    public boolean validSession = true;
 
     /**
      * Is the roster locked for sync editing?
@@ -486,20 +481,6 @@ public abstract class TransportSession<B extends TransportBuddy> implements Runn
      */
     public Boolean isLoggedIn() {
         return (loginStatus == TransportLoginStatus.LOGGED_IN);
-    }
-
-    /**
-     * Handles monitoring of whether session is still valid.
-     */
-    public void run() {
-        while (validSession) { }
-    }
-
-    /**
-     * Indicates that the session is done and should be stopped.
-     */
-    public void sessionDone() {
-        validSession = false;
     }
 
     /**
