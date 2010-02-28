@@ -30,11 +30,11 @@ public class XMPPBuddy extends TransportBuddy {
     
     public final RosterEntry rosterEntry;
 
-    public XMPPBuddy(TransportBuddyManager manager, String username) {
+    public XMPPBuddy(TransportBuddyManager<XMPPBuddy> manager, String username) {
         this(manager, username, null, Collections.EMPTY_SET, null);
     }
     
-    public XMPPBuddy(TransportBuddyManager manager, String username, String nickname, Collection<RosterGroup> groups, RosterEntry entry) {
+    public XMPPBuddy(TransportBuddyManager<XMPPBuddy> manager, String username, String nickname, Collection<RosterGroup> groups, RosterEntry entry) {
         super(manager, username, nickname, null);
         ArrayList<String> groupList = new ArrayList<String>();
         for (RosterGroup group : groups) {

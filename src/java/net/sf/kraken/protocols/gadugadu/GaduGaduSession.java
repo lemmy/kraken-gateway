@@ -10,20 +10,30 @@
 
 package net.sf.kraken.protocols.gadugadu;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
 
-import org.xmpp.packet.JID;
 import org.apache.log4j.Logger;
-import pl.mn.communicator.*;
+import org.xmpp.packet.JID;
 
-import java.util.Date;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Arrays;
+import pl.mn.communicator.GGConfiguration;
+import pl.mn.communicator.GGException;
+import pl.mn.communicator.IServer;
+import pl.mn.communicator.ISession;
+import pl.mn.communicator.LocalStatus;
+import pl.mn.communicator.LocalUser;
+import pl.mn.communicator.LoginContext;
+import pl.mn.communicator.OutgoingMessage;
+import pl.mn.communicator.Session;
+import pl.mn.communicator.User;
 
 /**
  * Represents a Gadu-Gadu session.
@@ -33,7 +43,7 @@ import java.util.Arrays;
  *
  * @author Daniel Henninger
  */
-public class GaduGaduSession extends TransportSession {
+public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
 
     static Logger Log = Logger.getLogger(GaduGaduSession.class);
 
@@ -66,6 +76,7 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {
@@ -90,6 +101,7 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
+    @Override
     public void logOut() {
         try {
             iSession.getLoginService().logout();
@@ -104,6 +116,7 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
+    @Override
     public void cleanUp() {
         try {
             iSession.getConnectionService().disconnect();
@@ -152,6 +165,7 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
         Collection<LocalUser> buddyList = new ArrayList<LocalUser>();
         for (TransportBuddy buddy : getBuddyManager().getBuddies()) {
@@ -187,11 +201,12 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(GaduGaduBuddy contact) {
         Collection<LocalUser> buddyList = new ArrayList<LocalUser>();
-        for (TransportBuddy buddy : getBuddyManager().getBuddies()) {
+        for (GaduGaduBuddy buddy : getBuddyManager().getBuddies()) {
             if (buddy.getJID().equals(contact.getJID())) {
-                LocalUser byeUser = ((GaduGaduBuddy)buddy).toLocalUser();
+                LocalUser byeUser = buddy.toLocalUser();
                 try {
                     iSession.getPresenceService().removeMonitoredUser(new User(byeUser.getUin()));
                 }
@@ -200,7 +215,7 @@ public class GaduGaduSession extends TransportSession {
                 }
                 continue;
             }
-            LocalUser localUser = ((GaduGaduBuddy)buddy).toLocalUser();
+            LocalUser localUser = buddy.toLocalUser();
             buddyList.add(localUser);
         }
         try {
@@ -215,20 +230,21 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(GaduGaduBuddy contact) {
         Collection<LocalUser> buddyList = new ArrayList<LocalUser>();
-        for (TransportBuddy buddy : getBuddyManager().getBuddies()) {
+        for (GaduGaduBuddy buddy : getBuddyManager().getBuddies()) {
             if (buddy.getJID().equals(contact.getJID())) {
                 if (!buddy.getNickname().equals(contact.getNickname())) {
-                	((GaduGaduBuddy)buddy).setBuddyNickname(contact.getNickname());
+                	buddy.setBuddyNickname(contact.getNickname());
                 }
                 String newGroup = (String)contact.getGroups().toArray()[0];
                 String origGroup = (String)buddy.getGroups().toArray()[0];
                 if (!origGroup.equals(newGroup)) {
-                    ((GaduGaduBuddy)buddy).setBuddyGroups(Arrays.asList(newGroup));
+                    buddy.setBuddyGroups(Arrays.asList(newGroup));
                 }
             }
-            LocalUser localUser = ((GaduGaduBuddy)buddy).toLocalUser();
+            LocalUser localUser = buddy.toLocalUser();
             buddyList.add(localUser);
         }
         try {
@@ -241,15 +257,20 @@ public class GaduGaduSession extends TransportSession {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("GaduGadu: accept-adding is currently not implemented."
+                + " Cannot accept-add: " + userID);
         // TODO: Currently unimplemented
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendMessage(JID jid, String message) {
         try {
             iSession.getMessageService().sendMessage(OutgoingMessage.createNewMessage(Integer.parseInt(getTransport().convertJIDToID(jid)), message));
@@ -262,24 +283,28 @@ public class GaduGaduSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         try {
             iSession.getPresenceService().setStatus(new LocalStatus(((GaduGaduTransport)getTransport()).convertXMPPStatusToGaduGadu(presenceType, (verboseStatus != null && !verboseStatus.equals(""))), verboseStatus, new Date()));

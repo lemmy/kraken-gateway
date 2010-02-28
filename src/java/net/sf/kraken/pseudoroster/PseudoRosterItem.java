@@ -268,6 +268,7 @@ public class PseudoRosterItem {
      * Retrieve a nice string representation of the roster item.
      * @return String representation of roster item.
      */
+    @Override
     public String toString() {
         return username + ", " + nickname + ", " + groups;
     }

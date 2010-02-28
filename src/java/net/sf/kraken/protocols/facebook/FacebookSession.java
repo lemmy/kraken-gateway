@@ -10,21 +10,20 @@
 
 package net.sf.kraken.protocols.facebook;
 
+import java.util.ArrayList;
+
 import net.sf.jfacebookiml.FacebookAdapter;
 import net.sf.jfacebookiml.FacebookHttpClient;
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
-import org.xmpp.packet.JID;
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 import org.json.JSONException;
-
-import java.util.ArrayList;
+import org.xmpp.packet.JID;
 
 /**
  * Represents a Facebook session.
@@ -34,7 +33,7 @@ import java.util.ArrayList;
  *
  * @author Daniel Henninger
  */
-public class FacebookSession extends TransportSession {
+public class FacebookSession extends TransportSession<FacebookBuddy> {
 
     static Logger Log = Logger.getLogger(FacebookSession.class);
 
@@ -59,6 +58,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {
@@ -74,6 +74,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
+    @Override
     public void logOut() {
         if (adapter != null) {
             adapter.setVisibility(false);
@@ -86,6 +87,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
+    @Override
     public void cleanUp() {
         if (adapter != null)
             adapter.shutdown();
@@ -98,31 +100,39 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(FacebookBuddy contact) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(FacebookBuddy contact) {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("Facebook: accept-adding is currently not implemented."
+                + " Cannot accept-add: " + userID);
         // TODO: Currently unimplemented
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendMessage(JID jid, String message) {
         try {
             adapter.postFacebookChatMessage(message, getTransport().convertJIDToID(jid));
@@ -135,6 +145,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
         try {
             adapter.postTypingNotification(getTransport().convertJIDToID(jid), chatState == ChatStateType.composing ? 1 : 0);
@@ -147,6 +158,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
         try {
             adapter.postBuddyPoke(getTransport().convertJIDToID(jid));
@@ -159,6 +171,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
         // we don't support this yet, may or may not implement this
     }
@@ -166,6 +179,7 @@ public class FacebookSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         adapter.setVisibility(true);
         // setting status on facebook will literally publish a new status on facebook on behalf of the user.  this could

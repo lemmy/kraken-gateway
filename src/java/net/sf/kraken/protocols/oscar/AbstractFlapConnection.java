@@ -12,19 +12,30 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import net.kano.joscar.flap.ClientFlapConn;
-import net.kano.joscar.flap.FlapPacketListener;
-import net.kano.joscar.flap.FlapPacketEvent;
-import net.kano.joscar.snac.*;
-import net.kano.joscar.flapcmd.DefaultFlapCmdFactory;
-import net.kano.joscar.flapcmd.SnacCommand;
-import net.kano.joscar.flapcmd.KeepaliveFlapCmd;
-import net.kano.joscar.snaccmd.DefaultClientFactoryList;
-import net.kano.joscar.net.*;
-
 import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import net.kano.joscar.flap.ClientFlapConn;
+import net.kano.joscar.flap.FlapPacketEvent;
+import net.kano.joscar.flap.FlapPacketListener;
+import net.kano.joscar.flapcmd.DefaultFlapCmdFactory;
+import net.kano.joscar.flapcmd.KeepaliveFlapCmd;
+import net.kano.joscar.flapcmd.SnacCommand;
+import net.kano.joscar.net.ClientConnEvent;
+import net.kano.joscar.net.ClientConnListener;
+import net.kano.joscar.net.ConnDescriptor;
+import net.kano.joscar.net.ConnProcessorExceptionEvent;
+import net.kano.joscar.net.ConnProcessorExceptionHandler;
+import net.kano.joscar.snac.ClientSnacProcessor;
+import net.kano.joscar.snac.FamilyVersionPreprocessor;
+import net.kano.joscar.snac.SnacPacketEvent;
+import net.kano.joscar.snac.SnacPacketListener;
+import net.kano.joscar.snac.SnacRequest;
+import net.kano.joscar.snac.SnacRequestAdapter;
+import net.kano.joscar.snac.SnacRequestListener;
+import net.kano.joscar.snac.SnacResponseEvent;
+import net.kano.joscar.snaccmd.DefaultClientFactoryList;
 
 import org.apache.log4j.Logger;
 
@@ -57,6 +68,7 @@ public abstract class AbstractFlapConnection extends ClientFlapConn {
         /**
          * Send keepalive to OSCAR.
          */
+        @Override
         public void run() {
             try {
                 getFlapProcessor().sendFlap(new KeepaliveFlapCmd());
@@ -134,6 +146,7 @@ public abstract class AbstractFlapConnection extends ClientFlapConn {
     }
 
     protected SnacRequestListener genericReqListener = new SnacRequestAdapter() {
+        @Override
         public void handleResponse(SnacResponseEvent e) {
             handleSnacResponse(e);
         }
@@ -150,6 +163,7 @@ public abstract class AbstractFlapConnection extends ClientFlapConn {
     public OSCARSession getMainSession() { return oscarSessionRef.get(); }
 
     void sendRequest(SnacRequest req) {
+        Log.debug("Sending SNAC request: "+req);
         if (!req.hasListeners()) req.addListener(genericReqListener);
         sp.sendSnac(req);
     }

@@ -9,25 +9,30 @@
  */
 package net.sf.kraken.protocols.oscar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+import net.kano.joscar.ByteBlock;
+import net.kano.joscar.flap.FlapPacketEvent;
+import net.kano.joscar.flapcmd.SnacCommand;
 import net.kano.joscar.net.ClientConnEvent;
 import net.kano.joscar.net.ConnDescriptor;
-import net.kano.joscar.ByteBlock;
-import net.kano.joscar.flapcmd.SnacCommand;
-import net.kano.joscar.snaccmd.mailcheck.MailUpdate;
-import net.kano.joscar.snaccmd.mailcheck.MailStatusRequest;
+import net.kano.joscar.snac.SnacPacketEvent;
+import net.kano.joscar.snaccmd.conn.ClientVersionsCmd;
+import net.kano.joscar.snaccmd.conn.ConnCommand;
+import net.kano.joscar.snaccmd.conn.RateInfoRequest;
+import net.kano.joscar.snaccmd.conn.ServerReadyCmd;
+import net.kano.joscar.snaccmd.conn.SnacFamilyInfo;
 import net.kano.joscar.snaccmd.mailcheck.ActivateMailCmd;
 import net.kano.joscar.snaccmd.mailcheck.MailCheckCmd;
-import net.kano.joscar.snaccmd.conn.*;
-import net.kano.joscar.snac.SnacPacketEvent;
-import net.kano.joscar.flap.FlapPacketEvent;
+import net.kano.joscar.snaccmd.mailcheck.MailStatusRequest;
+import net.kano.joscar.snaccmd.mailcheck.MailUpdate;
+
+import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.xmpp.packet.Message;
-import org.apache.log4j.Logger;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author Daniel Henninger
@@ -43,15 +48,18 @@ public class EmailConnection extends ServiceConnection {
         this.serviceFamily = serviceFamily;
     }
 
+    @Override
     protected void handleStateChange(ClientConnEvent e) {
         Log.debug("OSCAR email service state change from "+e.getOldState()+" to "+e.getNewState());
     }
 
+    @Override
     protected void handleFlapPacket(FlapPacketEvent e) {
 //        Log.debug("OSCAR email flap packet received: "+e);
         super.handleFlapPacket(e);
     }
 
+    @Override
     protected void clientReady() {
         super.clientReady();
         request(new MailStatusRequest());
@@ -59,6 +67,7 @@ public class EmailConnection extends ServiceConnection {
         startKeepAlive();
     }
 
+    @Override
     protected void handleSnacPacket(SnacPacketEvent e) {
 //        Log.debug("OSCAR email snac packet received: "+e);
 

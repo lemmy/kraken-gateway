@@ -10,15 +10,17 @@
 
 package net.sf.kraken.protocols.msn;
 
-import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.util.JiveGlobals;
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
+
 import net.sf.jml.MsnContact;
 import net.sf.jml.MsnGroup;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
+
+import org.apache.log4j.Logger;
+import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.jivesoftware.util.JiveGlobals;
+import org.xmpp.packet.JID;
 
 /**
  * @author Daniel Henninger
@@ -27,7 +29,7 @@ public class MSNBuddy extends TransportBuddy {
 
     static Logger Log = Logger.getLogger(MSNBuddy.class);
 
-    public MSNBuddy(TransportBuddyManager manager, MsnContact msnContact) {
+    public MSNBuddy(TransportBuddyManager<MSNBuddy> manager, MsnContact msnContact) {
         super(manager, msnContact.getEmail().toString(), msnContact.getFriendlyName(), null);
         ArrayList<String> groups = new ArrayList<String>();
         for (MsnGroup group : msnContact.getBelongGroups()) {
@@ -49,7 +51,8 @@ public class MSNBuddy extends TransportBuddy {
             if (!getNickname().equals(msnContact.getDisplayName())) {
                 setNickname(msnContact.getDisplayName());
                 try {
-                    getManager().getSession().getTransport().addOrUpdateRosterItem(getManager().getSession().getJID(), getJID(), getNickname(), getGroups());
+                    final JID owner = getManager().getSession().getJID();
+                    getManager().getSession().getTransport().addOrUpdateRosterItem(owner, getJID(), getNickname(), getGroups());
                 }
                 catch (UserNotFoundException e) {
                     // Can't update something that's not really in our list.

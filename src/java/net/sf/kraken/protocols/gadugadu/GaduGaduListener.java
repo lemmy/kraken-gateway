@@ -10,18 +10,31 @@
 
 package net.sf.kraken.protocols.gadugadu;
 
-import pl.mn.communicator.event.*;
-import pl.mn.communicator.*;
-
-import java.util.Collection;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 
 import net.sf.kraken.type.TransportLoginStatus;
 
-import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.util.NotFoundException;
-import org.jivesoftware.util.LocaleUtils;
 import org.apache.log4j.Logger;
+import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.jivesoftware.util.LocaleUtils;
+import org.jivesoftware.util.NotFoundException;
+
+import pl.mn.communicator.GGException;
+import pl.mn.communicator.IIncommingMessage;
+import pl.mn.communicator.ILocalStatus;
+import pl.mn.communicator.IOutgoingMessage;
+import pl.mn.communicator.IRemoteStatus;
+import pl.mn.communicator.IUser;
+import pl.mn.communicator.LocalUser;
+import pl.mn.communicator.MessageStatus;
+import pl.mn.communicator.User;
+import pl.mn.communicator.event.ConnectionListener;
+import pl.mn.communicator.event.ContactListListener;
+import pl.mn.communicator.event.LoginFailedEvent;
+import pl.mn.communicator.event.LoginListener;
+import pl.mn.communicator.event.MessageListener;
+import pl.mn.communicator.event.UserListener;
 
 /**
  * @author Daniel Henninger
@@ -152,7 +165,7 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         Log.debug("GaduGadu: User status changed for "+iUser+" to "+iRemoteStatus);
         if (getSession().getBuddyManager().isActivated()) {
             try {
-                GaduGaduBuddy buddy = (GaduGaduBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(Integer.toString(iUser.getUin())));
+                GaduGaduBuddy buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(Integer.toString(iUser.getUin())));
                 buddy.setPresenceAndStatus(((GaduGaduTransport)getSession().getTransport()).convertGaduGaduStatusToXMPP(iRemoteStatus.getStatusType()), iRemoteStatus.getDescription());
             }
             catch (NotFoundException e) {

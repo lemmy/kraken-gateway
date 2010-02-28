@@ -12,16 +12,16 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import net.kano.joscar.ByteBlock;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Locale;
+
 import net.kano.joscar.BinaryTools;
+import net.kano.joscar.ByteBlock;
 import net.kano.joscar.DefensiveTools;
 import net.kano.joscar.flap.FlapCommand;
 import net.kano.joscar.snaccmd.auth.ClientVersionInfo;
 import net.kano.joscar.tlv.Tlv;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -220,6 +220,7 @@ public class LoginICQFlapCmd extends FlapCommand {
      */
     public final ByteBlock getCookie() { return cookie; }
 
+    @Override
     public void writeData(OutputStream out) throws IOException {
         BinaryTools.writeUInt(out, version);
         if (cookie != null) new Tlv(TYPE_COOKIE, cookie).write(out);
@@ -246,6 +247,7 @@ public class LoginICQFlapCmd extends FlapCommand {
         }
     }
 
+    @Override
     public String toString() {
         return "LoginICQFlapCmd: "
                 + "version=" + version

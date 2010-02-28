@@ -11,10 +11,10 @@ package net.sf.kraken.protocols.simple;
 
 import java.net.InetAddress;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.TooManyListenersException;
-import java.util.ArrayList;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -28,37 +28,46 @@ import javax.sip.SipStack;
 import javax.sip.address.Address;
 import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
-import javax.sip.header.*;
+import javax.sip.header.CSeqHeader;
+import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.ExpiresHeader;
+import javax.sip.header.FromHeader;
+import javax.sip.header.HeaderFactory;
+import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.SubscriptionStateHeader;
+import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import net.sf.kraken.*;
+import net.sf.kraken.BaseTransport;
 import net.sf.kraken.pseudoroster.PseudoRoster;
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.pseudoroster.PseudoRosterManager;
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
-import org.jivesoftware.util.JiveGlobals;
-import org.jivesoftware.util.NotFoundException;
+import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.jivesoftware.util.JiveGlobals;
+import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
-import org.apache.log4j.Logger;
 
 /**
  * A gateway session to a SIMPLE IM server.
  * @author Patrick Siu
  * @author Daniel Henninger
  */
-public class SimpleSession extends TransportSession {
+public class SimpleSession extends TransportSession<SimpleBuddy> {
 
     static Logger Log = Logger.getLogger(SimpleSession.class);
 
@@ -225,6 +234,7 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String) 
      */
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
 		Log.debug("SimpleSession(" + getJID().getNode() + ").updateStatus:  Method commenced!");
 		
@@ -235,6 +245,7 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
         Log.debug("SimpleSession(" + jid.getNode() + ").addContact:  Roster of " + jid.toString() + " locked!");
 
@@ -298,7 +309,8 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(SimpleBuddy contact) {
 //		String nickname = getTransport().convertJIDToID(item.getJid());
 //        if (item.getNickname() != null && !item.getNickname().equals("")) {
 //            nickname = item.getNickname();
@@ -345,7 +357,8 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(SimpleBuddy contact) {
 		Log.debug("SimpleSession(" + jid.getNode() + ").updateContact:  I was called!");
 
         JID    destJid    = contact.getJID();
@@ -361,7 +374,7 @@ public class SimpleSession extends TransportSession {
         }
 
         try {
-            SimpleBuddy simpleBuddy = (SimpleBuddy)getBuddyManager().getBuddy(destJid);
+            SimpleBuddy simpleBuddy = getBuddyManager().getBuddy(destJid);
             simpleBuddy.pseudoRosterItem = rosterItem;
         }
         catch (NotFoundException e) {
@@ -370,15 +383,20 @@ public class SimpleSession extends TransportSession {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("SIMPLE: accept-adding is currently not implemented."
+                + " Cannot accept-add: " + userID);
         // TODO: Currently unimplemented
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendMessage(JID jid, String message) {
 		Log.debug("SimpleSession(" + jid.getNode() + "):  Starting message sending process.");
 		ContentTypeHeader contentTypeHeader;
@@ -410,6 +428,7 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID, net.sf.kraken.type.ChatStateType)
      */
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
 		Log.debug("SimpleSession(" + jid.getNode() + ").sendChatState:  I was called!");
     }
@@ -417,12 +436,14 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
     }
 
@@ -430,6 +451,7 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
 		if (!this.isLoggedIn()) {
 			this.setLoginStatus(TransportLoginStatus.LOGGING_IN);
@@ -486,6 +508,7 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
+    @Override
     public void logOut() {
         cleanUp();
         sessionDisconnectedNoReconnect(null);
@@ -494,6 +517,7 @@ public class SimpleSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
+    @Override
     public void cleanUp() {
         Request registerRequest = prepareRegisterRequest();
 
@@ -569,7 +593,8 @@ public class SimpleSession extends TransportSession {
 		sipStack = null;
 	}
 	
-	public void finalize() {
+	@Override
+    public void finalize() {
         try {
             super.finalize();
         }
@@ -611,7 +636,8 @@ public class SimpleSession extends TransportSession {
 			this.sipReqType = sipReqType;
 		}
 		
-		public String toString() {
+		@Override
+        public String toString() {
 			return sipReqType;
 		}
 	}

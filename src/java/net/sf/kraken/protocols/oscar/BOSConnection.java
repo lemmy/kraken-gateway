@@ -12,32 +12,59 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import net.kano.joscar.*;
-import net.kano.joscar.flap.*;
-import net.kano.joscar.flapcmd.*;
-import net.kano.joscar.net.*;
-import net.kano.joscar.snac.*;
-import net.kano.joscar.snaccmd.*;
+import java.util.Date;
+import java.util.List;
+
+import net.kano.joscar.ByteBlock;
+import net.kano.joscar.LEBinaryTools;
+import net.kano.joscar.OscarTools;
+import net.kano.joscar.flap.FlapCommand;
+import net.kano.joscar.flap.FlapPacketEvent;
+import net.kano.joscar.flapcmd.CloseFlapCmd;
+import net.kano.joscar.flapcmd.SnacCommand;
+import net.kano.joscar.net.ClientConnEvent;
+import net.kano.joscar.net.ConnDescriptor;
+import net.kano.joscar.snac.SnacPacketEvent;
+import net.kano.joscar.snac.SnacResponseEvent;
+import net.kano.joscar.snaccmd.InfoData;
+import net.kano.joscar.snaccmd.conn.MyInfoRequest;
+import net.kano.joscar.snaccmd.conn.ServerReadyCmd;
+import net.kano.joscar.snaccmd.conn.ServiceRedirect;
 import net.kano.joscar.snaccmd.error.SnacError;
-import net.kano.joscar.snaccmd.icq.OfflineMsgIcqCmd;
+import net.kano.joscar.snaccmd.icbm.ParamInfo;
+import net.kano.joscar.snaccmd.icbm.ParamInfoCmd;
+import net.kano.joscar.snaccmd.icbm.ParamInfoRequest;
+import net.kano.joscar.snaccmd.icbm.SetParamInfoCmd;
+import net.kano.joscar.snaccmd.icq.MetaShortInfoCmd;
 import net.kano.joscar.snaccmd.icq.OfflineMsgDoneCmd;
 import net.kano.joscar.snaccmd.icq.OfflineMsgIcqAckCmd;
-import net.kano.joscar.snaccmd.icq.MetaShortInfoCmd;
-import net.kano.joscar.snaccmd.conn.*;
-import net.kano.joscar.snaccmd.icbm.*;
-import net.kano.joscar.snaccmd.loc.*;
-import net.kano.joscar.snaccmd.ssi.*;
-import net.kano.joscar.ssiitem.*;
+import net.kano.joscar.snaccmd.icq.OfflineMsgIcqCmd;
+import net.kano.joscar.snaccmd.loc.LocRightsCmd;
+import net.kano.joscar.snaccmd.loc.LocRightsRequest;
+import net.kano.joscar.snaccmd.loc.SetInfoCmd;
+import net.kano.joscar.snaccmd.ssi.ActivateSsiCmd;
+import net.kano.joscar.snaccmd.ssi.AuthFutureCmd;
+import net.kano.joscar.snaccmd.ssi.AuthReplyCmd;
+import net.kano.joscar.snaccmd.ssi.BuddyAddedYouCmd;
+import net.kano.joscar.snaccmd.ssi.BuddyAuthRequest;
+import net.kano.joscar.snaccmd.ssi.ModifyItemsCmd;
+import net.kano.joscar.snaccmd.ssi.SsiDataCmd;
+import net.kano.joscar.snaccmd.ssi.SsiDataRequest;
+import net.kano.joscar.snaccmd.ssi.SsiItem;
+import net.kano.joscar.snaccmd.ssi.SsiRightsRequest;
+import net.kano.joscar.ssiitem.BuddyItem;
+import net.kano.joscar.ssiitem.DefaultSsiItemObjFactory;
+import net.kano.joscar.ssiitem.GroupItem;
+import net.kano.joscar.ssiitem.IconItem;
+import net.kano.joscar.ssiitem.SsiItemObj;
+import net.kano.joscar.ssiitem.SsiItemObjectFactory;
+import net.kano.joscar.ssiitem.VisibilityItem;
 import net.sf.kraken.type.TransportLoginStatus;
 
-import java.util.List;
-import java.util.Date;
-
-import org.jivesoftware.util.StringUtils;
-import org.jivesoftware.util.LocaleUtils;
-import org.jivesoftware.util.NotFoundException;
-import org.xmpp.packet.Presence;
 import org.apache.log4j.Logger;
+import org.jivesoftware.util.LocaleUtils;
+import org.jivesoftware.util.StringUtils;
+import org.xmpp.packet.Presence;
 
 /**
  * Handles BOS related packets.
@@ -55,11 +82,13 @@ public class BOSConnection extends BasicFlapConnection {
         super(cd, mainSession, cookie); // Hand off to BasicFlapConnection
     }
 
+    @Override
     protected void clientReady() {
         super.clientReady();
         startKeepAlive();
     }
 
+    @Override
     protected void handleStateChange(ClientConnEvent e) {
         Log.debug("OSCAR bos service state change from "+e.getOldState()+" to "+e.getNewState()+" Reason: "+e.getReason());
 //        if (e.getNewState() == ClientFlapConn.STATE_NOT_CONNECTED && e.getOldState() == ClientFlapConn.STATE_CONNECTED && getMainSession().isLoggedIn()) {
@@ -67,6 +96,7 @@ public class BOSConnection extends BasicFlapConnection {
 //        }
     }
 
+    @Override
     protected void handleFlapPacket(FlapPacketEvent e) {
 //        Log.debug("OSCAR bos flap packet received: "+e);
         FlapCommand cmd = e.getFlapCommand();
@@ -83,6 +113,7 @@ public class BOSConnection extends BasicFlapConnection {
         super.handleFlapPacket(e);
     }
 
+    @Override
     protected void handleSnacPacket(SnacPacketEvent e) {
 //        Log.debug("OSCAR bos snac packet received: "+e);
         super.handleSnacPacket(e);
@@ -144,24 +175,18 @@ public class BOSConnection extends BasicFlapConnection {
                 if (obj instanceof BuddyItem) {
                     BuddyItem bi = (BuddyItem)obj;
                     Log.debug("AIM got buddy item " + bi);
-                    try {
-                        OSCARBuddy oscarBuddy = (OSCARBuddy)getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(bi.getScreenname()));
-                        oscarBuddy.tieBuddyItem(bi, false);
-                    }
-                    catch (NotFoundException ee) {
-                        OSCARBuddy oscarBuddy = new OSCARBuddy(getMainSession().getBuddyManager(), bi);
-                        getMainSession().getBuddyManager().storeBuddy(oscarBuddy);
-                    }
+                    getMainSession().getSsiHierarchy().gotBuddy(bi);
                 }
                 else if (obj instanceof GroupItem) {
                     GroupItem gi = (GroupItem)obj;
                     Log.debug("AIM got group item " + gi);
-                    getMainSession().gotGroup(gi);
+                    getMainSession().getSsiHierarchy().gotGroup(gi);
                 }
             }
         }
     }
 
+    @Override
     protected void handleSnacResponse(SnacResponseEvent e) {
         super.handleSnacResponse(e);
 
@@ -200,29 +225,22 @@ public class BOSConnection extends BasicFlapConnection {
                 if (obj instanceof BuddyItem) {
                     BuddyItem bi = (BuddyItem)obj;
                     Log.debug("OSCAR: got buddy item " + bi);
-                    try {
-                        OSCARBuddy oscarBuddy = (OSCARBuddy)getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(bi.getScreenname()));
-                        oscarBuddy.tieBuddyItem(bi, false);
-                    }
-                    catch (NotFoundException ee) {
-                        OSCARBuddy oscarBuddy = new OSCARBuddy(getMainSession().getBuddyManager(), bi);
-                        getMainSession().getBuddyManager().storeBuddy(oscarBuddy);
-                    }
+                    getMainSession().getSsiHierarchy().gotBuddy(bi);
                 }
                 else if (obj instanceof GroupItem) {
                     GroupItem gi = (GroupItem)obj;
                     Log.debug("OSCAR: got group item " + gi);
-                    getMainSession().gotGroup(gi);
+                    getMainSession().getSsiHierarchy().gotGroup(gi);
                 }
                 else if (obj instanceof IconItem) {
                     IconItem ii = (IconItem)obj;
                     Log.debug("OSCAR: got icon item " + ii);
-                    getMainSession().gotIconItem(ii);
+                    getMainSession().getSsiHierarchy().gotIconItem(ii);
                 }
                 else if (obj instanceof VisibilityItem) {
                     VisibilityItem vi = (VisibilityItem)obj;
                     Log.debug("OSCAR: got visibility item " + vi);
-                    getMainSession().gotVisibilityItem(vi);
+                    getMainSession().getSsiHierarchy().gotVisibilityItem(vi);
                 }
                 else {
                     Log.debug("OSCAR: got item we're not handling " + obj);

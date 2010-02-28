@@ -19,7 +19,7 @@ import net.sf.kraken.roster.TransportBuddyManager;
  */
 public class IRCBuddy extends TransportBuddy {
 
-    public IRCBuddy(TransportBuddyManager manager, String username, PseudoRosterItem item) {
+    public IRCBuddy(TransportBuddyManager<IRCBuddy> manager, String username, PseudoRosterItem item) {
         super(manager, username, null, null);
         pseudoRosterItem = item;
         this.setNickname(item.getNickname());

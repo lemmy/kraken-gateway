@@ -28,6 +28,7 @@ public class ProbePacket extends Packet {
         setFrom(from);
     }
 
+    @Override
     public String toXML() {
         StringBuilder buf = new StringBuilder();
         buf.append("<presence");

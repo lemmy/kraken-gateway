@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Daniel Henninger
  */
-public abstract class TransportSession implements Runnable {
+public abstract class TransportSession<B extends TransportBuddy> implements Runnable {
 
     static Logger Log = Logger.getLogger(TransportSession.class);
 
@@ -59,11 +59,11 @@ public abstract class TransportSession implements Runnable {
      * @param transport Transport this session is associated with.
      * @param priority Priority associated with session.
      */
-    public TransportSession(Registration registration, JID jid, BaseTransport transport, Integer priority) {
+    public TransportSession(Registration registration, JID jid, BaseTransport<B> transport, Integer priority) {
         this.jid = new JID(jid.toBareJID());
         this.registration = registration;
-        this.transportRef = new WeakReference<BaseTransport>(transport);
-        mucSessionManager = new MUCTransportSessionManager(this);
+        this.transportRef = new WeakReference<BaseTransport<B>>(transport);
+        mucSessionManager = new MUCTransportSessionManager<B>(this);
         addResource(jid.getResource(), priority);
         loadAvatar();
         Log.debug("Created "+transport.getType()+" session for "+jid+" as '"+registration.getUsername()+"'");
@@ -77,7 +77,7 @@ public abstract class TransportSession implements Runnable {
     /**
      * Transport this session is associated with.
      */
-    public WeakReference<BaseTransport> transportRef;
+    public WeakReference<BaseTransport<B>> transportRef;
 
     /**
      * The bare JID the session is associated with.
@@ -147,7 +147,7 @@ public abstract class TransportSession implements Runnable {
     /**
      * Transport buddy manager.
      */
-    public TransportBuddyManager buddyManager = new TransportBuddyManager(this);
+    public TransportBuddyManager<B> buddyManager = new TransportBuddyManager<B>(this);
 
     /**
      * This session's avatar.
@@ -157,14 +157,14 @@ public abstract class TransportSession implements Runnable {
     /**
      *  The MUC transport session manager.
      */
-    public MUCTransportSessionManager mucSessionManager;
+    public MUCTransportSessionManager<B> mucSessionManager;
 
     /**
      * Retrieve the muc session manager.
      *
      * @return muc session manager instance.
      */
-    public MUCTransportSessionManager getMUCSessionManager() {
+    public MUCTransportSessionManager<B> getMUCSessionManager() {
         return mucSessionManager;
     }
 
@@ -173,7 +173,7 @@ public abstract class TransportSession implements Runnable {
      *
      * @return buddy manager instance.
      */
-    public TransportBuddyManager getBuddyManager() {
+    public TransportBuddyManager<B> getBuddyManager() {
         return buddyManager;
     }
 
@@ -327,7 +327,7 @@ public abstract class TransportSession implements Runnable {
      *
      * @return Transport associated with the session.
      */
-    public BaseTransport getTransport() {
+    public BaseTransport<B> getTransport() {
         return transportRef.get();
     }
 
@@ -745,6 +745,7 @@ public abstract class TransportSession implements Runnable {
     /**
      * Provides a "neat" string representation of the session.
      */
+    @Override
     public String toString() {
         return "TransportSession["+getJID()+"]";
     }
@@ -771,21 +772,21 @@ public abstract class TransportSession implements Runnable {
      *
      * @param contact Transport buddy item associated with the legacy contact.
      */
-    public abstract void removeContact(TransportBuddy contact);
+    public abstract void removeContact(B contact);
 
     /**
      * Updates a legacy contact on the legacy service.
      *
      * @param contact Transport buddy item associated with the legacy contact.
      */
-    public abstract void updateContact(TransportBuddy contact);
+    public abstract void updateContact(B contact);
 
     /**
      * Accept a legacy contact's add friend request.
      *
-     * @param contact Transport buddy item associated with the legacy contact.
+     * @param jid JID associated with the target contact.
      */
-    public abstract void acceptAddContact(TransportBuddy contact);
+    public abstract void acceptAddContact(JID jid);
 
     /**
      * Sends an outgoing message through the legacy service.

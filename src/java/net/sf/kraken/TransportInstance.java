@@ -10,6 +10,7 @@
 
 package net.sf.kraken;
 
+import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.cluster.TransportSessionRouter;
 import net.sf.kraken.type.TransportType;
 
@@ -31,14 +32,14 @@ import java.util.Map;
  *
  * @author Daniel Henninger
  */
-public class TransportInstance implements PropertyEventListener {
+public class TransportInstance<B extends TransportBuddy> implements PropertyEventListener {
 
     final static Logger Log = Logger.getLogger(TransportInstance.class);
 
     private final ComponentManager componentManager;
     private final String description;
     private final String nameOfClass;
-    public BaseTransport transport = null;
+    public BaseTransport<B> transport = null;
     private final TransportType type;
     private boolean enabled = false;
     private boolean running = false;
@@ -216,7 +217,7 @@ public class TransportInstance implements PropertyEventListener {
      *
      * @return Transport that the instance is associated with.
      */
-    public BaseTransport getTransport() {
+    public BaseTransport<B> getTransport() {
         return transport;
     }
 

@@ -12,9 +12,9 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import net.kano.joscar.snac.SnacRequest;
-
 import java.util.List;
+
+import net.kano.joscar.snac.SnacRequest;
 
 /**
  * Handles events from pending SNAC manager.

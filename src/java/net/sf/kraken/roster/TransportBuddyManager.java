@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
  * 
  * @author Daniel Henninger
  */
-public class TransportBuddyManager {
+public class TransportBuddyManager<B extends TransportBuddy> {
 
     static Logger Log = Logger.getLogger(TransportBuddyManager.class);
 
@@ -39,19 +39,19 @@ public class TransportBuddyManager {
      *
      * @param session Transport session associated with this buddy manager.
      */
-    public TransportBuddyManager(TransportSession session) {
-        this.sessionRef = new WeakReference<TransportSession>(session);
+    public TransportBuddyManager(TransportSession<B> session) {
+        this.sessionRef = new WeakReference<TransportSession<B>>(session);
     }
 
-    private final ConcurrentHashMap<JID,TransportBuddy> buddies = new ConcurrentHashMap<JID,TransportBuddy>();
+    private final ConcurrentHashMap<JID,B> buddies = new ConcurrentHashMap<JID,B>();
     private final ConcurrentHashMap<JID,PresenceType> pendingPresences = new ConcurrentHashMap<JID,PresenceType>();
     private final ConcurrentHashMap<JID,String> pendingVerboseStatuses = new ConcurrentHashMap<JID,String>();
 
-    private WeakReference<TransportSession> sessionRef = null;
+    private WeakReference<TransportSession<B>> sessionRef = null;
 
-    private Boolean isActive = false;
+    private boolean isActive = false;
 
-    public TransportSession getSession() {
+    public TransportSession<B> getSession() {
         return sessionRef.get();
     }
 
@@ -60,7 +60,7 @@ public class TransportBuddyManager {
      *
      * @return True or false if the buddy manager has been activated.
      */
-    public Boolean isActivated() {
+    public boolean isActivated() {
         return isActive;
     }
 
@@ -71,7 +71,7 @@ public class TransportBuddyManager {
         for (JID jid : pendingPresences.keySet()) {
             if (pendingVerboseStatuses.containsKey(jid)) {
                 try {
-                    TransportBuddy buddy = getBuddy(jid);
+                    B buddy = getBuddy(jid);
                     buddy.setPresenceAndStatus(pendingPresences.get(jid), pendingVerboseStatuses.get(jid));
                 }
                 catch (NotFoundException e) {
@@ -81,7 +81,7 @@ public class TransportBuddyManager {
             }
             else {
                 try {
-                    TransportBuddy buddy = getBuddy(jid);
+                    B buddy = getBuddy(jid);
                     buddy.setPresence(pendingPresences.get(jid));
                 }
                 catch (NotFoundException e) {
@@ -91,7 +91,7 @@ public class TransportBuddyManager {
         }
         for (JID jid : pendingVerboseStatuses.keySet()) {
             try {
-                TransportBuddy buddy = getBuddy(jid);
+                B buddy = getBuddy(jid);
                 buddy.setVerboseStatus(pendingVerboseStatuses.get(jid));
             }
             catch (NotFoundException e) {
@@ -119,7 +119,7 @@ public class TransportBuddyManager {
         }
         else {
             try {
-                TransportBuddy buddy = getBuddy(jid);
+                B buddy = getBuddy(jid);
                 buddy.setPresenceAndStatus(presence, status);
             }
             catch (NotFoundException e) {
@@ -142,14 +142,14 @@ public class TransportBuddyManager {
      * @throws NotFoundException if the given jid is not found.
      * @return TransportBuddy instance requested.
      */
-    public TransportBuddy getBuddy(JID jid) throws NotFoundException {
-        TransportBuddy buddy = buddies.get(jid);
+    public B getBuddy(JID jid) throws NotFoundException {
+        B buddy = buddies.get(jid);
         if (buddy == null) {
             throw new NotFoundException("Could not find buddy requested.");
         }
         return buddy;
     }
-
+    
     /**
      * Retrieve the buddy instance for a given user.
      *
@@ -158,8 +158,8 @@ public class TransportBuddyManager {
      * @return TransportBuddy instance requested.
      */
 // Disabling this because it can cause confusion in one's attempt to match a buddy.
-//    public TransportBuddy getBuddy(String username) throws NotFoundException {
-//        TransportBuddy buddy = buddies.get(username.toLowerCase());
+//    public B getBuddy(String username) throws NotFoundException {
+//        B buddy = buddies.get(username.toLowerCase());
 //        if (buddy == null) {
 //            throw new NotFoundException("Could not find buddy requested.");
 //        }
@@ -171,7 +171,7 @@ public class TransportBuddyManager {
      *
      * @param buddy TransportBuddy associated with the username.
      */
-    public void storeBuddy(TransportBuddy buddy) {
+    public void storeBuddy(B buddy) {
         if (!buddies.containsKey(buddy.jid)) {
             Log.debug("("+getSession().getTransport().getType().toString().toUpperCase()+") Storing new buddy: "+buddy);
             buddies.put(buddy.jid, buddy);
@@ -198,7 +198,7 @@ public class TransportBuddyManager {
      * @param username buddy to be removed.
      */
     public void removeBuddy(String username) {
-        TransportBuddy buddy = buddies.remove(getSession().getTransport().convertIDToJID(username));
+        B buddy = buddies.remove(getSession().getTransport().convertIDToJID(username));
         if (buddy != null && isActivated()) {
             Log.debug("TransportBuddyManager: Triggering contact removal for "+buddy);
             getSession().removeContact(buddy);
@@ -210,7 +210,7 @@ public class TransportBuddyManager {
      *
      * @return List of buddies.
      */
-    public Collection<TransportBuddy> getBuddies() {
+    public Collection<B> getBuddies() {
         return buddies.values();
     }
 
@@ -233,7 +233,7 @@ public class TransportBuddyManager {
      * @param to JID to send presence updates to.
      */
     public void sendAllPresences(JID to) {
-        for (TransportBuddy buddy : buddies.values()) {
+        for (B buddy : buddies.values()) {
             buddy.sendPresence(to);
         }
     }
@@ -246,7 +246,7 @@ public class TransportBuddyManager {
      * @param to JID to send presence updates to.
      */
     public void sendAllAvailablePresences(JID to) {
-        for (TransportBuddy buddy : buddies.values()) {
+        for (B buddy : buddies.values()) {
             buddy.sendPresenceIfAvailable(to);
         }
     }
@@ -259,9 +259,12 @@ public class TransportBuddyManager {
      * @param to JID to send presence updates to.
      */
     public void sendOfflineForAllAvailablePresences(JID to) {
-        for (TransportBuddy buddy : buddies.values()) {
+        for (B buddy : buddies.values()) {
             buddy.sendOfflinePresenceIfAvailable(to);
         }
     }
 
+    public boolean hasBuddy(JID jid) {
+        return buddies.containsKey(jid);
+    }
 }

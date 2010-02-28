@@ -17,11 +17,11 @@ import net.sf.jmyspaceiml.MessageListener;
 import net.sf.jmyspaceiml.contact.Contact;
 import net.sf.jmyspaceiml.contact.ContactListener;
 import net.sf.jmyspaceiml.packet.ActionMessage;
+import net.sf.jmyspaceiml.packet.ErrorMessage;
 import net.sf.jmyspaceiml.packet.InstantMessage;
 import net.sf.jmyspaceiml.packet.MediaMessage;
 import net.sf.jmyspaceiml.packet.ProfileMessage;
 import net.sf.jmyspaceiml.packet.StatusMessage;
-import net.sf.jmyspaceiml.packet.ErrorMessage;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
@@ -74,7 +74,7 @@ public class MySpaceIMListener implements MessageListener, ContactListener {
         Log.debug("MySpaceIM: Received status message packet: "+msgPacket);
         if (getSession().getBuddyManager().isActivated()) {
             try {
-                MySpaceIMBuddy buddy = (MySpaceIMBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(msgPacket.getFrom()));
+                MySpaceIMBuddy buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(msgPacket.getFrom()));
                 buddy.setPresenceAndStatus(
                         ((MySpaceIMTransport)getSession().getTransport()).convertMySpaceIMStatusToXMPP(msgPacket.getStatusCode()),
                         msgPacket.getStatusMessage()
@@ -117,7 +117,7 @@ public class MySpaceIMListener implements MessageListener, ContactListener {
         for (Contact contact : contacts) {
             MySpaceIMBuddy buddy;
             try {
-                buddy = (MySpaceIMBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(contact.getContactID())));
+                buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(contact.getContactID())));
             }
             catch (NotFoundException e) {
                 buddy = new MySpaceIMBuddy(getSession().getBuddyManager(), contact.getContactID());

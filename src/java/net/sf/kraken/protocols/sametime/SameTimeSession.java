@@ -10,15 +10,16 @@
 
 package net.sf.kraken.protocols.sametime;
 
+import java.util.ArrayList;
+
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
 
-import org.xmpp.packet.JID;
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
+import org.xmpp.packet.JID;
 
 import com.lotus.sametime.awareness.AwarenessService;
 import com.lotus.sametime.awareness.WatchList;
@@ -30,8 +31,6 @@ import com.lotus.sametime.core.constants.ImTypes;
 import com.lotus.sametime.im.Im;
 import com.lotus.sametime.im.InstantMessagingService;
 
-import java.util.ArrayList;
-
 /**
  * Represents a SameTime session.
  *
@@ -40,7 +39,7 @@ import java.util.ArrayList;
  *
  * @author Daniel Henninger
  */
-public class SameTimeSession extends TransportSession {
+public class SameTimeSession extends TransportSession<SameTimeBuddy> {
 
     static Logger Log = Logger.getLogger(SameTimeSession.class);
 
@@ -80,6 +79,7 @@ public class SameTimeSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {  
@@ -122,6 +122,7 @@ public class SameTimeSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
+    @Override
     public void logOut() {
         communityService.logout();
         cleanUp();
@@ -131,6 +132,7 @@ public class SameTimeSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
+    @Override
     public void cleanUp() {
         // Shut down services
         if (watchList != null) {
@@ -167,31 +169,39 @@ public class SameTimeSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(SameTimeBuddy contact) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(SameTimeBuddy contact) {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("SameTime: accept-adding is currently not implemented."
+                + " Cannot accept-add: " + userID);
         // TODO: Currently unimplemented
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendMessage(JID jid, String message) {
         Im im = listener.getIMSession(jid);
         if (im != null) {
@@ -202,24 +212,28 @@ public class SameTimeSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
     }
 

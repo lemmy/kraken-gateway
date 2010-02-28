@@ -10,7 +10,8 @@
 
 package net.sf.kraken.protocols.yahoo;
 
-import net.sf.kraken.*;
+import net.sf.kraken.BaseTransport;
+import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
@@ -29,13 +30,14 @@ import org.xmpp.packet.JID;
  *
  * @author Daniel Henninger
  */
-public class YahooTransport extends BaseTransport {
+public class YahooTransport extends BaseTransport<YahooBuddy> {
 
     static Logger Log = Logger.getLogger(YahooTransport.class);
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
+    @Override
     public String getTerminologyUsername() {
         return LocaleUtils.getLocalizedString("gateway.yahoo.username", "kraken");
     }
@@ -43,6 +45,7 @@ public class YahooTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
+    @Override
     public String getTerminologyPassword() {
         return LocaleUtils.getLocalizedString("gateway.yahoo.password", "kraken");
     }
@@ -50,6 +53,7 @@ public class YahooTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
+    @Override
     public String getTerminologyNickname() {
         return null;
     }
@@ -57,6 +61,7 @@ public class YahooTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
+    @Override
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway.yahoo.registration", "kraken");
     }
@@ -64,16 +69,19 @@ public class YahooTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
+    @Override
     public Boolean isPasswordRequired() { return true; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
+    @Override
     public Boolean isNicknameRequired() { return false; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
+    @Override
     public Boolean isUsernameValid(String username) {
         return username.matches("[^ \\p{Cntrl}()@,;:\\\\\"\\[\\]]+@?[^ \\p{Cntrl}()@,;:\\\\\"\\[\\]]+");
     }
@@ -86,8 +94,9 @@ public class YahooTransport extends BaseTransport {
      * @param presenceType Type of presence.
      * @param verboseStatus Longer status description.
      */
-    public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-        TransportSession session = new YahooSession(registration, jid, this, priority);
+    @Override
+    public TransportSession<YahooBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+        TransportSession<YahooBuddy> session = new YahooSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
         session.logIn(presenceType, verboseStatus);
         return session;
@@ -98,7 +107,8 @@ public class YahooTransport extends BaseTransport {
      *
      * @param session The session to be disconnected.
      */
-    public void registrationLoggedOut(TransportSession session) {
+    @Override
+    public void registrationLoggedOut(TransportSession<YahooBuddy> session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }

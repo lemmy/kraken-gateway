@@ -10,24 +10,36 @@
 
 package net.sf.kraken.muc;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.sf.kraken.BaseTransport;
+import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.NameSpace;
 
+import org.apache.log4j.Logger;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
-import org.jivesoftware.util.JiveGlobals;
 import org.xmpp.component.Component;
 import org.xmpp.component.ComponentManager;
-import org.xmpp.packet.*;
-import org.dom4j.Element;
-import org.dom4j.DocumentHelper;
-import org.dom4j.QName;
+import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
+import org.xmpp.packet.Message;
+import org.xmpp.packet.Packet;
+import org.xmpp.packet.PacketError;
+import org.xmpp.packet.Presence;
 import org.xmpp.packet.PacketError.Condition;
-import org.apache.log4j.Logger;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for all MUC transports.
@@ -39,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Daniel Henninger
  */
-public abstract class BaseMUCTransport implements Component {
+public abstract class BaseMUCTransport<B extends TransportBuddy> implements Component {
 
     static Logger Log = Logger.getLogger(BaseMUCTransport.class);
 
@@ -48,21 +60,21 @@ public abstract class BaseMUCTransport implements Component {
      *
      * @param transport Transport to associate with this MUC transport.
      */
-    public BaseMUCTransport(BaseTransport transport) {
+    public BaseMUCTransport(BaseTransport<B> transport) {
         this.transport = transport;
         requestWatcher = new RequestWatcher();
         timer.schedule(requestWatcher, requestCheckInterval, requestCheckInterval);
     }
 
     /* The transport we are associated with. */
-    public BaseTransport transport;
+    public BaseTransport<B> transport;
 
     /**
      * Retrieves the transport we are associated with.
      *
      * @return Transport we are associated with.
      */
-    public BaseTransport getTransport() {
+    public BaseTransport<B> getTransport() {
         return transport;
     }
 
@@ -205,6 +217,7 @@ public abstract class BaseMUCTransport implements Component {
         /**
          * Expire any requests that have timed out.
          */
+        @Override
         public void run() {
             checkPendingExpirations();
         }
@@ -318,7 +331,7 @@ public abstract class BaseMUCTransport implements Component {
         JID to = packet.getTo();
 
         try {
-            TransportSession session = getTransport().getSessionManager().getSession(from);
+            TransportSession<B> session = getTransport().getSessionManager().getSession(from);
             if (!session.isLoggedIn()) {
                 Message m = new Message();
                 m.setError(Condition.service_unavailable);
@@ -381,7 +394,7 @@ public abstract class BaseMUCTransport implements Component {
         }
 
         try {
-            TransportSession session = getTransport().getSessionManager().getSession(from);
+            TransportSession<B> session = getTransport().getSessionManager().getSession(from);
             if (!session.isLoggedIn()) {
                 Message m = new Message();
                 m.setError(Condition.service_unavailable);
@@ -534,7 +547,7 @@ public abstract class BaseMUCTransport implements Component {
             // Ah, a request for information about a room.
             IQ result = IQ.createResultIQ(packet);
             try {
-                TransportSession session = getTransport().getSessionManager().getSession(from);
+                TransportSession<B> session = getTransport().getSessionManager().getSession(from);
                 if (session.isLoggedIn()) {
                     storePendingRequest(packet);
                     session.getRoomInfo(getTransport().convertJIDToID(to));
@@ -571,7 +584,7 @@ public abstract class BaseMUCTransport implements Component {
             IQ result = IQ.createResultIQ(packet);
             if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".roomlist", false)) {
                 try {
-                    TransportSession session = getTransport().getSessionManager().getSession(from);
+                    TransportSession<B> session = getTransport().getSessionManager().getSession(from);
                     if (session.isLoggedIn()) {
                         storePendingRequest(packet);
                         session.getRooms();
@@ -592,7 +605,7 @@ public abstract class BaseMUCTransport implements Component {
             // Ah, a request for members of a room.
             IQ result = IQ.createResultIQ(packet);
             try {
-                TransportSession session = getTransport().getSessionManager().getSession(from);
+                TransportSession<B> session = getTransport().getSessionManager().getSession(from);
                 if (session.isLoggedIn()) {
                     storePendingRequest(packet);
                     session.getRoomMembers(getTransport().convertJIDToID(to));
@@ -629,7 +642,7 @@ public abstract class BaseMUCTransport implements Component {
         String role = item.attribute("role").getText();
 
         try {
-            TransportSession session = getTransport().getSessionManager().getSession(from);
+            TransportSession<B> session = getTransport().getSessionManager().getSession(from);
             if (session.isLoggedIn()) {
                 try {
                     MUCTransportSession mucSession = session.getMUCSessionManager().getSession(to.getNode());
@@ -932,6 +945,6 @@ public abstract class BaseMUCTransport implements Component {
      * @param nickname Nickname to use in room.
      * @return Session instance that will handle the room interactions.
      */
-    public abstract MUCTransportSession createRoom(TransportSession transportSession, String roomname, String nickname);
+    public abstract MUCTransportSession createRoom(TransportSession<B> transportSession, String roomname, String nickname);
     
 }

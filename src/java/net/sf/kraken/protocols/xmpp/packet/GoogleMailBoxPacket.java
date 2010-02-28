@@ -45,6 +45,7 @@ public class GoogleMailBoxPacket extends IQ {
     public GoogleMailBoxPacket() {
     }
 
+    @Override
     public void addExtension(PacketExtension extension) {
     }
 
@@ -88,6 +89,7 @@ public class GoogleMailBoxPacket extends IQ {
         this.url = url;
     }
 
+    @Override
     public String getChildElementXML() {
         StringBuffer buf = new StringBuffer();
         buf.append("<mailbox xmlns=\"").append(MAILBOX_NAMESPACE).append("\"");

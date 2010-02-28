@@ -12,20 +12,28 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import org.jivesoftware.util.LocaleUtils;
-import org.apache.log4j.Logger;
+import java.util.Arrays;
+import java.util.Locale;
 
-import net.kano.joscar.*;
-import net.kano.joscar.flap.*;
-import net.kano.joscar.flapcmd.*;
-import net.kano.joscar.net.*;
-import net.kano.joscar.snac.*;
-import net.kano.joscar.snaccmd.auth.*;
+import net.kano.joscar.ByteBlock;
+import net.kano.joscar.flap.ClientFlapConn;
+import net.kano.joscar.flap.FlapPacketEvent;
+import net.kano.joscar.flapcmd.LoginFlapCmd;
+import net.kano.joscar.flapcmd.SnacCommand;
+import net.kano.joscar.net.ClientConnEvent;
+import net.kano.joscar.net.ConnDescriptor;
+import net.kano.joscar.snac.SnacPacketEvent;
+import net.kano.joscar.snac.SnacResponseEvent;
+import net.kano.joscar.snaccmd.auth.AuthRequest;
+import net.kano.joscar.snaccmd.auth.AuthResponse;
+import net.kano.joscar.snaccmd.auth.ClientVersionInfo;
+import net.kano.joscar.snaccmd.auth.KeyRequest;
+import net.kano.joscar.snaccmd.auth.KeyResponse;
 import net.sf.kraken.type.TransportLoginStatus;
 import net.sf.kraken.type.TransportType;
 
-import java.util.Locale;
-import java.util.Arrays;
+import org.apache.log4j.Logger;
+import org.jivesoftware.util.LocaleUtils;
 
 /**
  * Handles the login process with the OSCAR login server.
@@ -41,6 +49,7 @@ public class LoginConnection extends AbstractFlapConnection {
         super(cd, mainSession); // Hand off to AbstractFlapConnection
     }
 
+    @Override
     protected void handleStateChange(ClientConnEvent e) {
         Log.debug("OSCAR login service state change from "+e.getOldState()+" to "+e.getNewState());
         if (e.getNewState() == ClientFlapConn.STATE_CONNECTED) {
@@ -78,12 +87,15 @@ public class LoginConnection extends AbstractFlapConnection {
         }
     }
 
+    @Override
     protected void handleFlapPacket(FlapPacketEvent e) {
 //        FlapCommand cmd = e.getFlapCommand();
     }
 
+    @Override
     protected void handleSnacPacket(SnacPacketEvent e) { }
 
+    @Override
     @SuppressWarnings("unchecked")
     protected void handleSnacResponse(SnacResponseEvent e) {
         SnacCommand cmd = e.getSnacCommand();

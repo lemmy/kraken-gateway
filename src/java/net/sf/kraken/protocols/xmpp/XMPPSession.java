@@ -27,7 +27,6 @@ import net.sf.kraken.protocols.xmpp.packet.IQWithPacketExtension;
 import net.sf.kraken.protocols.xmpp.packet.ProbePacket;
 import net.sf.kraken.protocols.xmpp.packet.VCardUpdateExtension;
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.NameSpace;
@@ -69,7 +68,7 @@ import org.xmpp.packet.JID;
  * @author Daniel Henninger
  * @author Mehmet Ecevit
  */
-public class XMPPSession extends TransportSession {
+public class XMPPSession extends TransportSession<XMPPBuddy> {
 
     static Logger Log = Logger.getLogger(XMPPSession.class);
     
@@ -210,6 +209,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
         presence = new org.jivesoftware.smack.packet.Presence(org.jivesoftware.smack.packet.Presence.Type.available);
         if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".avatars", true) && getAvatar() != null) {
@@ -225,6 +225,7 @@ public class XMPPSession extends TransportSession {
             listener = new XMPPListener(this);
             presenceHandler = new XMPPPresenceHandler(this);
             new Thread() {
+                @Override
                 public void run() {
                     String userName = generateUsername(registration.getUsername());
                     conn = new XMPPConnection(config);
@@ -244,6 +245,7 @@ public class XMPPSession extends TransportSession {
 
                             if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".avatars", true) && getAvatar() != null) {
                                 new Thread() {
+                                    @Override
                                     public void run() {
                                         Avatar avatar = getAvatar();
 
@@ -292,6 +294,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
+    @Override
     public void logOut() {
         cleanUp();
         sessionDisconnectedNoReconnect(null);
@@ -300,6 +303,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
+    @Override
     public void cleanUp() {
         if (timer != null) {
             try {
@@ -359,6 +363,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         org.jivesoftware.smack.packet.Presence.Mode mode = ((XMPPTransport)getTransport()).convertGatewayStatusToXMPP(presenceType);
         if (mode != null && mode != presence.getMode()) {
@@ -385,6 +390,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
         String mail = getTransport().convertJIDToID(jid);
         try {
@@ -401,7 +407,8 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(XMPPBuddy contact) {
         RosterEntry user2remove;
         String mail = getTransport().convertJIDToID(contact.getJID());
         user2remove =  conn.getRoster().getEntry(mail);
@@ -416,7 +423,8 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(XMPPBuddy contact) {
         RosterEntry user2Update;
         String mail = getTransport().convertJIDToID(contact.getJID());
         user2Update =  conn.getRoster().getEntry(mail);
@@ -460,19 +468,22 @@ public class XMPPSession extends TransportSession {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
-        Log.debug("XMPP: accept add contact " + contact.toString());
-        final String legacyContact = getTransport().convertJIDToID(contact.getJID());
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("XMPP: accept-add contact: " + userID);
+        
         final Presence accept = new Presence(Type.subscribed);
-        accept.setTo(legacyContact);
+        accept.setTo(userID);
         conn.sendPacket(accept);
     }
-
+    
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendMessage(JID jid, String message) {
         Chat chat = conn.getChatManager().createChat(getTransport().convertJIDToID(jid), listener);
         try {
@@ -486,6 +497,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID, net.sf.kraken.type.ChatStateType)
      */
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
         Chat chat = conn.getChatManager().createChat(getTransport().convertJIDToID(jid), listener);
         try {
@@ -510,6 +522,7 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
         Chat chat = conn.getChatManager().createChat(getTransport().convertJIDToID(jid), listener);
         try {
@@ -526,9 +539,11 @@ public class XMPPSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
         final byte[] tmpData = data;
         new Thread() {
+            @Override
             public void run() {
                 Avatar avatar = getAvatar();
 
@@ -584,6 +599,7 @@ public class XMPPSession extends TransportSession {
         /**
          * Check GMail for new mail.
          */
+        @Override
         public void run() {
             if (getTransport().getType().equals(TransportType.gtalk) && JiveGlobals.getBooleanProperty("plugin.gateway.gtalk.mailnotifications", true)) {
                 GoogleMailNotifyExtension gmne = new GoogleMailNotifyExtension();

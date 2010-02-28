@@ -9,26 +9,24 @@
  */
 package net.sf.kraken.protocols.qq;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import net.sf.jqql.QQ;
 import net.sf.jqql.QQClient;
 import net.sf.jqql.beans.QQUser;
 import net.sf.jqql.net.PortGateFactory;
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
-import org.xmpp.packet.JID;
 import org.apache.log4j.Logger;
+import org.xmpp.packet.JID;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.*;
-
-public class QQSession extends TransportSession {
+public class QQSession extends TransportSession<QQBuddy> {
 
     static Logger Log = Logger.getLogger(QQSession.class);
 
@@ -85,6 +83,7 @@ public class QQSession extends TransportSession {
         setupDefaultServerList();
     }
 
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         if (isLoggedIn()) {
         	if (presenceType.equals(PresenceType.away) ||
@@ -106,27 +105,35 @@ public class QQSession extends TransportSession {
 
     }
 
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
     	//qqclient.addFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
     	qqclient.sendAddFriendAuth(Integer.valueOf(getTransport().convertJIDToID(jid)), "Please accept my friend request!");
     	qqclient.downloadFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
     }
 
-    public void removeContact(TransportBuddy transportBuddy) {
+    @Override
+    public void removeContact(QQBuddy transportBuddy) {
     	qqclient.deleteFriend(Integer.valueOf(getTransport().convertJIDToID(transportBuddy.getJID())));
     }
 
-    public void updateContact(TransportBuddy transportBuddy) {
+    @Override
+    public void updateContact(QQBuddy transportBuddy) {
     	// There's nothing to change here currently.
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("QQ: accept-adding is currently not implemented."
+                + " Cannot accept-add: " + userID);
         // TODO: Currently unimplemented
     }
-
+    
+    @Override
     public void sendMessage(JID jID, String message) {
         try {
             int qqNum = Integer.parseInt(getTransport().convertJIDToID(jID));
@@ -143,14 +150,17 @@ public class QQSession extends TransportSession {
 
     }
 
+    @Override
     public void sendChatState(JID jID, ChatStateType chatStateType) {
     	// either not supported by QQ, or not supported by the lumaqq library
     }
 
+    @Override
     public void sendBuzzNotification(JID jID, String string) {
     	// either not supported by QQ, or not supported by the lumaqq library
     }
 
+    @Override
     public void logIn(PresenceType presenceType, String string) {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
     	if (udpServerList.isEmpty()) {
@@ -176,11 +186,13 @@ public class QQSession extends TransportSession {
 		}
     }
 
+    @Override
     public void logOut() {
         cleanUp();
         sessionDisconnectedNoReconnect(null);
     }
 
+    @Override
     public void cleanUp() {
     	if (qqclient != null) {
     		qqclient.logout();
@@ -189,6 +201,7 @@ public class QQSession extends TransportSession {
         qqclient = null;
     }
 
+    @Override
     public void updateLegacyAvatar(String string, byte[] byteArray) {
     }
 

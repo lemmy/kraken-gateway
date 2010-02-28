@@ -10,16 +10,17 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import org.jivesoftware.util.LocaleUtils;
-import org.xmpp.packet.JID;
 import net.kano.joscar.snaccmd.FullUserInfo;
 import net.kano.joscar.snaccmd.conn.SetExtraInfoCmd;
-import net.sf.kraken.*;
+import net.sf.kraken.BaseTransport;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 import net.sf.kraken.type.TransportType;
+
+import org.jivesoftware.util.LocaleUtils;
+import org.xmpp.packet.JID;
 
 /**
  * OSCAR Transport Interface.
@@ -29,11 +30,12 @@ import net.sf.kraken.type.TransportType;
  *
  * @author Daniel Henninger
  */
-public class OSCARTransport extends BaseTransport {
+public class OSCARTransport extends BaseTransport<OSCARBuddy> {
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
+    @Override
     public String getTerminologyUsername() {
         return LocaleUtils.getLocalizedString("gateway."+getType().toString()+".username", "kraken");
     }
@@ -41,6 +43,7 @@ public class OSCARTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
+    @Override
     public String getTerminologyPassword() {
         return LocaleUtils.getLocalizedString("gateway."+getType().toString()+".password", "kraken");
     }
@@ -48,6 +51,7 @@ public class OSCARTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
+    @Override
     public String getTerminologyNickname() {
         return null;
     }
@@ -55,6 +59,7 @@ public class OSCARTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
+    @Override
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway."+getType().toString()+".registration", "kraken");
     }
@@ -62,16 +67,19 @@ public class OSCARTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
+    @Override
     public Boolean isPasswordRequired() { return true; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
+    @Override
     public Boolean isNicknameRequired() { return false; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
+    @Override
     public Boolean isUsernameValid(String username) {
         if (getType() == TransportType.icq) {
             return username.matches("\\d+");
@@ -89,8 +97,9 @@ public class OSCARTransport extends BaseTransport {
      * @param presenceType Type of presence.
      * @param verboseStatus Longer status description.
      */
-    public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-        TransportSession session = new OSCARSession(registration, jid, this, priority);
+    @Override
+    public TransportSession<OSCARBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+        TransportSession<OSCARBuddy> session = new OSCARSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
         session.logIn(presenceType, verboseStatus);
         return session;
@@ -101,7 +110,8 @@ public class OSCARTransport extends BaseTransport {
      *
      * @param session The session to be disconnected.
      */
-    public void registrationLoggedOut(TransportSession session) {
+    @Override
+    public void registrationLoggedOut(TransportSession<OSCARBuddy> session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }
@@ -168,5 +178,4 @@ public class OSCARTransport extends BaseTransport {
             return PresenceType.unknown;
         }
     }
-
 }

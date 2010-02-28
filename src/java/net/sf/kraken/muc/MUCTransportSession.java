@@ -10,13 +10,14 @@
 
 package net.sf.kraken.muc;
 
+import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
 
 /**
  * @author Daniel Henninger
  */
-public abstract class MUCTransportSession {
+public abstract class MUCTransportSession<B extends TransportBuddy> {
 
     /**
      * Creates the MUC session instance, associated with a particular room name.
@@ -26,7 +27,7 @@ public abstract class MUCTransportSession {
      * @param nickname Nickname we are using with the MUC session.
      * @param transport MUCTransport we are associated with.
      */
-    public MUCTransportSession(TransportSession session, String roomname, String nickname, BaseMUCTransport transport) {
+    public MUCTransportSession(TransportSession<B> session, String roomname, String nickname, BaseMUCTransport<B> transport) {
         this.session = session;
         this.roomname = roomname;
         this.nickname = nickname;
@@ -34,13 +35,13 @@ public abstract class MUCTransportSession {
     }
 
     /* MUC transport we are associaed with. */
-    public BaseMUCTransport transport = null;
+    public BaseMUCTransport<B> transport = null;
 
     /* Name of room this session is associated with. */
     public String roomname = null;
 
     /* Transport session this session are associated with. */
-    public TransportSession session = null;
+    public TransportSession<B> session = null;
 
     /* Nickname associated with this session. */
     public String nickname = null;

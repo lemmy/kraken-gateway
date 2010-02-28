@@ -146,7 +146,7 @@ public class YahooListener extends SessionAdapter {
         Log.debug("Yahoo: Got status update: "+user);
         if (getSession().getBuddyManager().isActivated()) {
             try {
-                YahooBuddy yahooBuddy = (YahooBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
+                YahooBuddy yahooBuddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.getId()));
                 yahooBuddy.yahooUser = user;
                 yahooBuddy.setPresenceAndStatus(((YahooTransport)getSession().getTransport()).convertYahooStatusToXMPP(user.getStatus(), user.getCustomStatus()), user.getCustomStatusMessage());
 

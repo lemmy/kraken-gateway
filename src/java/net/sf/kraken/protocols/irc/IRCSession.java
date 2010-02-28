@@ -10,11 +10,13 @@
 
 package net.sf.kraken.protocols.irc;
 
-import f00f.net.irc.martyr.IRCConnection;
-import f00f.net.irc.martyr.commands.*;
-import f00f.net.irc.martyr.services.AutoReconnect;
-import f00f.net.irc.martyr.services.AutoRegister;
-import f00f.net.irc.martyr.services.AutoResponder;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import net.sf.kraken.muc.MUCTransportRoom;
 import net.sf.kraken.pseudoroster.PseudoRoster;
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
@@ -33,17 +35,21 @@ import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.JiveGlobals;
 import org.xmpp.packet.JID;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import f00f.net.irc.martyr.IRCConnection;
+import f00f.net.irc.martyr.commands.AwayCommand;
+import f00f.net.irc.martyr.commands.IsonCommand;
+import f00f.net.irc.martyr.commands.ListCommand;
+import f00f.net.irc.martyr.commands.MessageCommand;
+import f00f.net.irc.martyr.commands.NamesCommand;
+import f00f.net.irc.martyr.commands.QuitCommand;
+import f00f.net.irc.martyr.services.AutoReconnect;
+import f00f.net.irc.martyr.services.AutoRegister;
+import f00f.net.irc.martyr.services.AutoResponder;
 
 /**
  * @author Daniel Henninger
  */
-public class IRCSession extends TransportSession {
+public class IRCSession extends TransportSession<IRCBuddy> {
 
     static Logger Log = Logger.getLogger(IRCSession.class);
 
@@ -88,6 +94,7 @@ public class IRCSession extends TransportSession {
         return connection;
     }
 
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
         connection = new IRCConnection();
         autoResponder = new AutoResponder(connection);
@@ -96,6 +103,7 @@ public class IRCSession extends TransportSession {
         listener = new IRCListener(this);
         listener.enable();
         new Thread() {
+            @Override
             public void run() {
                 try {
                     connection.connect(JiveGlobals.getProperty("plugin.gateway.irc.connecthost", "irc.freenode.net"),
@@ -131,12 +139,14 @@ public class IRCSession extends TransportSession {
         }.start();
     }
 
+    @Override
     public void logOut() {
         connection.sendCommand(new QuitCommand());
         cleanUp();
         sessionDisconnectedNoReconnect(null);
     }
 
+    @Override
     public void cleanUp() {
         if (timer != null) {
             try {
@@ -203,6 +213,7 @@ public class IRCSession extends TransportSession {
         }
     }
     
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         String awayMsg = ((IRCTransport)getTransport()).convertJabStatusToIRC(presenceType, verboseStatus);
         if (awayMsg == null) {
@@ -225,6 +236,7 @@ public class IRCSession extends TransportSession {
         }
     }
 
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
         String contact = getTransport().convertJIDToID(jid);
         PseudoRosterItem rosterItem;
@@ -242,12 +254,14 @@ public class IRCSession extends TransportSession {
 //        connection.sendCommand(new IsonCommand(contact));
     }
 
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(IRCBuddy contact) {
         String ircContact = getTransport().convertJIDToID(contact.getJID());
         pseudoRoster.removeItem(ircContact);
     }
 
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(IRCBuddy contact) {
         String ircContact = getTransport().convertJIDToID(contact.getJID());
         if (pseudoRoster.hasItem(ircContact)) {
             PseudoRosterItem rosterItem = pseudoRoster.getItem(ircContact);
@@ -263,16 +277,22 @@ public class IRCSession extends TransportSession {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("IRC: accept-adding is currently not implemented."
+                + " Cannot accept-add: " + userID);
         // TODO: Currently unimplemented
     }
 
+    @Override
     public void sendMessage(JID jid, String message) {
         connection.sendCommand(new MessageCommand(getTransport().convertJIDToID(jid), message));
     }
 
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
         // Nothing to do here
     }
@@ -280,12 +300,14 @@ public class IRCSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
     }
 
@@ -339,6 +361,7 @@ public class IRCSession extends TransportSession {
         /**
          * Send ISON to IRC to check on status of contacts.
          */
+        @Override
         public void run() {
             List<String> buddyList = new ArrayList<String>();
             for (TransportBuddy buddy : getBuddyManager().getBuddies()) {

@@ -29,7 +29,7 @@ import org.xmpp.packet.JID;
  * @author Daniel Henninger
  * @author Mehmet Ecevit
  */
-public class XMPPTransport extends BaseTransport {
+public class XMPPTransport extends BaseTransport<XMPPBuddy> {
 
     /*
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
@@ -92,8 +92,8 @@ public class XMPPTransport extends BaseTransport {
      * @param verboseStatus Longer status description.
      */
 	@Override
-    public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-        TransportSession session = new XMPPSession(registration, jid, this, priority);
+    public TransportSession<XMPPBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+        TransportSession<XMPPBuddy> session = new XMPPSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
         session.logIn(presenceType, verboseStatus);
         return session;
@@ -105,7 +105,7 @@ public class XMPPTransport extends BaseTransport {
      * @param session The session to be disconnected.
      */
 	@Override
-    public void registrationLoggedOut(TransportSession session) {
+    public void registrationLoggedOut(TransportSession<XMPPBuddy> session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }

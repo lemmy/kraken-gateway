@@ -10,7 +10,7 @@
 
 package net.sf.kraken.protocols.gadugadu;
 
-import net.sf.kraken.*;
+import net.sf.kraken.BaseTransport;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
@@ -18,6 +18,7 @@ import net.sf.kraken.type.TransportLoginStatus;
 
 import org.jivesoftware.util.LocaleUtils;
 import org.xmpp.packet.JID;
+
 import pl.mn.communicator.StatusType;
 
 /**
@@ -28,11 +29,12 @@ import pl.mn.communicator.StatusType;
  *
  * @author Daniel Henninger
  */
-public class GaduGaduTransport extends BaseTransport {
+public class GaduGaduTransport extends BaseTransport<GaduGaduBuddy> {
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
+    @Override
     public String getTerminologyUsername() {
         return LocaleUtils.getLocalizedString("gateway.gadugadu.username", "kraken");
     }
@@ -40,6 +42,7 @@ public class GaduGaduTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
+    @Override
     public String getTerminologyPassword() {
         return LocaleUtils.getLocalizedString("gateway.gadugadu.password", "kraken");
     }
@@ -47,6 +50,7 @@ public class GaduGaduTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
+    @Override
     public String getTerminologyNickname() {
         return null;
     }
@@ -54,6 +58,7 @@ public class GaduGaduTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
+    @Override
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway.gadugadu.registration", "kraken");
     }
@@ -61,16 +66,19 @@ public class GaduGaduTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
+    @Override
     public Boolean isPasswordRequired() { return true; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
+    @Override
     public Boolean isNicknameRequired() { return false; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
+    @Override
     public Boolean isUsernameValid(String username) {
         return username.matches("\\d+");
     }
@@ -83,8 +91,9 @@ public class GaduGaduTransport extends BaseTransport {
      * @param presenceType Type of presence.
      * @param verboseStatus Longer status description.
      */
-    public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-        TransportSession session = new GaduGaduSession(registration, jid, this, priority);
+    @Override
+    public TransportSession<GaduGaduBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+        TransportSession<GaduGaduBuddy> session = new GaduGaduSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
         session.logIn(presenceType, verboseStatus);
         return session;
@@ -95,7 +104,8 @@ public class GaduGaduTransport extends BaseTransport {
      *
      * @param session The session to be disconnected.
      */
-    public void registrationLoggedOut(TransportSession session) {
+    @Override
+    public void registrationLoggedOut(TransportSession<GaduGaduBuddy> session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }

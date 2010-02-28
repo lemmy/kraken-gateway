@@ -69,7 +69,7 @@ import java.util.concurrent.locks.Lock;
  *
  * @author Daniel Henninger
  */
-public abstract class BaseTransport implements Component, RosterEventListener, UserEventListener, PacketInterceptor, SessionEventListener, VCardListener {
+public abstract class BaseTransport<B extends TransportBuddy> implements Component, RosterEventListener, UserEventListener, PacketInterceptor, SessionEventListener, VCardListener {
 
     static Logger Log = Logger.getLogger(BaseTransport.class);
 
@@ -112,7 +112,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * Manages all active sessions.
      * @see net.sf.kraken.session.TransportSessionManager
      */
-    public final TransportSessionManager sessionManager = new TransportSessionManager(this);
+    public final TransportSessionManager<B> sessionManager = new TransportSessionManager<B>(this);
 
     /**
      * Manages permission information.
@@ -149,7 +149,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
     /**
      * MUC transport handler we are associated with.  null means no handler.
      */
-    public BaseMUCTransport mucTransport;
+    public BaseMUCTransport<B> mucTransport;
 
     /**
      * Type of the transport in question.
@@ -234,7 +234,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         }
 
         try {
-            TransportSession session = sessionManager.getSession(from);
+            TransportSession<B> session = sessionManager.getSession(from);
             if (!session.isLoggedIn()) {
                 Message m = new Message();
                 m.setError(Condition.service_unavailable);
@@ -362,7 +362,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 // This packet is to the transport itself.
                 if (packet.getType() == null) {
                     // A user's resource has come online.
-                    TransportSession session;
+                    TransportSession<B> session;
                     Lock l = CacheFactory.getLock(registration.getJID()+"@"+transportType.toString()+"ns", sessionRouter.sessionLocations);
                     try {
                         l.lock();
@@ -404,7 +404,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 }
                 else if (packet.getType() == Presence.Type.unavailable) {
                     // A user's resource has gone offline.
-                    TransportSession session;
+                    TransportSession<B> session;
                     try {
                         session = sessionManager.getSession(from);
                         String resource = from.getResource();
@@ -447,7 +447,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                 }
                 else if (packet.getType() == Presence.Type.probe) {
                     // Client is asking for presence status.
-                    TransportSession session;
+                    TransportSession<B> session;
                     try {
                         session = sessionManager.getSession(from);
                         session.sendPresence(from);
@@ -464,7 +464,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             else {
                 // This packet is to a user at the transport.
                 try {
-                    TransportSession session = sessionManager.getSession(from);
+                    TransportSession<B> session = sessionManager.getSession(from);
 
                     if (packet.getType() == Presence.Type.probe) {
                         // Presence probe, lets try to answer appropriately.
@@ -505,12 +505,8 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                         sendPacket(p);
                     }
                     else if (packet.getType() == Presence.Type.subscribed) {
-                        final String legacyContact = this.convertJIDToID(packet.getTo());
-                        final TransportBuddy buddy = new TransportBuddy(session.getBuddyManager(), legacyContact, null, null);
-                        session.getBuddyManager().storeBuddy(buddy);
-                        
                         // let the legacy domain know that the contact was accepted.
-                        session.acceptAddContact(buddy);
+                        session.acceptAddContact(packet.getTo());
                     }
                     else {
                         // Anything else we will ignore for now.
@@ -731,7 +727,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             IQ result = IQ.createResultIQ(packet);
             if (from.getNode() != null) {
                 try {
-                    TransportSession session = sessionManager.getSession(from);
+                    TransportSession<B> session = sessionManager.getSession(from);
                     Element vcard = session.getBuddyManager().getBuddy(to).getVCard();
                     result.setChildElement(vcard);
                 }
@@ -769,7 +765,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
             IQ result = IQ.createResultIQ(packet);
             if (from.getNode() != null) {
                 try {
-                    TransportSession session = sessionManager.getSession(from);
+                    TransportSession<B> session = sessionManager.getSession(from);
                     Element response = DocumentHelper.createElement(QName.get("query", NameSpace.IQ_LAST)); 
                     Long timestamp = session.getBuddyManager().getBuddy(to).getLastActivityTimestamp();
                     String lastevent = session.getBuddyManager().getBuddy(to).getLastActivityEvent();
@@ -956,7 +952,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
         RosterEventDispatcher.removeListener(this);
         UserEventDispatcher.removeListener(this);
         // Disconnect everyone's session
-        for (TransportSession session : sessionManager.getSessions()) {
+        for (TransportSession<B> session : sessionManager.getSessions()) {
             registrationLoggedOut(session);
             session.removeAllResources();
         }
@@ -991,7 +987,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
     /**
      * @return the MUC transport we are associated with.
      */
-    public BaseMUCTransport getMUCTransport() {
+    public BaseMUCTransport<B> getMUCTransport() {
         return mucTransport;
     }
 
@@ -1019,7 +1015,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
     /**
      * @return the session manager of the transport.
      */
-    public TransportSessionManager getSessionManager() {
+    public TransportSessionManager<B> getSessionManager() {
         return sessionManager;
     }
 
@@ -1321,14 +1317,14 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @param legacyitems List of TransportBuddy's to be synced.
      * @throws UserNotFoundException if userjid not found.
      */
-    public void syncLegacyRoster(JID userjid, Collection<TransportBuddy> legacyitems) throws UserNotFoundException {
+    public void syncLegacyRoster(JID userjid, Collection<B> legacyitems) throws UserNotFoundException {
         Log.debug("Syncing Legacy Roster: "+legacyitems);
         try {
             Roster roster = rosterManager.getRoster(userjid.getNode());
 
             // Lets lock down the roster from update notifications if there's an active session.
             try {
-                TransportSession session = sessionManager.getSession(userjid.getNode());
+                TransportSession<B> session = sessionManager.getSession(userjid.getNode());
                 session.lockRoster();
             }
             catch (NotFoundException e) {
@@ -1396,7 +1392,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
 
             // All done, lets unlock the roster.
             try {
-                TransportSession session = sessionManager.getSession(userjid.getNode());
+                TransportSession<B> session = sessionManager.getSession(userjid.getNode());
                 session.unlockRoster();
             }
             catch (NotFoundException e) {
@@ -1426,7 +1422,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
 
             // Lets lock down the roster from update notifications if there's an active session.
             try {
-                TransportSession session = sessionManager.getSession(jid.getNode());
+                TransportSession<B> session = sessionManager.getSession(jid.getNode());
                 session.lockRoster();
             }
             catch (NotFoundException e) {
@@ -1456,7 +1452,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
 
             // All done, lets unlock the roster.
             try {
-                TransportSession session = sessionManager.getSession(jid.getNode());
+                TransportSession<B> session = sessionManager.getSession(jid.getNode());
                 session.unlockRoster();
             }
             catch (NotFoundException e) {
@@ -1500,6 +1496,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @throws UserNotFoundException if the user is not found.
      * @deprecated Use net.sf.kraken.roster.TransportBuddyManager#sendOfflineForAllAvailablePresences(JID)
      */
+    @Deprecated
     public void notifyRosterOffline(JID jid) throws UserNotFoundException {
         try {
             Roster roster = rosterManager.getRoster(jid.getNode());
@@ -1755,7 +1752,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
 //            return;
 //        }
 //        try {
-//            TransportSession session = sessionManager.getSession(roster.getUsername());
+//            TransportSession<B> session = sessionManager.getSession(roster.getUsername());
 //            if (!session.isRosterLocked(item.getJid().toString())) {
 //                Log.debug(getType().toString()+": contactUpdated "+roster.getUsername()+":"+item.getJid());
 //                TransportBuddy buddy = session.getBuddyManager().getBuddy(item.getJid());
@@ -1788,7 +1785,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
 //            return;
 //        }
 //        try {
-//            TransportSession session = sessionManager.getSession(roster.getUsername());
+//            TransportSession<B> session = sessionManager.getSession(roster.getUsername());
 //            if (!session.isRosterLocked(item.getJid().toString())) {
 //                Log.debug(getType().toString()+": contactAdded "+roster.getUsername()+":"+item.getJid());
 //                session.addContact(item);
@@ -1815,7 +1812,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
 //            return;
 //        }
 //        try {
-//            TransportSession session = sessionManager.getSession(roster.getUsername());
+//            TransportSession<B> session = sessionManager.getSession(roster.getUsername());
 //            if (!session.isRosterLocked(item.getJid().toString())) {
 //                Log.debug(getType().toString()+": contactDeleted "+roster.getUsername()+":"+item.getJid());
 //                session.getBuddyManager().removeBuddy(convertJIDToID(item.getJid()));
@@ -1876,7 +1873,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
     public void sessionDestroyed(Session destroyedSession) {
         JID from = destroyedSession.getAddress();
         // A user's resource has gone offline.
-        TransportSession session;
+        TransportSession<B> session;
         try {
             session = sessionManager.getSession(from);
             if (session.getLoginStatus().equals(TransportLoginStatus.LOGGING_OUT) || session.getLoginStatus().equals(TransportLoginStatus.LOGGED_OUT)) {
@@ -1982,7 +1979,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                             md.update(imageData);
                             String xmppHash = StringUtils.encodeHex(md.digest());
                             try {
-                                TransportSession trSession = sessionManager.getSession(username);
+                                TransportSession<B> trSession = sessionManager.getSession(username);
                                 if (trSession.getAvatar() == null || !trSession.getAvatar().getXmppHash().equals(xmppHash)) {
                                     // Store a cache of the avatar
                                     trSession.setAvatar(new Avatar(trSession.getJID(), imageData));
@@ -2021,7 +2018,7 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
                             md.update(imageData);
                             String xmppHash = StringUtils.encodeHex(md.digest());
                             try {
-                                TransportSession trSession = sessionManager.getSession(username);
+                                TransportSession<B> trSession = sessionManager.getSession(username);
                                 if (trSession.getAvatar() == null || !trSession.getAvatar().getXmppHash().equals(xmppHash)) {
                                     // Store a cache of the avatar
                                     trSession.setAvatar(new Avatar(trSession.getJID(), imageData));
@@ -2235,14 +2232,14 @@ public abstract class BaseTransport implements Component, RosterEventListener, U
      * @param priority Priority of the session (from presence packet).
      * @return A session instance for the new login.
      */
-    public abstract TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority);
+    public abstract TransportSession<B> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority);
 
     /**
      * Will handle logging out of the legacy service.
      *
      * @param session TransportSession to be logged out.
      */
-    public abstract void registrationLoggedOut(TransportSession session);
+    public abstract void registrationLoggedOut(TransportSession<B> session);
 
     /**
      * Returns the terminology used for a username on the legacy service.

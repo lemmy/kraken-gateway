@@ -12,13 +12,13 @@
 
 package net.sf.kraken.protocols.oscar;
 
-import net.kano.joscar.snac.SnacRequest;
-import net.kano.joscar.DefensiveTools;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.kano.joscar.DefensiveTools;
+import net.kano.joscar.snac.SnacRequest;
 
 /**
  * Handles pending SNAC commands.

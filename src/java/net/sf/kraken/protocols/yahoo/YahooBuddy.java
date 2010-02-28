@@ -10,11 +10,11 @@
 
 package net.sf.kraken.protocols.yahoo;
 
+import java.util.Collection;
+
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
-
-import java.util.Collection;
 
 import org.openymsg.network.YahooUser;
 
@@ -23,7 +23,7 @@ import org.openymsg.network.YahooUser;
  */
 public class YahooBuddy extends TransportBuddy {
 
-    public YahooBuddy(TransportBuddyManager manager, YahooUser yahooUser, String nickname, Collection<String> groups, PseudoRosterItem rosterItem) {
+    public YahooBuddy(TransportBuddyManager<YahooBuddy> manager, YahooUser yahooUser, String nickname, Collection<String> groups, PseudoRosterItem rosterItem) {
         super(manager, yahooUser.getId(), nickname, groups);
         this.yahooUser = yahooUser;
         this.pseudoRosterItem = rosterItem;

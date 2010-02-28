@@ -10,14 +10,15 @@
 
 package net.sf.kraken.protocols.msn;
 
-import org.jivesoftware.util.LocaleUtils;
-import org.xmpp.packet.JID;
 import net.sf.jml.MsnUserStatus;
-import net.sf.kraken.*;
+import net.sf.kraken.BaseTransport;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
+
+import org.jivesoftware.util.LocaleUtils;
+import org.xmpp.packet.JID;
 
 /**
  * MSN Transport Interface.
@@ -27,11 +28,12 @@ import net.sf.kraken.type.TransportLoginStatus;
  *
  * @author Daniel Henninger
  */
-public class MSNTransport extends BaseTransport {
+public class MSNTransport extends BaseTransport<MSNBuddy> {
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
+    @Override
     public String getTerminologyUsername() {
         return LocaleUtils.getLocalizedString("gateway.msn.username", "kraken");
     }
@@ -39,6 +41,7 @@ public class MSNTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
+    @Override
     public String getTerminologyPassword() {
         return LocaleUtils.getLocalizedString("gateway.msn.password", "kraken");
     }
@@ -46,6 +49,7 @@ public class MSNTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
+    @Override
     public String getTerminologyNickname() {
         return null;
     }
@@ -53,6 +57,7 @@ public class MSNTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
+    @Override
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway.msn.registration", "kraken");
     }
@@ -60,16 +65,19 @@ public class MSNTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
+    @Override
     public Boolean isPasswordRequired() { return true; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
+    @Override
     public Boolean isNicknameRequired() { return false; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
+    @Override
     public Boolean isUsernameValid(String username) {
         return username.matches("[^ \\p{Cntrl}()@,;:\\\\\"\\[\\]]+@[^ \\p{Cntrl}()@,;:\\\\\"\\[\\]]+");
     }
@@ -82,8 +90,9 @@ public class MSNTransport extends BaseTransport {
      * @param presenceType Type of presence.
      * @param verboseStatus Longer status description.
      */
-    public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-        TransportSession session = new MSNSession(registration, jid, this, priority);
+    @Override
+    public TransportSession<MSNBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+        TransportSession<MSNBuddy> session = new MSNSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
         session.logIn(presenceType, verboseStatus);
         return session;
@@ -94,7 +103,8 @@ public class MSNTransport extends BaseTransport {
      *
      * @param session The session to be disconnected.
      */
-    public void registrationLoggedOut(TransportSession session) {
+    @Override
+    public void registrationLoggedOut(TransportSession<MSNBuddy> session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }

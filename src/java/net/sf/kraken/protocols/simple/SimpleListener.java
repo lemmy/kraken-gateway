@@ -10,6 +10,9 @@
 package net.sf.kraken.protocols.simple;
 
 import gov.nist.javax.sip.address.SipUri;
+
+import java.lang.ref.WeakReference;
+
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogTerminatedEvent;
@@ -34,12 +37,10 @@ import javax.sip.message.Response;
 
 import net.sf.kraken.type.TransportLoginStatus;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
-import org.apache.log4j.Logger;
-
-import java.lang.ref.WeakReference;
 
 /**
  * A listener for a SIMPLE session.
@@ -154,7 +155,7 @@ public class SimpleListener implements SipListener {
 						if (content.length() > 0) {
 							SimplePresence simplePresence = SimplePresence.parseSimplePresence(content);
                             try {
-                                SimpleBuddy buddy = (SimpleBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(fromAddr));
+                                SimpleBuddy buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(fromAddr));
                                 String verboseStatus = null;
                                 if (simplePresence.getTupleStatus().isOpen()) {
 			                        switch (simplePresence.getRpid()) {
@@ -325,7 +326,8 @@ public class SimpleListener implements SipListener {
 		          dialogTerminatedEvent.getDialog().getDialogId());
 	}
 	
-	public void finalize() {
+	@Override
+    public void finalize() {
         try {
             super.finalize();
         }

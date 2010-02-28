@@ -10,17 +10,17 @@
 
 package net.sf.kraken.protocols.sametime;
 
+import java.util.Arrays;
+
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
-
-import java.util.Arrays;
 
 /**
  * @author Daniel Henninger
  */
 public class SameTimeBuddy extends TransportBuddy {
 
-    public SameTimeBuddy(TransportBuddyManager manager, String uin, String nickname, String group) {
+    public SameTimeBuddy(TransportBuddyManager<SameTimeBuddy> manager, String uin, String nickname, String group) {
         super(manager, uin, nickname, null);
         if (group != null) {
             this.setGroups(Arrays.asList(group));

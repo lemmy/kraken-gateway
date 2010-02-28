@@ -53,7 +53,7 @@ public class SameTimeListener implements LoginListener, ImServiceListener, ImLis
     public Im getIMSession(JID jid) {
         Im currentIm = null;
         for (int i = 0; i < imOpened.size(); i++) {
-            currentIm = (Im)imOpened.elementAt(i);
+            currentIm = imOpened.elementAt(i);
             if (getSession().getTransport().convertIDToJID(currentIm.getPartner().getName()).equals(jid)) {
                 return currentIm;
             }
@@ -77,7 +77,7 @@ public class SameTimeListener implements LoginListener, ImServiceListener, ImLis
         Im currentIm = null;
         
         for (int i = 0; i < imOpened.size(); i++) {
-            currentIm = (Im)imOpened.elementAt(i);
+            currentIm = imOpened.elementAt(i);
             if(currentIm.equals(im)) {
                 imExists = true;
                 im = currentIm;
@@ -145,7 +145,7 @@ public class SameTimeListener implements LoginListener, ImServiceListener, ImLis
         Im currentIm = null;
         
         for (int i = 0; i < imOpened.size(); i++) {
-            currentIm = (Im)imOpened.elementAt(i);
+            currentIm = imOpened.elementAt(i);
             if (currentIm.equals(im)) {
                 imOpened.removeElement(im);
                 im.close(0);

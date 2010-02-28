@@ -11,15 +11,15 @@ package net.sf.kraken.protocols.facebook;
 
 import java.lang.ref.WeakReference;
 
-import org.apache.log4j.Logger;
-import org.jivesoftware.util.NotFoundException;
-import org.xmpp.packet.Message.Type;
-
 import net.sf.jfacebookiml.FacebookEventListener;
 import net.sf.jfacebookiml.FacebookMessage;
 import net.sf.jfacebookiml.FacebookUser;
 import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.type.PresenceType;
+
+import org.apache.log4j.Logger;
+import org.jivesoftware.util.NotFoundException;
+import org.xmpp.packet.Message.Type;
 
 public class FacebookListener implements FacebookEventListener {
 	
@@ -43,7 +43,7 @@ public class FacebookListener implements FacebookEventListener {
         }
         FacebookBuddy buddy;
         try {
-            buddy = (FacebookBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.uid));
+            buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(user.uid));
         }
         catch (NotFoundException e) {
             buddy = new FacebookBuddy(getSession().getBuddyManager(), user);
@@ -55,7 +55,7 @@ public class FacebookListener implements FacebookEventListener {
             buddy.setPresenceAndStatus(PresenceType.available, user.status);
         else
             buddy.setPresenceAndStatus(PresenceType.unavailable, user.status);
-        Avatar avatar = new Avatar(buddy.getJID(), user.thumbSrc, ((FacebookSession)getSession()).readUrlBytes(user.thumbSrc));
+        Avatar avatar = new Avatar(buddy.getJID(), user.thumbSrc, (getSession()).readUrlBytes(user.thumbSrc));
         buddy.setAvatar(avatar);
 	}
 

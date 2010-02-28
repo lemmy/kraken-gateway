@@ -10,18 +10,18 @@
 
 package net.sf.kraken.protocols.qq;
 
+import java.util.Collection;
+
 import net.sf.jqql.beans.QQFriend;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
-
-import java.util.Collection;
 
 /**
  * @author Daniel Henninger
  */
 public class QQBuddy extends TransportBuddy {
 
-    public QQBuddy(TransportBuddyManager manager, QQFriend qqFriend, String nickname, Collection<String> groups) {
+    public QQBuddy(TransportBuddyManager<QQBuddy> manager, QQFriend qqFriend, String nickname, Collection<String> groups) {
         super(manager, String.valueOf(qqFriend.qqNum), nickname, groups);
         this.qqFriend = qqFriend;
     }

@@ -17,7 +17,7 @@ import net.sf.kraken.session.TransportSession;
 /**
  * @author Daniel Henninger
  */
-public class IRCMUCTransport extends BaseMUCTransport {
+public class IRCMUCTransport extends BaseMUCTransport<IRCBuddy> {
 
     /**
      * Handles creation of a new IRCMUCTransport.
@@ -31,7 +31,8 @@ public class IRCMUCTransport extends BaseMUCTransport {
     /**
      * @see net.sf.kraken.muc.BaseMUCTransport#createRoom(net.sf.kraken.session.TransportSession, String, String)
      */
-    public MUCTransportSession createRoom(TransportSession transportSession, String roomname, String nickname) {
+    @Override
+    public MUCTransportSession<IRCBuddy> createRoom(TransportSession<IRCBuddy> transportSession, String roomname, String nickname) {
         return new IRCMUCSession(transportSession, roomname, nickname, this);
     }
     

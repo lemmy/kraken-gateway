@@ -468,6 +468,7 @@ public class RegistrationManager {
             this.registrationIDs = registrationIDs;
         }
 
+        @Override
         public Iterator<Registration> iterator() {
             final Iterator<Long> regIterator = registrationIDs.iterator();
             return new Iterator() {
@@ -521,6 +522,7 @@ public class RegistrationManager {
             };
         }
 
+        @Override
         public int size() {
             return registrationIDs.size();
         }

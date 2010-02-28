@@ -10,20 +10,11 @@
 
 package net.sf.kraken.protocols.irc;
 
-import f00f.net.irc.martyr.GenericAutoService;
-import f00f.net.irc.martyr.State;
-import f00f.net.irc.martyr.InCommand;
-import f00f.net.irc.martyr.util.IRCStringUtils;
-import f00f.net.irc.martyr.clientstate.Channel;
-import f00f.net.irc.martyr.clientstate.Member;
-import f00f.net.irc.martyr.replies.*;
-import f00f.net.irc.martyr.commands.*;
-
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.kraken.muc.BaseMUCTransport;
@@ -33,12 +24,42 @@ import net.sf.kraken.muc.MUCTransportSession;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.type.PresenceType;
 
-import org.jivesoftware.util.NotFoundException;
+import org.apache.log4j.Logger;
+import org.dom4j.Element;
 import org.jivesoftware.util.LocaleUtils;
+import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
-import org.dom4j.Element;
-import org.apache.log4j.Logger;
+
+import f00f.net.irc.martyr.GenericAutoService;
+import f00f.net.irc.martyr.InCommand;
+import f00f.net.irc.martyr.State;
+import f00f.net.irc.martyr.clientstate.Channel;
+import f00f.net.irc.martyr.clientstate.Member;
+import f00f.net.irc.martyr.commands.ChannelModeCommand;
+import f00f.net.irc.martyr.commands.CtcpMessage;
+import f00f.net.irc.martyr.commands.CtcpNotice;
+import f00f.net.irc.martyr.commands.InviteCommand;
+import f00f.net.irc.martyr.commands.IsonCommand;
+import f00f.net.irc.martyr.commands.JoinCommand;
+import f00f.net.irc.martyr.commands.KickCommand;
+import f00f.net.irc.martyr.commands.MessageCommand;
+import f00f.net.irc.martyr.commands.ModeCommand;
+import f00f.net.irc.martyr.commands.NickCommand;
+import f00f.net.irc.martyr.commands.NoticeCommand;
+import f00f.net.irc.martyr.commands.PartCommand;
+import f00f.net.irc.martyr.commands.QuitCommand;
+import f00f.net.irc.martyr.commands.TopicCommand;
+import f00f.net.irc.martyr.replies.AwayReply;
+import f00f.net.irc.martyr.replies.ListEndReply;
+import f00f.net.irc.martyr.replies.ListReply;
+import f00f.net.irc.martyr.replies.ListStartReply;
+import f00f.net.irc.martyr.replies.NamesEndReply;
+import f00f.net.irc.martyr.replies.NamesReply;
+import f00f.net.irc.martyr.replies.NowAwayReply;
+import f00f.net.irc.martyr.replies.TopicInfoReply;
+import f00f.net.irc.martyr.replies.UnAwayReply;
+import f00f.net.irc.martyr.util.IRCStringUtils;
 
 /**
  * @author Daniel Henninger
@@ -58,10 +79,12 @@ public class IRCListener extends GenericAutoService {
         return ircSessionRef.get();
     }
 
+    @Override
     protected void updateState(State state) {
         Log.debug("IRC: Received incoming state:"+state);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     protected void updateCommand(InCommand inCommand) {
         Log.debug("IRC: Received incoming command:"+inCommand);

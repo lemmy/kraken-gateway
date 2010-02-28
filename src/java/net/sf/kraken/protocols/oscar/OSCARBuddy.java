@@ -10,35 +10,55 @@
 
 package net.sf.kraken.protocols.oscar;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.kano.joscar.ssiitem.BuddyItem;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
+ * Representation of a AIM or ICQ specific {@link TransportBuddy}.
+ * 
+ * OSCAR contacts are represented by the {@link BuddyItem} class. Each instance
+ * is linked to exactly one group. A person on ones OSCAR list can exist in
+ * multiple groups though. If this happens, multiple {@link BuddyItem}s will
+ * exist for the same person. This implementation of Krakens {@link OSCARBuddy}
+ * can combine multiple {@link BuddyItem} instances. In this way, it allows for
+ * one contact list entity that is assigned to multiple groups.
+ * 
  * @author Daniel Henninger
  */
 public class OSCARBuddy extends TransportBuddy {
 
-    public OSCARBuddy(TransportBuddyManager manager, BuddyItem buddyItem) {
+    /**
+     * The {@link BuddyItem} instances of which this {@link OSCARBuddy} instance
+     * is a representation. Each BuddyItem is mapped by its unique ID (obtained
+     * through {@link BuddyItem#getId()}.
+     */
+    public Map<Integer,BuddyItem> buddyItems = new ConcurrentHashMap<Integer,BuddyItem>();
+
+    public OSCARBuddy(TransportBuddyManager<OSCARBuddy> manager, BuddyItem buddyItem) {
         super(manager, buddyItem.getScreenname(), buddyItem.getAlias(), null);
         buddyItems.put(buddyItem.getGroupId(), buddyItem);
-        ((OSCARSession)getManager().getSession()).updateHighestId(buddyItem);
     }
-
-    public ConcurrentHashMap<Integer,BuddyItem> buddyItems = new ConcurrentHashMap<Integer,BuddyItem>();
 
     /**
      * Runs through group id list, matching to finished collection of groups to get names.
      */
     public void populateGroupList() {
-        ArrayList<String> groupList = new ArrayList<String>();
-        for (BuddyItem buddyItem : buddyItems.values()) {
+        List<String> groupList = new ArrayList<String>();
+
+        final SSIHierarchy ssi = ((OSCARSession) this.getManager().getSession()).getSsiHierarchy();
+            for (BuddyItem buddyItem : buddyItems.values()) {
             try {
-                groupList.add(((OSCARSession)getManager().getSession()).groups.get(buddyItem.getGroupId()).getGroupName());
+                // resolve the group name that matches the ID in the buddy item.
+                final int groupID = buddyItem.getGroupId();
+                final String groupName = ssi.getGroupName(groupID);
+                groupList.add(groupName);
             }
             catch (Exception e) {
                 // Hrm, unknown group.  Don't include.
@@ -48,14 +68,18 @@ public class OSCARBuddy extends TransportBuddy {
     }
 
     /**
-     * Ties another buddy item to this buddy.
+     * Links this instance to a {@link BuddyItem} instance. Multiple BuddyItem
+     * instances can be linked to one {@link OSCARBuddy}. This is used to
+     * simulate one contact belonging to multiple groups on the contact list.
+     * 
+     * This method adds the provided BuddyItem, replacing any previous BuddyItem
+     * that has the same ID (obtained through {@link BuddyItem#getId()}.
      *
      * @param buddyItem Buddy item to attach.
      * @param autoPopulate Trigger an automatic regeneration of group list.
      */
-    public synchronized void tieBuddyItem(BuddyItem buddyItem, Boolean autoPopulate) {
+    public synchronized void tieBuddyItem(BuddyItem buddyItem, boolean autoPopulate) {
         buddyItems.put(buddyItem.getGroupId(), buddyItem);
-        ((OSCARSession)getManager().getSession()).updateHighestId(buddyItem);
         if (autoPopulate) {
             populateGroupList();
         }
@@ -67,7 +91,7 @@ public class OSCARBuddy extends TransportBuddy {
      * @param groupId Group id of buddy item to retrieve.
      * @return Buddy item in said group.
      */
-    public BuddyItem getBuddyItem(Integer groupId) {
+    public BuddyItem getBuddyItem(int groupId) {
         return buddyItems.get(groupId);
     }
 
@@ -77,7 +101,7 @@ public class OSCARBuddy extends TransportBuddy {
      * @param groupId Group id of buddy item to be removed.
      * @param autoPopulate Trigger an automatic regeneration of group list.
      */
-    public synchronized void removeBuddyItem(Integer groupId, Boolean autoPopulate) {
+    public synchronized void removeBuddyItem(int groupId, boolean autoPopulate) {
         buddyItems.remove(groupId);
         if (autoPopulate) {
             populateGroupList();

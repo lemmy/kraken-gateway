@@ -331,6 +331,7 @@ public class Registration {
         }
     }
 
+    @Override
     public String toString() {
         return jid + ", " + transportType + ", " + username;
     }

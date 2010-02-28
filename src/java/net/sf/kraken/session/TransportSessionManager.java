@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.kraken.BaseTransport;
+import net.sf.kraken.roster.TransportBuddy;
 
 import org.jivesoftware.util.NotFoundException;
 import org.jivesoftware.openfire.SessionManager;
@@ -28,12 +29,12 @@ import org.xmpp.packet.JID;
  *
  * @author Daniel Henninger
  */
-public class TransportSessionManager {
+public class TransportSessionManager<B extends TransportBuddy> {
 
     /**
      * Container for all active sessions.
      */
-    private ConcurrentHashMap<JID,TransportSession> activeSessions = new ConcurrentHashMap<JID,TransportSession>();
+    private ConcurrentHashMap<JID,TransportSession<B>> activeSessions = new ConcurrentHashMap<JID,TransportSession<B>>();
 
     /**
      * Timer to check for orphaned sessions.
@@ -53,14 +54,14 @@ public class TransportSessionManager {
     /**
      * The transport we are associated with.
      */
-    BaseTransport transport;
+    BaseTransport<B> transport;
 
     /**
      * Creates the transport session manager instance and initializes.
      *
      * @param transport Transport associated with this session manager.
      */
-    public TransportSessionManager(BaseTransport transport) {
+    public TransportSessionManager(BaseTransport<B> transport) {
         this.transport = transport;
         sessionReaper = new SessionReaper();
         timer.schedule(sessionReaper, reaperInterval, reaperInterval);
@@ -83,8 +84,8 @@ public class TransportSessionManager {
      * @throws NotFoundException if the given jid is not found.
      * @return TransportSession instance requested.
      */
-    public TransportSession getSession(JID jid) throws NotFoundException {
-        TransportSession session = activeSessions.get(new JID(jid.toBareJID()));
+    public TransportSession<B> getSession(JID jid) throws NotFoundException {
+        TransportSession<B> session = activeSessions.get(new JID(jid.toBareJID()));
         if (session == null) {
             throw new NotFoundException("Could not find session requested.");
         }
@@ -98,8 +99,8 @@ public class TransportSessionManager {
      * @throws NotFoundException if the given username is not found.
      * @return TransportSession instance requested.
      */
-    public TransportSession getSession(String username) throws NotFoundException {
-        TransportSession session = activeSessions.get(XMPPServer.getInstance().createJID(username, null));
+    public TransportSession<B> getSession(String username) throws NotFoundException {
+        TransportSession<B> session = activeSessions.get(XMPPServer.getInstance().createJID(username, null));
         if (session == null) {
             throw new NotFoundException("Could not find session requested.");
         }
@@ -115,7 +116,7 @@ public class TransportSessionManager {
      * @param jid JID information used to track the session.
      * @param session TransportSession associated with the jid.
      */
-    public void storeSession(JID jid, TransportSession session) {
+    public void storeSession(JID jid, TransportSession<B> session) {
         activeSessions.put(new JID(jid.toBareJID()), session);
         getTransport().getSessionRouter().addSession(getTransport().getType().toString(), jid.toBareJID());
     }
@@ -129,7 +130,7 @@ public class TransportSessionManager {
      * @param jid JID to be removed.
      */
     public void removeSession(JID jid) {
-        TransportSession session = activeSessions.remove(new JID(jid.toBareJID()));
+        TransportSession<B> session = activeSessions.remove(new JID(jid.toBareJID()));
         if (session != null) {
             session.getBuddyManager().sendOfflineForAllAvailablePresences(jid);
         }
@@ -141,7 +142,7 @@ public class TransportSessionManager {
      *
      * @return List of active sessions.
      */
-    public Collection<TransportSession> getSessions() {
+    public Collection<TransportSession<B>> getSessions() {
         return activeSessions.values();
     }
 
@@ -152,6 +153,7 @@ public class TransportSessionManager {
         /**
          * Kill any session that has been orphaned.
          */
+        @Override
         public void run() {
             cleanupOrphanedSessions();
         }
@@ -162,7 +164,7 @@ public class TransportSessionManager {
      */
     private void cleanupOrphanedSessions() {
         SessionManager sessionManager = SessionManager.getInstance();
-        for (TransportSession session : getSessions()) {
+        for (TransportSession<B> session : getSessions()) {
             if (sessionManager.getSessionCount(session.getJID().getNode()) == 0) {
                 transport.registrationLoggedOut(session);
             }
@@ -174,7 +176,7 @@ public class TransportSessionManager {
      *
      * @return transport associated with this session manager.
      */
-    public BaseTransport getTransport() {
+    public BaseTransport<B> getTransport() {
         return this.transport;
     }
 }

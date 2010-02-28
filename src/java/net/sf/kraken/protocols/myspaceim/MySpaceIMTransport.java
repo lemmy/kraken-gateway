@@ -11,7 +11,8 @@
 package net.sf.kraken.protocols.myspaceim;
 
 import net.sf.jmyspaceiml.packet.StatusMessage;
-import net.sf.kraken.*;
+import net.sf.kraken.BaseTransport;
+import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
@@ -28,11 +29,12 @@ import org.xmpp.packet.JID;
  *
  * @author Daniel Henninger
  */
-public class MySpaceIMTransport extends BaseTransport {
+public class MySpaceIMTransport extends BaseTransport<MySpaceIMBuddy> {
 
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */
+    @Override
     public String getTerminologyUsername() {
         return LocaleUtils.getLocalizedString("gateway.myspaceim.username", "kraken");
     }
@@ -40,6 +42,7 @@ public class MySpaceIMTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyPassword()
      */
+    @Override
     public String getTerminologyPassword() {
         return LocaleUtils.getLocalizedString("gateway.myspaceim.password", "kraken");
     }
@@ -47,6 +50,7 @@ public class MySpaceIMTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
+    @Override
     public String getTerminologyNickname() {
         return null;
     }
@@ -54,6 +58,7 @@ public class MySpaceIMTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
+    @Override
     public String getTerminologyRegistration() {
         return LocaleUtils.getLocalizedString("gateway.myspaceim.registration", "kraken");
     }
@@ -61,16 +66,19 @@ public class MySpaceIMTransport extends BaseTransport {
     /**
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
+    @Override
     public Boolean isPasswordRequired() { return true; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
+    @Override
     public Boolean isNicknameRequired() { return false; }
 
     /**
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
+    @Override
     public Boolean isUsernameValid(String username) {
         return true;
     }
@@ -83,8 +91,9 @@ public class MySpaceIMTransport extends BaseTransport {
      * @param presenceType Type of presence.
      * @param verboseStatus Longer status description.
      */
-    public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-        TransportSession session = new MySpaceIMSession(registration, jid, this, priority);
+    @Override
+    public TransportSession<MySpaceIMBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+        TransportSession<MySpaceIMBuddy> session = new MySpaceIMSession(registration, jid, this, priority);
         session.setLoginStatus(TransportLoginStatus.LOGGING_IN);
         session.logIn(presenceType, verboseStatus);
         return session;
@@ -95,7 +104,8 @@ public class MySpaceIMTransport extends BaseTransport {
      *
      * @param session The session to be disconnected.
      */
-    public void registrationLoggedOut(TransportSession session) {
+    @Override
+    public void registrationLoggedOut(TransportSession<MySpaceIMBuddy> session) {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
     }

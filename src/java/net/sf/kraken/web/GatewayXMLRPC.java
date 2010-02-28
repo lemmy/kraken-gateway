@@ -32,6 +32,7 @@ public class GatewayXMLRPC extends XmlRpcServlet implements PropertyEventListene
 
     XMLRPCConduit conduit;
 
+    @Override
     public void init(ServletConfig servletConfig) {
         try {
             super.init(servletConfig);
@@ -47,6 +48,7 @@ public class GatewayXMLRPC extends XmlRpcServlet implements PropertyEventListene
         }
     }
 
+    @Override
     public void destroy() {
         AuthCheckFilter.removeExclude("kraken/xml-rpc");
         PropertyEventDispatcher.removeListener(this);        

@@ -90,7 +90,7 @@ public class XMPPPresenceHandler implements PacketListener{
         else {
 			// TODO: Need to handle resources and priorities!
 			try {
-			    final XMPPBuddy xmppBuddy = (XMPPBuddy)session.getBuddyManager().getBuddy(session.getTransport().convertIDToJID(presence.getFrom()));
+			    final XMPPBuddy xmppBuddy = session.getBuddyManager().getBuddy(session.getTransport().convertIDToJID(presence.getFrom()));
 			    Log.debug("XMPP: Presence changed detected type "+presence.getType()+" and mode "+presence.getMode()+" for "+presence.getFrom());
 			    xmppBuddy.setPresenceAndStatus(
 			            ((XMPPTransport)session.getTransport()).convertXMPPStatusToGateway(presence.getType(), presence.getMode()),
@@ -106,7 +106,8 @@ public class XMPPPresenceHandler implements PacketListener{
 			                Avatar curAvatar = xmppBuddy.getAvatar();
 			                if (curAvatar == null || !curAvatar.getLegacyIdentifier().equals(hash)) {
 			                    new Thread() {
-			                        public void run() {
+			                        @Override
+                                    public void run() {
 			                            VCard vcard = new VCard();
 			                            try {
 			                                vcard.load(session.conn, from);

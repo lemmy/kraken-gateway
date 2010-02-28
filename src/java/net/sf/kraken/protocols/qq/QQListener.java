@@ -9,6 +9,12 @@
  */
 package net.sf.kraken.protocols.qq;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.jqql.beans.FriendOnlineEntry;
 import net.sf.jqql.beans.NormalIM;
 import net.sf.jqql.beans.QQFriend;
@@ -21,16 +27,10 @@ import net.sf.jqql.packets.in.GetOnlineOpReplyPacket;
 import net.sf.jqql.packets.in.ReceiveIMPacket;
 import net.sf.kraken.type.TransportLoginStatus;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.NotFoundException;
-import org.apache.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.*;
-import java.lang.ref.WeakReference;
 
 public class QQListener implements IQQListener {
 
@@ -330,7 +330,7 @@ public class QQListener implements IQQListener {
             for (FriendOnlineEntry f : p.onlineFriends) {
                 if (getSession().getBuddyManager().isActivated()) {
                     try {
-                        QQBuddy qqBuddy = (QQBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(f.status.qqNum)));
+                        QQBuddy qqBuddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(f.status.qqNum)));
                         qqBuddy.setPresenceAndStatus(((QQTransport)getSession().getTransport()).convertQQStatusToXMPP(f.status.status), null);
                     }
                     catch (NotFoundException ee) {
@@ -359,7 +359,7 @@ public class QQListener implements IQQListener {
         try {
             if (getSession().getBuddyManager().isActivated()) {
                 try {
-                    QQBuddy qqBuddy = (QQBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(p.friendQQ)));
+                    QQBuddy qqBuddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(p.friendQQ)));
                     qqBuddy.setPresenceAndStatus(((QQTransport)getSession().getTransport()).convertQQStatusToXMPP(p.status), null);
                 }
                 catch (NotFoundException ee) {

@@ -318,7 +318,7 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
         }
         if (getSession().getBuddyManager().isActivated()) {
             try {
-                final MSNBuddy buddy = (MSNBuddy)getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(friend.getEmail().toString()));
+                final MSNBuddy buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(friend.getEmail().toString()));
                 buddy.setPresenceAndStatus(((MSNTransport)getSession().getTransport()).convertMSNStatusToXMPP(friend.getStatus()), friend.getPersonalMessage());
                 buddy.setMsnContact(friend);
                 if (JiveGlobals.getBooleanProperty("plugin.gateway.msn.avatars", true)) {
@@ -500,6 +500,7 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
         /**
          * Silence any typing notifications that are stale.
          */
+        @Override
         public void run() {
             cancelTypingNotifications();
         }

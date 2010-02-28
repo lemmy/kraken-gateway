@@ -10,12 +10,14 @@
 package net.sf.kraken.protocols.simple;
 
 import java.io.ByteArrayInputStream;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.apache.log4j.Logger;
 
 /**
  * This class performs conversions between presence packets of XMPP and SIMPLE formats.
@@ -54,7 +56,8 @@ public class SimplePresence {
 			return status.equals("open");
 		}
 		
-		public String toString() {
+		@Override
+        public String toString() {
 			return status;
 		}
 	}
@@ -111,7 +114,8 @@ public class SimplePresence {
 		/**
 		 * Overridden to return the string description of the constant.
 		 */
-		public String toString() {
+		@Override
+        public String toString() {
 			return desc;
 		}
 	}
@@ -306,7 +310,8 @@ public class SimplePresence {
 		public SimplePresenceParser() {
 		}
 		
-		public void startElement(String namespaceURI, String sName, String qName, Attributes attrs) throws SAXException {
+		@Override
+        public void startElement(String namespaceURI, String sName, String qName, Attributes attrs) throws SAXException {
 //			isStartTag  = true;
 			elementName = (!sName.equals(""))? sName : qName;
 			
@@ -353,7 +358,8 @@ public class SimplePresence {
 			}
 		}
 		
-		public void characters(char buf[], int offset, int len) throws SAXException {
+		@Override
+        public void characters(char buf[], int offset, int len) throws SAXException {
 			String data = new String(buf, offset, len);
 			
 			if (isStatus) {
@@ -382,7 +388,8 @@ public class SimplePresence {
 			}
 		}
 		
-		public void endElement(String namespaceURI, String sName, String qName) throws SAXException {
+		@Override
+        public void endElement(String namespaceURI, String sName, String qName) throws SAXException {
 //			isStartTag = false;
 			elementName = (!sName.equals(""))? sName : qName;
 			
@@ -400,7 +407,8 @@ public class SimplePresence {
 			}
 		}
 		
-		public void endDocument() throws SAXException {
+		@Override
+        public void endDocument() throws SAXException {
 //			obj.setUser(userName);
 //			obj.setType(statusType);
 //			obj.setStatus(statusName);

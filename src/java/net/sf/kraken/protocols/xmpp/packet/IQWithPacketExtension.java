@@ -41,6 +41,7 @@ public class IQWithPacketExtension extends IQ {
         this.setType(type);
     }
 
+    @Override
     public String getChildElementXML() {
         return this.getExtensionsXML();
     }

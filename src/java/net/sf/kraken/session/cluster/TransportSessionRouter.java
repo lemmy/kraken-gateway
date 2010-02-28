@@ -13,6 +13,7 @@ package net.sf.kraken.session.cluster;
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.KrakenPlugin;
 import net.sf.kraken.TransportInstance;
+import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 
 import org.apache.log4j.Logger;
@@ -152,7 +153,7 @@ public class TransportSessionRouter implements ClusterEventListener {
                     sessionLocations.remove(jid+"@"+trType);
                     TransportInstance trInstance = plugin.getTransportInstance(trType);
                     if (trInstance != null) {
-                        BaseTransport transport = trInstance.getTransport();
+                        BaseTransport<? extends TransportBuddy> transport = trInstance.getTransport();
                         if (transport != null) {
                             Collection<ClientSession> sessions = XMPPServer.getInstance().getSessionManager().getSessions(new JID(jid).getNode());
                             for (ClientSession session : sessions) {
@@ -183,9 +184,9 @@ public class TransportSessionRouter implements ClusterEventListener {
             if (getPlugin().serviceEnabled(transportName)) {
                 TransportInstance ti = getPlugin().getTransportInstance(transportName);
                 if (ti != null) {
-                    BaseTransport tr = ti.getTransport();
+                    BaseTransport<? extends TransportBuddy> tr = ti.getTransport();
                     if (tr != null) {
-                        for (TransportSession session : tr.getSessionManager().getSessions()) {
+                        for (TransportSession<? extends TransportBuddy> session : tr.getSessionManager().getSessions()) {
                             addSession(transportName, session.getJID().toBareJID());
                         }
                     }

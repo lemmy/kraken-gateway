@@ -26,7 +26,7 @@ import org.xmpp.packet.JID;
  * @author Patrick Siu
  * @author Daniel Henninger
  */
-public class SimpleTransport extends BaseTransport {
+public class SimpleTransport extends BaseTransport<SimpleBuddy> {
 	SipFactory sipFactory = null;
 	
 	public SimpleTransport() {
@@ -37,8 +37,9 @@ public class SimpleTransport extends BaseTransport {
 		sipFactory.setPathName("gov.nist");
 	}
 	
-	public TransportSession registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
-		TransportSession session = new SimpleSession(registration, jid, this, priority); 
+	@Override
+    public TransportSession<SimpleBuddy> registrationLoggedIn(Registration registration, JID jid, PresenceType presenceType, String verboseStatus, Integer priority) {
+		TransportSession<SimpleBuddy> session = new SimpleSession(registration, jid, this, priority); 
 		
 		// Possibly more work here!
 		session.logIn(presenceType, verboseStatus);
@@ -46,7 +47,8 @@ public class SimpleTransport extends BaseTransport {
 		return session;
 	}
 
-	public void registrationLoggedOut(TransportSession session) {
+	@Override
+    public void registrationLoggedOut(TransportSession<SimpleBuddy> session) {
 		session.logOut();
 		
 		((SimpleSession) session).removeStack();
@@ -58,18 +60,21 @@ public class SimpleTransport extends BaseTransport {
 	
 	/**
 	 */
-	public String getTerminologyUsername() {
+	@Override
+    public String getTerminologyUsername() {
 		return LocaleUtils.getLocalizedString("gateway.simple.username", "kraken");
 	}
 
-	public String getTerminologyPassword() {
+	@Override
+    public String getTerminologyPassword() {
 		return LocaleUtils.getLocalizedString("gateway.simple.password", "kraken");
 	}
 	
 	/**
      * @see net.sf.kraken.BaseTransport#getTerminologyNickname()
      */
-	public String getTerminologyNickname() {
+	@Override
+    public String getTerminologyNickname() {
 		// If this string is needed, then take it.  Just put a draft code to ensure integrity.
 		
 		return null;
@@ -78,14 +83,16 @@ public class SimpleTransport extends BaseTransport {
 	/**
      * @see net.sf.kraken.BaseTransport#getTerminologyRegistration()
      */
-	public String getTerminologyRegistration() {
+	@Override
+    public String getTerminologyRegistration() {
 		return LocaleUtils.getLocalizedString("gateway.simple.registration", "kraken");
 	}
 	
 	/**
      * @see net.sf.kraken.BaseTransport#isPasswordRequired()
      */
-	public Boolean isPasswordRequired() {
+	@Override
+    public Boolean isPasswordRequired() {
 		// Just put a draft code to ensure integrity.
 		
 		return true;
@@ -94,7 +101,8 @@ public class SimpleTransport extends BaseTransport {
 	/**
      * @see net.sf.kraken.BaseTransport#isNicknameRequired()
      */
-	public Boolean isNicknameRequired() {
+	@Override
+    public Boolean isNicknameRequired() {
 		// Just put a draft code to ensure integrity.
 		
 		return false;
@@ -103,7 +111,8 @@ public class SimpleTransport extends BaseTransport {
 	/**
      * @see net.sf.kraken.BaseTransport#isUsernameValid(String)
      */
-	public Boolean isUsernameValid(String username) {
+	@Override
+    public Boolean isUsernameValid(String username) {
 		// Just put a draft code to ensure integrity.
 //		Log.debug("SimpleTransport.isUsernameValid:  Checking '" + username + "'");
 //		Boolean result = username.matches("\\w+");
@@ -216,7 +225,8 @@ public class SimpleTransport extends BaseTransport {
 	/**
 	 * An improved method to do the trick.
 	 */
-	public String convertJIDToID(JID jid) {
+	@Override
+    public String convertJIDToID(JID jid) {
 		String node = jid.getNode();
 		while (!JID.unescapeNode(node).equals(node)) {
 			node = JID.unescapeNode(node);

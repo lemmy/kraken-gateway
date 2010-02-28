@@ -43,7 +43,7 @@ import java.util.List;
  *
  * @author Daniel Henninger
  */
-public class TransportBuddy {
+public abstract class TransportBuddy {
 
     static Logger Log = Logger.getLogger(TransportBuddy.class);
 
@@ -601,6 +601,7 @@ public class TransportBuddy {
     /**
      * Outputs information about the transport buddy in a pretty format.
      */
+    @Override
     public String toString() {
         return "{Buddy: "+this.jid+" (Nickname: "+this.nickname+") (Groups: "+this.groups+")}";
     }

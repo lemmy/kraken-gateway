@@ -10,17 +10,17 @@
 
 package net.sf.kraken.protocols.myspaceim;
 
+import java.util.Arrays;
+
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
-
-import java.util.Arrays;
 
 /**
  * @author Daniel Henninger
  */
 public class MySpaceIMBuddy extends TransportBuddy {
 
-    public MySpaceIMBuddy(TransportBuddyManager manager, Integer userid) {
+    public MySpaceIMBuddy(TransportBuddyManager<MySpaceIMBuddy> manager, Integer userid) {
         super(manager, String.valueOf(userid), String.valueOf(userid), Arrays.asList("IM Buddies"));
     }
 

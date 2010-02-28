@@ -13,15 +13,16 @@
 package net.sf.kraken.protocols.oscar;
 
 
+import net.kano.joscar.ByteBlock;
 import net.kano.joscar.flap.ClientFlapConn;
 import net.kano.joscar.flap.FlapPacketEvent;
-import net.kano.joscar.ByteBlock;
 import net.kano.joscar.flapcmd.SnacCommand;
-import net.kano.joscar.snaccmd.conn.RateInfoCmd;
-import net.kano.joscar.snac.SnacPacketEvent;
-import net.kano.joscar.snac.SnacResponseEvent;
 import net.kano.joscar.net.ClientConnEvent;
 import net.kano.joscar.net.ConnDescriptor;
+import net.kano.joscar.snac.SnacPacketEvent;
+import net.kano.joscar.snac.SnacResponseEvent;
+import net.kano.joscar.snaccmd.conn.RateInfoCmd;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -41,11 +42,13 @@ public class ServiceConnection extends BasicFlapConnection {
         this.serviceFamily = serviceFamily;
     }
 
+    @Override
     protected void clientReady() {
         getMainSession().serviceReady(this);
         super.clientReady();
     }
 
+    @Override
     protected void handleStateChange(ClientConnEvent e) {
         Log.debug("OSCAR service state change from "+e.getOldState()+" to "+e.getNewState());
         if (e.getNewState() == ClientFlapConn.STATE_FAILED) {
@@ -57,14 +60,17 @@ public class ServiceConnection extends BasicFlapConnection {
         }
     }
 
+    @Override
     protected void handleFlapPacket(FlapPacketEvent e) {
         super.handleFlapPacket(e);
     }
 
+    @Override
     protected void handleSnacPacket(SnacPacketEvent e) {
         super.handleSnacPacket(e);
     }
 
+    @Override
     protected void handleSnacResponse(SnacResponseEvent e) {
         super.handleSnacResponse(e);
 

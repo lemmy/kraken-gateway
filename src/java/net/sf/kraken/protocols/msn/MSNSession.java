@@ -10,12 +10,22 @@
 
 package net.sf.kraken.protocols.msn;
 
-import net.sf.jml.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.sf.jml.Email;
+import net.sf.jml.MsnContact;
+import net.sf.jml.MsnGroup;
+import net.sf.jml.MsnMessenger;
+import net.sf.jml.MsnObject;
+import net.sf.jml.MsnProtocol;
+import net.sf.jml.MsnSwitchboard;
 import net.sf.jml.impl.BasicMessenger;
 import net.sf.jml.impl.MsnMessengerFactory;
 import net.sf.jml.message.MsnControlMessage;
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
+import net.sf.kraken.roster.TransportBuddyManager;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
@@ -31,10 +41,6 @@ import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Represents a MSN session.
  *
@@ -43,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Daniel Henninger
  */
-public class MSNSession extends TransportSession {
+public class MSNSession extends TransportSession<MSNBuddy> {
 
     static Logger Log = Logger.getLogger(MSNSession.class);
 
@@ -93,6 +99,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
         if (!isLoggedIn()) {
             Log.debug("Creating MSN session for " + registration.getUsername());
@@ -143,6 +150,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#logOut()
      */
+    @Override
     public void logOut() {
         cleanUp();
         sessionDisconnectedNoReconnect(null);
@@ -151,6 +159,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#cleanUp()
      */
+    @Override
     public void cleanUp() {
         if (msnMessenger != null) {
             if (msnListener != null) {
@@ -287,6 +296,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#addContact(org.xmpp.packet.JID, String, java.util.ArrayList)
      */
+    @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
         Email contact = Email.parseStr(getTransport().convertJIDToID(jid));
         if (contact == null) {
@@ -299,7 +309,8 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#removeContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void removeContact(TransportBuddy contact) {
+    @Override
+    public void removeContact(MSNBuddy contact) {
         Email email = Email.parseStr(getTransport().convertJIDToID(contact.getJID()));
         if (email == null) {
             Log.debug("MSN: Unable to remove illegal contact "+contact.getJID());
@@ -311,7 +322,8 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateContact(net.sf.kraken.roster.TransportBuddy)
      */
-    public void updateContact(TransportBuddy contact) {
+    @Override
+    public void updateContact(MSNBuddy contact) {
         Email email = Email.parseStr(getTransport().convertJIDToID(contact.getJID()));
         if (email == null) {
             Log.debug("MSN: Unable to update illegal contact "+contact.getJID());
@@ -323,7 +335,7 @@ public class MSNSession extends TransportSession {
         }
 
         try {
-            MSNBuddy msnBuddy = (MSNBuddy)getBuddyManager().getBuddy(contact.getJID());
+            MSNBuddy msnBuddy = getBuddyManager().getBuddy(contact.getJID());
             if (msnBuddy.msnContact == null) {
                 MsnContact msnContact = msnMessenger.getContactList().getContactByEmail(email);
                 if (msnContact == null) {
@@ -346,19 +358,37 @@ public class MSNSession extends TransportSession {
     }
     
     /**
-     * @see net.sf.kraken.session.TransportSession#acceptAddContact(TransportBuddy) 
+     * @see net.sf.kraken.session.TransportSession#acceptAddContact(JID)
      */
-    public void acceptAddContact(TransportBuddy contact) {
-        Log.debug("MSN: accept-adding " + contact); 
+    @Override
+    public void acceptAddContact(JID jid) {
+        final String userID = getTransport().convertJIDToID(jid);
+        Log.debug("MSN: accept-adding " + userID); 
+
         // According to a packet dump made with Wireshark, 'accepting' a
         // contact-add is done by adding the contact yourself (using an outgoing
         // ADL).
-        final Email email = Email.parseStr(contact.getName());
+        final Email email = Email.parseStr(userID);
         if (email == null) {
-            Log.warn("MSN: Unable to accept-add this illegal contact "+contact.getJID());
+            Log.warn("MSN: Unable to accept-add this illegal contact "+userID);
             return;
         }
-        msnMessenger.addFriend(email, contact.getNickname());
+        
+        final TransportBuddyManager<MSNBuddy> manager = this.getBuddyManager();
+        
+        final String nickname;
+        if (manager.hasBuddy(jid)) {
+            try {
+                final MSNBuddy buddy = manager.getBuddy(jid);
+                nickname = buddy.getNickname();
+            } catch (NotFoundException ex) {
+                throw new RuntimeException("Buddy does not exist although manager.getBuddy() returns true: " + jid);
+            }
+        } else {
+            nickname = null;
+        }
+        
+        msnMessenger.addFriend(email, nickname);
     }
 
     /**
@@ -371,7 +401,7 @@ public class MSNSession extends TransportSession {
     public void syncContactGroups(Email contact, List<String> groups) {
         MsnContact msnContact = null;
         try {
-            MSNBuddy msnBuddy = (MSNBuddy)getBuddyManager().getBuddy(getTransport().convertIDToJID(contact.getEmailAddress()));
+            MSNBuddy msnBuddy = getBuddyManager().getBuddy(getTransport().convertIDToJID(contact.getEmailAddress()));
             msnContact = msnBuddy.getMsnContact();
         }
         catch (NotFoundException e) {
@@ -416,6 +446,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendMessage(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendMessage(JID jid, String message) {
         msnMessenger.sendText(Email.parseStr(getTransport().convertJIDToID(jid)), message.replaceAll("\n", "\r\n"));
     }
@@ -423,6 +454,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendChatState(org.xmpp.packet.JID,net.sf.kraken.type.ChatStateType)
      */
+    @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
         if (chatState.equals(ChatStateType.composing)) {
             Email jidEmail = Email.parseStr(getTransport().convertJIDToID(jid));
@@ -439,12 +471,14 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#sendBuzzNotification(org.xmpp.packet.JID, String)
      */
+    @Override
     public void sendBuzzNotification(JID jid, String message) {
     }
 
     /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
+    @Override
     public void updateLegacyAvatar(String type, byte[] data) {
         msnMessenger.getOwner().setDisplayPicture(MsnObject.getInstance(
             msnMessenger.getOwner().getEmail().getEmailAddress(),
@@ -456,6 +490,7 @@ public class MSNSession extends TransportSession {
     /**
      * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, String)
      */
+    @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         if (isLoggedIn()) {
             try {

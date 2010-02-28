@@ -43,6 +43,7 @@ public class GatewayDWR extends DWRServlet {
 
     private Document document;
 
+    @Override
     public void configure(ServletConfig servletConfig, Configuration configuration) throws ServletException {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -89,6 +90,7 @@ public class GatewayDWR extends DWRServlet {
         return element;
     }
     
+    @Override
     protected void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
 	    throws IOException, ServletException {
 
@@ -103,6 +105,7 @@ public class GatewayDWR extends DWRServlet {
             super(httpServletRequest);
         }
 
+        @Override
         public String getPathInfo() {
             String pathInfo = super.getPathInfo();
             return pathInfo.replaceAll("/kraken/dwr", "");

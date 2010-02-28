@@ -10,20 +10,20 @@
 
 package net.sf.kraken.protocols.gadugadu;
 
-import net.sf.kraken.roster.TransportBuddy;
-import net.sf.kraken.roster.TransportBuddyManager;
-import pl.mn.communicator.LocalUser;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import net.sf.kraken.roster.TransportBuddy;
+import net.sf.kraken.roster.TransportBuddyManager;
+import pl.mn.communicator.LocalUser;
 
 /**
  * @author Daniel Henninger
  */
 public class GaduGaduBuddy extends TransportBuddy {
 
-    public GaduGaduBuddy(TransportBuddyManager manager, LocalUser localUser) {
+    public GaduGaduBuddy(TransportBuddyManager<GaduGaduBuddy> manager, LocalUser localUser) {
         super(manager, Integer.toString(localUser.getUin()), localUser.getDisplayName(), null);
         if (localUser.getGroup() != null) {
             this.groups = Arrays.asList(localUser.getGroup());
@@ -35,7 +35,7 @@ public class GaduGaduBuddy extends TransportBuddy {
         gaduEmailAddress = localUser.getEmailAddress();
     }
 
-    public GaduGaduBuddy(TransportBuddyManager manager, String uin, String nickname, String group) {
+    public GaduGaduBuddy(TransportBuddyManager<GaduGaduBuddy> manager, String uin, String nickname, String group) {
         super(manager, uin, nickname, null);
         if (group != null) {
             this.groups = Arrays.asList(group);

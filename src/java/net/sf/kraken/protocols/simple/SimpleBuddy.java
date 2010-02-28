@@ -9,11 +9,11 @@
  */
 package net.sf.kraken.protocols.simple;
 
+import javax.sip.Dialog;
+
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
-
-import javax.sip.Dialog;
 
 /**
  * This class represents a roster item of SIP transport.
@@ -26,7 +26,7 @@ public class SimpleBuddy extends TransportBuddy {
 
     public PseudoRosterItem pseudoRosterItem = null;
 
-    public SimpleBuddy(TransportBuddyManager manager, String username, PseudoRosterItem rosterItem) {
+    public SimpleBuddy(TransportBuddyManager<SimpleBuddy> manager, String username, PseudoRosterItem rosterItem) {
         super(manager, username, null, null);
         pseudoRosterItem = rosterItem;
         this.setNickname(rosterItem.getNickname());

@@ -12,6 +12,14 @@
 
 package net.sf.kraken.protocols.oscar;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import net.kano.joscar.BinaryTools;
 import net.kano.joscar.ByteBlock;
 import net.kano.joscar.flap.FlapCommand;
@@ -20,11 +28,29 @@ import net.kano.joscar.flapcmd.LoginFlapCmd;
 import net.kano.joscar.flapcmd.SnacCommand;
 import net.kano.joscar.net.ConnDescriptor;
 import net.kano.joscar.ratelim.RateLimitingQueueMgr;
-import net.kano.joscar.snac.*;
-import net.kano.joscar.snaccmd.*;
+import net.kano.joscar.snac.SnacPacketEvent;
+import net.kano.joscar.snac.SnacRequest;
+import net.kano.joscar.snac.SnacRequestAdapter;
+import net.kano.joscar.snac.SnacRequestListener;
+import net.kano.joscar.snac.SnacRequestTimeoutEvent;
+import net.kano.joscar.snac.SnacResponseEvent;
+import net.kano.joscar.snaccmd.ExtraInfoBlock;
+import net.kano.joscar.snaccmd.ExtraInfoData;
+import net.kano.joscar.snaccmd.FullUserInfo;
+import net.kano.joscar.snaccmd.MiniUserInfo;
+import net.kano.joscar.snaccmd.SnacFamilyInfoFactory;
 import net.kano.joscar.snaccmd.buddy.BuddyOfflineCmd;
 import net.kano.joscar.snaccmd.buddy.BuddyStatusCmd;
-import net.kano.joscar.snaccmd.conn.*;
+import net.kano.joscar.snaccmd.conn.ClientReadyCmd;
+import net.kano.joscar.snaccmd.conn.ClientVersionsCmd;
+import net.kano.joscar.snaccmd.conn.ExtraInfoAck;
+import net.kano.joscar.snaccmd.conn.RateAck;
+import net.kano.joscar.snaccmd.conn.RateClassInfo;
+import net.kano.joscar.snaccmd.conn.RateInfoCmd;
+import net.kano.joscar.snaccmd.conn.RateInfoRequest;
+import net.kano.joscar.snaccmd.conn.ServerReadyCmd;
+import net.kano.joscar.snaccmd.conn.SnacFamilyInfo;
+import net.kano.joscar.snaccmd.conn.WarningNotification;
 import net.kano.joscar.snaccmd.error.SnacError;
 import net.kano.joscar.snaccmd.icbm.InstantMessage;
 import net.kano.joscar.snaccmd.icbm.OldIcbm;
@@ -44,14 +70,6 @@ import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
 import org.xmpp.packet.Message;
-
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Handles incoming FLAP packets.
@@ -84,6 +102,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
             = DateFormat.getDateTimeInstance(DateFormat.SHORT,
                     DateFormat.SHORT);
 
+    @Override
     protected void handleFlapPacket(FlapPacketEvent e) {
         Log.debug("OSCAR flap packet received: "+e);
         FlapCommand cmd = e.getFlapCommand();
@@ -93,6 +112,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
         }
     }
 
+    @Override
     protected void handleSnacPacket(SnacPacketEvent e) {
         Log.debug("OSCAR snac packet received: "+e);
         SnacCommand cmd = e.getSnacCommand();
@@ -167,12 +187,14 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                 for (ExtraInfoBlock i : extraInfo) {
                     ExtraInfoData data = i.getExtraData();
 
-                    if (JiveGlobals.getBooleanProperty("plugin.gateway."+getMainSession().getTransport().getType()+".avatars", true) && (data.getFlags() & ExtraInfoData.FLAG_UPLOAD_ICON) != 0 && getMainSession().pendingAvatar != null) {
+                    final byte[] pendingAvatar = getMainSession().getSsiHierarchy().getPendingAvatarData();
+                    if (JiveGlobals.getBooleanProperty("plugin.gateway."+getMainSession().getTransport().getType()+".avatars", true) && (data.getFlags() & ExtraInfoData.FLAG_UPLOAD_ICON) != 0 && pendingAvatar != null) {
                         Log.debug("OSCAR: Server has indicated that it wants our icon.");
-                        request(new UploadIconCmd(ByteBlock.wrap(getMainSession().pendingAvatar)), new SnacRequestAdapter() {
+                        request(new UploadIconCmd(ByteBlock.wrap(pendingAvatar)), new SnacRequestAdapter() {
+                            @Override
                             public void handleResponse(SnacResponseEvent e) {
                                 SnacCommand cmd = e.getSnacCommand();
-                                if (cmd instanceof UploadIconAck && getMainSession().pendingAvatar != null) {
+                                if (cmd instanceof UploadIconAck && pendingAvatar != null) {
                                     UploadIconAck iconAck = (UploadIconAck) cmd;
                                     if (iconAck.getCode() == UploadIconAck.CODE_DEFAULT || iconAck.getCode() == UploadIconAck.CODE_SUCCESS) {
                                         ExtraInfoBlock iconInfo = iconAck.getIconInfo();
@@ -182,7 +204,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                                         Log.debug("OSCAR: Successfully set icon.");
                                         try {
                                             MessageDigest md = MessageDigest.getInstance("MD5");
-                                            md.update(getMainSession().pendingAvatar);
+                                            md.update(pendingAvatar);
                                             getMainSession().getAvatar().setLegacyIdentifier(org.jivesoftware.util.StringUtils.encodeHex(md.digest()));
                                         }
                                         catch (NoSuchAlgorithmException ee) {
@@ -198,11 +220,13 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                                     else {
                                         Log.debug("OSCAR: Got unknown code from UploadIconAck: " + iconAck.getCode());
                                     }
-                                    getMainSession().pendingAvatar = null;
                                 }
                                 else if (cmd instanceof SnacError) {
                                     Log.debug("Got SnacError while setting icon: " + cmd);
                                 }
+                                
+                                // Clear the pending binary data from Krakens memory.
+                                getMainSession().getSsiHierarchy().clearPendingAvatar();
                             }
                         });
                     }
@@ -250,11 +274,12 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                     }
                     else if (i.getType() == ExtraInfoBlock.TYPE_ICONHASH && JiveGlobals.getBooleanProperty("plugin.gateway."+getMainSession().getTransport().getType()+".avatars", true)) {
                         try {
-                            OSCARBuddy oscarBuddy = (OSCARBuddy)getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(info.getScreenname()));
+                            OSCARBuddy oscarBuddy = getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(info.getScreenname()));
                             Avatar curAvatar = oscarBuddy.getAvatar();
                             if (curAvatar == null || !curAvatar.getLegacyIdentifier().equals(org.jivesoftware.util.StringUtils.encodeHex(i.getExtraData().getData().toByteArray()))) {
                                 IconRequest req = new IconRequest(info.getScreenname(), i.getExtraData());
                                 request(req, new SnacRequestAdapter() {
+                                    @Override
                                     public void handleResponse(SnacResponseEvent e) {
                                         SnacCommand cmd = e.getSnacCommand();
                                         if (cmd instanceof IconDataCmd) {
@@ -263,7 +288,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                                                 Log.debug("Got icon data: "+idc);
                                                 if (getMainSession().getBuddyManager().isActivated()) {
                                                     try {
-                                                        OSCARBuddy oscarBuddy = (OSCARBuddy)getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(idc.getScreenname()));
+                                                        OSCARBuddy oscarBuddy = getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(idc.getScreenname()));
                                                         oscarBuddy.setAvatar(new Avatar(getMainSession().getTransport().convertIDToJID(idc.getScreenname()), org.jivesoftware.util.StringUtils.encodeHex(idc.getIconInfo().getExtraData().getData().toByteArray()), idc.getIconData().toByteArray()));
                                                     }
                                                     catch (NotFoundException ee) {
@@ -277,6 +302,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
                                         }
                                     }
 
+                                    @Override
                                     public void handleTimeout(SnacRequestTimeoutEvent e) {
                                         Log.debug("Time out while waiting for icon data.");
                                     }
@@ -291,7 +317,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
             }
             if (getMainSession().getBuddyManager().isActivated()) {
                 try {
-                    OSCARBuddy oscarBuddy = (OSCARBuddy)getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(info.getScreenname()));
+                    OSCARBuddy oscarBuddy = getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(info.getScreenname()));
                     oscarBuddy.setPresenceAndStatus(pType, vStatus);
                 }
                 catch (NotFoundException ee) {
@@ -307,7 +333,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
             BuddyOfflineCmd boc = (BuddyOfflineCmd)cmd;
             if (getMainSession().getBuddyManager().isActivated()) {
                 try {
-                    OSCARBuddy oscarBuddy = (OSCARBuddy)getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(boc.getScreenname()));
+                    OSCARBuddy oscarBuddy = getMainSession().getBuddyManager().getBuddy(getMainSession().getTransport().convertIDToJID(boc.getScreenname()));
                     oscarBuddy.setPresence(PresenceType.unavailable);
                 }
                 catch (NotFoundException ee) {
@@ -343,6 +369,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
         }
     }
 
+    @Override
     protected void handleSnacResponse(SnacResponseEvent e) {
         Log.debug("OSCAR snac packet response: "+e);
         SnacCommand cmd = e.getSnacCommand();
@@ -397,6 +424,7 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
         getMainSession().handleRequest(req);
     }
 
+    @Override
     protected SnacRequest request(SnacCommand cmd,
             SnacRequestListener listener) {
         SnacRequest req = new SnacRequest(cmd, listener);
