@@ -52,7 +52,6 @@ public class SimpleTransport extends BaseTransport<SimpleBuddy> {
 		session.logOut();
 		
 		((SimpleSession) session).removeStack();
-		session.sessionDone();
 		
         // Just in case.
 		session.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
