@@ -44,6 +44,7 @@ import net.sf.kraken.roster.TransportBuddyManager;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.SupportedFeature;
 import net.sf.kraken.type.TransportType;
 
 import org.apache.log4j.Logger;
@@ -90,6 +91,8 @@ public class OSCARSession extends TransportSession<OSCARBuddy> {
      */
     public OSCARSession(Registration registration, JID jid, OSCARTransport transport, Integer priority) {
         super(registration, jid, transport, priority);
+        setSupportedFeature(SupportedFeature.chatstates);
+
         ssiHierarchy = new SSIHierarchy(this);
         this.propertyPrefix = "plugin.gateway."+transport.getType().toString();
         OscarTools.setDefaultCharset(JiveGlobals.getProperty(this.propertyPrefix+".encoding", "ISO8859-1"));

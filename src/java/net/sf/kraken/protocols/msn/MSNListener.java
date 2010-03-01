@@ -166,21 +166,15 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
      * Handles incoming datacast messages from MSN.
      */
     public void datacastMessageReceived(MsnSwitchboard switchboard, MsnDatacastMessage message, MsnContact friend) {
+        final JID to = getSession().getJID();
+        final JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
         if (message.getId() == 1) {
-            getSession().getTransport().sendMessage(
-                    getSession().getJID(),
-                    getSession().getTransport().convertIDToJID(friend.getEmail().toString()),
-                    LocaleUtils.getLocalizedString("gateway.msn.nudge", "kraken"),
-                    Message.Type.headline
-            );
+            final String msg = LocaleUtils.getLocalizedString("gateway.msn.nudge", "kraken");
+            getSession().getTransport().sendAttentionNotification(to, from, msg);
         }
         else if (message.getId() == 2) {
-            getSession().getTransport().sendMessage(
-                    getSession().getJID(),
-                    getSession().getTransport().convertIDToJID(friend.getEmail().toString()),
-                    LocaleUtils.getLocalizedString("gateway.msn.wink", "kraken"),
-                    Message.Type.headline
-            );
+            final String msg = LocaleUtils.getLocalizedString("gateway.msn.wink", "kraken");
+            getSession().getTransport().sendAttentionNotification(to, from, msg);
         }
         else {
             Log.debug("MSN: Received unknown datacast message to " + switchboard + " from " + friend + ": " + message);

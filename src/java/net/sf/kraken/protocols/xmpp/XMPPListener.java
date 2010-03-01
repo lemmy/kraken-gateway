@@ -4,12 +4,15 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Date;
 
+import net.sf.kraken.BaseTransport;
+import net.sf.kraken.protocols.xmpp.packet.AttentionExtension;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailBoxPacket;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailNotifyExtension;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailSender;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailThread;
 import net.sf.kraken.protocols.xmpp.packet.GoogleNewMailExtension;
 import net.sf.kraken.protocols.xmpp.packet.IQWithPacketExtension;
+import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.NameSpace;
 
 import org.apache.log4j.Logger;
@@ -21,9 +24,11 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.smackx.packet.DelayInformation;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 /**
@@ -78,23 +83,79 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
     public void processMessage(Chat chat, org.jivesoftware.smack.packet.Message message) {
         Log.debug("Received XMPP/GTalk message: "+message.toXML());
         try {
-            PacketExtension pe = message.getExtension("x", NameSpace.X_DELAY);
+            final BaseTransport<XMPPBuddy> transport = getSession().getTransport();
+            final JID legacyJID = transport.convertIDToJID(message.getFrom());
+            final JID localJID = getSession().getJID();
+            final PacketExtension pe = message.getExtension("x", NameSpace.X_DELAY);
+            final PacketExtension attExt = message.getExtension(AttentionExtension.ELEMENT_NAME, AttentionExtension.NAMESPACE);
+            
             if (pe != null && pe instanceof DelayInformation) {
                 DelayInformation di = (DelayInformation)pe;
-                getSession().getTransport().sendOfflineMessage(
-                        getSession().getJID(),
-                        getSession().getTransport().convertIDToJID(message.getFrom()),
+                transport.sendOfflineMessage(
+                        localJID,
+                        legacyJID,
                         message.getBody(),
                         di.getStamp(),
                         di.getReason()
                 );
+            } else if (attExt != null && (attExt instanceof AttentionExtension)) {
+                transport.sendAttentionNotification(localJID, legacyJID, message.getBody());
             }
             else {
-                getSession().getTransport().sendMessage(
-                        getSession().getJID(),
-                        getSession().getTransport().convertIDToJID(message.getFrom()),
-                        message.getBody()
-                );
+                // see if we got sent chat state notifications
+                final PacketExtension cse = message
+                        .getExtension("http://jabber.org/protocol/chatstates");
+                if (cse != null && cse instanceof ChatStateExtension) {
+                    final String chatState = cse.getElementName();
+                    try {
+                        final ChatStateType cst = ChatStateType.valueOf(
+                                ChatStateType.class, chatState);
+                        switch (cst) {
+                            case active:
+                                // only send a 'stand alone' active state if the
+                                // message stanza does not include a text
+                                // message. If it does, the 'active' state is
+                                // included with that chat message below.
+                                if (message.getBody() == null
+                                        || message.getBody().trim().length() == 0) {
+                                    transport.sendChatActiveNotification(
+                                            localJID, legacyJID);
+                                }
+                                break;
+
+                            case composing:
+                                transport.sendComposingNotification(localJID,
+                                        legacyJID);
+                                break;
+
+                            case gone:
+                                transport.sendChatGoneNotification(localJID,
+                                        legacyJID);
+                                break;
+
+                            case inactive:
+                                transport.sendChatInactiveNotification(
+                                        localJID, legacyJID);
+                                break;
+
+                            case paused:
+                                transport.sendComposingPausedNotification(
+                                        localJID, legacyJID);
+                                break;
+
+                            default:
+                                Log.debug("Unexpected chat state recieved: " + cst);
+                                break;
+
+                        }
+                    }
+                    catch (IllegalArgumentException ex) {
+                        Log.warn("Illegal chat state notification "
+                                + "recieved from legacy domain: " + chatState);
+                    }
+
+                }
+                transport.sendMessage(localJID, legacyJID, message.getBody());
             }
 //            if (message.getProperty("time") == null || message.getProperty("time").equals("")) {
 //            }
@@ -112,7 +173,6 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
         catch (Exception ex) {
             Log.debug("E001:"+ ex.getMessage(), ex);
         }
-        
     }
 
     public void connectionClosed() {

@@ -31,6 +31,7 @@ import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.NameSpace;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.SupportedFeature;
 import net.sf.kraken.type.TransportLoginStatus;
 import net.sf.kraken.type.TransportType;
 
@@ -82,6 +83,9 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
      */
     public XMPPSession(Registration registration, JID jid, XMPPTransport transport, Integer priority) {
         super(registration, jid, transport, priority);
+        setSupportedFeature(SupportedFeature.attention);
+        setSupportedFeature(SupportedFeature.chatstates);
+
         Log.debug("Creating "+getTransport().getType()+" session for " + registration.getUsername());
         String connecthost;
         Integer connectport;

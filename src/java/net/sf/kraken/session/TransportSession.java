@@ -67,6 +67,9 @@ public abstract class TransportSession<B extends TransportBuddy> {
         addResource(jid.getResource(), priority);
         loadAvatar();
         Log.debug("Created "+transport.getType()+" session for "+jid+" as '"+registration.getUsername()+"'");
+        
+        // note: vcards are supported even if avatars are not!
+        setSupportedFeature(SupportedFeature.vcardtemp); 
     }
 
     /**
@@ -375,7 +378,7 @@ public abstract class TransportSession<B extends TransportBuddy> {
      * @param priority New priority of resource
      */
     public void updatePriority(String resource, Integer priority) {
-        Boolean currentHighest = false;
+        boolean currentHighest = false;
         if (isHighestPriority(resource)) {
             currentHighest = true;
         }
@@ -404,7 +407,7 @@ public abstract class TransportSession<B extends TransportBuddy> {
      * @param resource Resource to be checked.
      * @return True of false if the resource is associated with this session.
      */
-    public Boolean hasResource(String resource) {
+    public boolean hasResource(String resource) {
         return (resources.containsKey(resource));
     }
 

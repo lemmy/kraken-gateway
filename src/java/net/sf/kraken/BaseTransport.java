@@ -259,6 +259,9 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
                     if (packet.getChildElement("buzz", NameSpace.SPARKNS) != null) {
                         session.sendBuzzNotification(to, packet.getBody());
                     }
+                    else if (packet.getChildElement("attention", NameSpace.ATTENTIONNS) != null) {
+                        session.sendBuzzNotification(to, packet.getBody());
+                    }
                     else {
                         session.sendMessage(to, packet.getBody());
                     }
@@ -614,12 +617,13 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
      * @return A list of IQ packets to be returned to the user.
      */
     private List<Packet> handleDiscoInfo(IQ packet) {
+        // TODO: why return a list? we're sure to return always exactly one result.
         List<Packet> reply = new ArrayList<Packet>();
         JID from = packet.getFrom();
-
+        IQ result = IQ.createResultIQ(packet);
+        
         if (packet.getTo().getNode() == null) {
             // Requested info from transport itself.
-            IQ result = IQ.createResultIQ(packet);
             if (from.getNode() == null || RegistrationManager.getInstance().isRegistered(from, this.transportType) || permissionManager.hasAccess(from)) {
                 Element response = DocumentHelper.createElement(QName.get("query", NameSpace.DISCO_INFO));
                 response.addElement("identity")
@@ -649,9 +653,33 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
             else {
                 result.setError(Condition.forbidden);
             }
-            reply.add(result);
+        } else {
+            // Requested info from a gateway user.
+            
+            final TransportSession<B> session;
+            try {
+                session = sessionManager.getSession(packet.getFrom());
+                if ((from.getNode() == null || permissionManager.hasAccess(from)) && session != null) {
+                    final Element response = DocumentHelper.createElement(QName.get("query", NameSpace.DISCO_INFO));
+                    response.addElement("identity")
+                        .addAttribute("category", "client")
+                        .addAttribute("type", "pc");
+                    response.addElement("feature")
+                        .addAttribute("var", NameSpace.DISCO_INFO);
+                    
+                    for(final SupportedFeature feature : session.supportedFeatures) {
+                        response.addElement("feature")
+                            .addAttribute("var", feature.getVar());
+                    }
+                    result.setChildElement(response);
+                } else {
+                    result.setError(Condition.forbidden);
+                }
+            } catch (NotFoundException ex) {
+                result.setError(Condition.item_not_found);
+            }
         }
-
+        reply.add(result);
         return reply;
     }
 
@@ -1626,7 +1654,7 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
      * @param from Who the notification is from.
      * @param message Message attached to buzz notification.
      */
-    public void sendBuzzNotification(JID to, JID from, String message) {
+    private void sendBuzzNotification(JID to, JID from, String message) {
         Message m = new Message();
 //        m.setType(Message.Type.headline);
         m.setTo(to);
@@ -1638,34 +1666,34 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
 //        m.addChildElement("attention", "http://www.xmpp.org/extensions/xep-0224.html#ns");
         sendPacket(m);
     }
-    
-    /**
-     * Sends a active chat session notification through the component manager.
-     * Note that this type of state is also included in chat messages with a
-     * body. Take care to avoid sending duplicate 'active' state messages. This
-     * method is intended to be used only for those (rare) occurrances, where
-     * the legacy domain wishes to express that a contact is activly taking part
-     * in a conversation, without sending an actual chat message.
-     *
-     * This will check whether the person supports typing notifications before
-     * sending. TODO: actually check for typing notification support
-     *
-     * @param to
-     *            Who the notification is for.
-     * @param from
-     *            Who the notification is from.
-     */
-    public void sendChatActiveNotification(JID to, JID from) {
-        final Message m = new Message();
-        m.setType(Message.Type.chat);
-        m.setTo(to);
-        m.setFrom(from);
-        final Element xEvent = m.addChildElement("x", "jabber:x:event");
-        xEvent.addElement("id");
-        m.addChildElement("active", NameSpace.CHATSTATES);
-        sendPacket(m);
-    }
 
+    /**
+     * Sends an Attention notification, as specified in XEP-0224.
+     * 
+     * @param to The entity that of which the attention is being tried to capture.
+     * @param from The entity that is trying to capturing another ones attention.
+     * @param message An optional (headline) message (can be <tt>null</tt>).
+     */
+    public void sendAttentionNotification(JID to, JID from, String message) {
+        // TODO: query receiving entity for support.
+        
+        // TODO: only buzz clients that support the Spark namespace!
+        sendBuzzNotification(to, from, message);
+        
+        final Message stanza = new Message();
+        if (message != null && message.trim().length() > 0) {
+            stanza.setBody(message);
+        }
+        
+        stanza.addChildElement("attention", NameSpace.ATTENTIONNS);
+        
+        stanza.setType(Message.Type.headline);
+        stanza.setTo(to);
+        stanza.setFrom(from);
+        
+        sendPacket(stanza);
+    }
+    
     /**
      * Sends a typing notification through the component manager.
      *
@@ -1747,6 +1775,33 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         sendPacket(m);
     }
 
+    /**
+     * Sends a active chat session notification through the component manager.
+     * Note that this type of state is also included in chat messages with a
+     * body. Take care to avoid sending duplicate 'active' state messages. This
+     * method is intended to be used only for those (rare) occurrances, where
+     * the legacy domain wishes to express that a contact is activly taking part
+     * in a conversation, without sending an actual chat message.
+     * 
+     * This will check whether the person supports typing notifications before
+     * sending. TODO: actually check for typing notification support
+     * 
+     * @param to
+     *            Who the notification is for.
+     * @param from
+     *            Who the notification is from.
+     */
+    public void sendChatActiveNotification(JID to, JID from) {
+        final Message m = new Message();
+        m.setType(Message.Type.chat);
+        m.setTo(to);
+        m.setFrom(from);
+        final Element xEvent = m.addChildElement("x", "jabber:x:event");
+        xEvent.addElement("id");
+        m.addChildElement("active", NameSpace.CHATSTATES);
+        sendPacket(m);
+    }
+    
     /**
      * Intercepts roster additions related to the gateway and flags them as non-persistent.
      *

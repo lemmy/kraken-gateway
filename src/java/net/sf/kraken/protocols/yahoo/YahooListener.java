@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
+import org.openymsg.network.Status;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionChatEvent;
@@ -248,7 +249,7 @@ public class YahooListener extends SessionAdapter {
      */
     @Override
     public void buzzReceived(SessionEvent event) {
-        getSession().getTransport().sendBuzzNotification(
+        getSession().getTransport().sendAttentionNotification(
                 getSession().getJID(),
                 getSession().getTransport().convertIDToJID(event.getFrom()),
                 messageDecoder.decodeToText(event.getMessage())

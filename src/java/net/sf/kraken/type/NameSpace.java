@@ -38,5 +38,6 @@ public class NameSpace {
     public static final String X_DELAY = "jabber:x:delay";
     public static final String VCARD_TEMP = "vcard-temp";
     public static final String VCARD_TEMP_X_UPDATE = "vcard-temp:x:update";
+    public static final String ATTENTIONNS = "urn:xmpp:attention:0";
 
 }

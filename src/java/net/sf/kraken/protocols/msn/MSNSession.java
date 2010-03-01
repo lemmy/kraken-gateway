@@ -24,11 +24,13 @@ import net.sf.jml.MsnSwitchboard;
 import net.sf.jml.impl.BasicMessenger;
 import net.sf.jml.impl.MsnMessengerFactory;
 import net.sf.jml.message.MsnControlMessage;
+import net.sf.jml.message.MsnDatacastMessage;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddyManager;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.SupportedFeature;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.roster.Roster;
@@ -63,6 +65,8 @@ public class MSNSession extends TransportSession<MSNBuddy> {
      */
     public MSNSession(Registration registration, JID jid, MSNTransport transport, Integer priority) {
         super(registration, jid, transport, priority);
+        setSupportedFeature(SupportedFeature.chatstates);
+        setSupportedFeature(SupportedFeature.attention);
 
         if (Email.parseStr(registration.getUsername()) == null) {
             Message m = new Message();
@@ -473,6 +477,15 @@ public class MSNSession extends TransportSession<MSNBuddy> {
      */
     @Override
     public void sendBuzzNotification(JID jid, String message) {
+        final MsnDatacastMessage nudge = new MsnDatacastMessage();
+        nudge.setId(1); // 1=nudge, 2=wink
+
+        final Email jidEmail = Email.parseStr(getTransport().convertJIDToID(jid));
+        for (MsnSwitchboard sb : msnMessenger.getActiveSwitchboards()) {
+            if (sb.containContact(jidEmail)) {
+                sb.sendMessage(nudge, false);
+            }
+        }
     }
 
     /**

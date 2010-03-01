@@ -11,12 +11,14 @@
 package net.sf.kraken.protocols.xmpp;
 
 import net.sf.kraken.BaseTransport;
+import net.sf.kraken.protocols.xmpp.packet.AttentionExtension;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.util.LocaleUtils;
 import org.xmpp.packet.JID;
 
@@ -31,6 +33,11 @@ import org.xmpp.packet.JID;
  */
 public class XMPPTransport extends BaseTransport<XMPPBuddy> {
 
+    static {
+        final ProviderManager pm = ProviderManager.getInstance();
+        pm.addExtensionProvider(AttentionExtension.ELEMENT_NAME, AttentionExtension.NAMESPACE, new AttentionExtension.Provider());
+    }
+    
     /*
      * @see net.sf.kraken.BaseTransport#getTerminologyUsername()
      */

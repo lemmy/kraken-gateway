@@ -22,6 +22,7 @@ import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.SupportedFeature;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
@@ -69,6 +70,8 @@ public class YahooSession extends TransportSession<YahooBuddy> {
      */
     public YahooSession(Registration registration, JID jid, YahooTransport transport, Integer priority) {
         super(registration, jid, transport, priority);
+        setSupportedFeature(SupportedFeature.attention);
+        setSupportedFeature(SupportedFeature.chatstates);
 
         pseudoRoster = PseudoRosterManager.getInstance().getPseudoRoster(registration);
     }

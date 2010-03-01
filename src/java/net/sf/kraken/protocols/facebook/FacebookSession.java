@@ -18,6 +18,7 @@ import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.type.SupportedFeature;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
@@ -47,6 +48,7 @@ public class FacebookSession extends TransportSession<FacebookBuddy> {
      */
     public FacebookSession(Registration registration, JID jid, FacebookTransport transport, Integer priority) {
         super(registration, jid, transport, priority);
+        setSupportedFeature(SupportedFeature.attention);
     }
 
     /* Adapter */
