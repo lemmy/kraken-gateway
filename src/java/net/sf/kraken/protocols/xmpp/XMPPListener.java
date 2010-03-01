@@ -87,8 +87,7 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
             final JID legacyJID = transport.convertIDToJID(message.getFrom());
             final JID localJID = getSession().getJID();
             final PacketExtension pe = message.getExtension("x", NameSpace.X_DELAY);
-            final PacketExtension attExt = message.getExtension(AttentionExtension.ELEMENT_NAME, AttentionExtension.NAMESPACE);
-            
+           
             if (pe != null && pe instanceof DelayInformation) {
                 DelayInformation di = (DelayInformation)pe;
                 transport.sendOfflineMessage(
@@ -98,8 +97,6 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
                         di.getStamp(),
                         di.getReason()
                 );
-            } else if (attExt != null && (attExt instanceof AttentionExtension)) {
-                transport.sendAttentionNotification(localJID, legacyJID, message.getBody());
             }
             else {
                 // see if we got sent chat state notifications
@@ -168,7 +165,7 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
 //                        message.getProperty("time").toString()
 //                );
 //            }
-            
+           
         }
         catch (Exception ex) {
             Log.debug("E001:"+ ex.getMessage(), ex);
