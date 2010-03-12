@@ -580,6 +580,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     public void syncUsers() {
         for (RosterEntry entry : conn.getRoster().getEntries()) {
             getBuddyManager().storeBuddy(new XMPPBuddy(getBuddyManager(), entry.getUser(), entry.getName(), entry.getGroups(), entry));
+            // TODO: This should pass the correct from and probepacket should reenable setting from address.  Temporary quick fix in place.
             ProbePacket probe = new ProbePacket(getJID().toString(), entry.getUser());
             try {
                 conn.sendPacket(probe);
