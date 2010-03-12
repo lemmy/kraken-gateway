@@ -19,7 +19,7 @@ json.jar                 | 1.0
 log4j.jar                | 1.2.14
 martyr.jar               | svn-20070908
 msim.jar                 | svn-20090125
-openymsg.jar             | svn-20100113
+openymsg.jar             | svn-20100312
 servlet.jar              | 2.5
 smack.jar                | svn-20090707 (patched [#2])
 smackx.jar               | svn-20090707 (patched [#2])
