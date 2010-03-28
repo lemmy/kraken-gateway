@@ -13,7 +13,7 @@ jggapi.jar               | cvs-20090802
 jml.jar                  | svn-20100207
 joscar-common.jar        | svn-20091130
 joscar-protocol.jar      | svn-20091130
-jqql.jar                 | svn-20081124
+jqql.jar                 | svn-20100328
 jsocks.jar               | 1.01 (patched [#1])
 json.jar                 | 1.0
 log4j.jar                | 1.2.14

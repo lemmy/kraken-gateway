@@ -23,7 +23,7 @@ import net.sf.jqql.events.QQEvent;
 import net.sf.jqql.packets.in.ChangeStatusReplyPacket;
 import net.sf.jqql.packets.in.FriendChangeStatusPacket;
 import net.sf.jqql.packets.in.GetFriendListReplyPacket;
-import net.sf.jqql.packets.in.GetOnlineOpReplyPacket;
+import net.sf.jqql.packets.in._08._08GetOnlineOpReplyPacket;
 import net.sf.jqql.packets.in.ReceiveIMPacket;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -75,21 +75,20 @@ public class QQListener implements IQQListener {
     public void qqEvent(QQEvent e) {
         Log.debug("Received - " + e.getSource() + " Event ID: "+e.type);
         switch (e.type) {
-            case QQEvent.QQ_LOGIN_SUCCESS:
+            case QQEvent.LOGIN_OK:
                 processSuccessfulLogin();
                 break;
-            case QQEvent.QQ_LOGIN_FAIL:
+            case QQEvent.LOGIN_FAIL:
                 getSession().sessionDisconnectedNoReconnect(null);
                 break;
-            case QQEvent.QQ_LOGIN_UNKNOWN_ERROR:
-            case QQEvent.QQ_CONNECTION_BROKEN:
-            case QQEvent.QQ_CONNECTION_LOST:
+            case QQEvent.LOGIN_UNKNOWN_ERROR:
+            case QQEvent.ERROR_CONNECTION_BROKEN:
                 getSession().sessionDisconnected(null);
                 break;
-            case QQEvent.QQ_CHANGE_STATUS_SUCCESS:
+            case QQEvent.USER_STATUS_CHANGE_OK:
                 processStatusChangeOK((ChangeStatusReplyPacket)e.getSource());
                 break;
-            case QQEvent.QQ_CHANGE_STATUS_FAIL:
+            case QQEvent.USER_STATUS_CHANGE_FAIL:
                 getSession().sessionDisconnected(null);
                 break;
     //        case QQEvent.QQ_DOWNLOAD_GROUP_FRIEND_SUCCESS:
@@ -107,20 +106,20 @@ public class QQListener implements IQQListener {
     //        case QQEvent.QQ_RECEIVE_CLUSTER_IM:
     //            processClusterIM(e);
     //            break;
-            case QQEvent.QQ_RECEIVE_NORMAL_IM:
+            case QQEvent.IM_RECEIVED:
                 processNormalIM((ReceiveIMPacket)e.getSource());
                 break;
-            case QQEvent.QQ_NETWORK_ERROR:
-            case QQEvent.QQ_RUNTIME_ERROR:
+            case QQEvent.ERROR_NETWORK:
+            case QQEvent.ERROR_RUNTIME:
                 getSession().sessionDisconnected(null);
                 break;
-            case QQEvent.QQ_GET_FRIEND_ONLINE_SUCCESS:
-                processFriendOnline((GetOnlineOpReplyPacket)e.getSource());
+            case QQEvent.FRIEND_GET_ONLINE_OK:
+                processFriendOnline((_08GetOnlineOpReplyPacket)e.getSource());
                 break;
-            case QQEvent.QQ_FRIEND_CHANGE_STATUS:
+            case QQEvent.FRIEND_STATUS_CHANGED:
                 processFriendChangeStatus((FriendChangeStatusPacket)e.getSource());
                 break;
-            case QQEvent.QQ_GET_FRIEND_LIST_SUCCESS:
+            case QQEvent.FRIEND_GET_LIST_OK:
                 processFriendList((GetFriendListReplyPacket)e.getSource());
                 break;
             default:
@@ -145,7 +144,7 @@ public class QQListener implements IQQListener {
                 getSession().getBuddyManager().storeBuddy(qqBuddy);
             }
             if (p.position != 0xFFFF) {
-                getSession().getQQClient().getFriendList(p.position);
+                getSession().getQQClient().user_GetList(p.position);
             }
         } catch (Exception ex) {
             Log.error("Failed to process friend list: ", ex);
@@ -245,9 +244,9 @@ public class QQListener implements IQQListener {
     
     private void processSuccessfulLogin() {
         getSession().setLoginStatus(TransportLoginStatus.LOGGED_IN);
-        getSession().getQQClient().getFriendList();
+        getSession().getQQClient().user_GetList();
 //        getSession().getQQClient().downloadGroup();
-        getSession().getQQClient().getFriendOnline();
+        getSession().getQQClient().user_GetOnline();
     }
 
     private void processStatusChangeOK(ChangeStatusReplyPacket p) {
@@ -325,7 +324,7 @@ public class QQListener implements IQQListener {
      * 
      * @param e Event to be handled.
      */
-    private void processFriendOnline(GetOnlineOpReplyPacket p) {
+    private void processFriendOnline(_08GetOnlineOpReplyPacket p) {
         try {
             for (FriendOnlineEntry f : p.onlineFriends) {
                 if (getSession().getBuddyManager().isActivated()) {

@@ -89,10 +89,10 @@ public class QQSession extends TransportSession<QQBuddy> {
         	if (presenceType.equals(PresenceType.away) ||
         			presenceType.equals(PresenceType.xa) ||
         			presenceType.equals(PresenceType.dnd)) {
-        		qqclient.makeMeAway();
+        		qqclient.status_Away();
         	}
         	else {
-        		qqclient.makeMeOnline();
+        		qqclient.status_Online();
         	}
 //            try { 
 //                qquser.setStatus(((QQTransport) getTransport()).
@@ -108,13 +108,13 @@ public class QQSession extends TransportSession<QQBuddy> {
     @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
     	//qqclient.addFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
-    	qqclient.sendAddFriendAuth(Integer.valueOf(getTransport().convertJIDToID(jid)), "Please accept my friend request!");
-    	qqclient.downloadFriend(Integer.valueOf(getTransport().convertJIDToID(jid)));
+    	qqclient.user_SendAuth(Integer.valueOf(getTransport().convertJIDToID(jid)), "Please accept my friend request!");
+    	qqclient.user_Add(Integer.valueOf(getTransport().convertJIDToID(jid)));
     }
 
     @Override
     public void removeContact(QQBuddy transportBuddy) {
-    	qqclient.deleteFriend(Integer.valueOf(getTransport().convertJIDToID(transportBuddy.getJID())));
+    	qqclient.user_Delete(Integer.valueOf(getTransport().convertJIDToID(transportBuddy.getJID())));
     }
 
     @Override
@@ -141,7 +141,7 @@ public class QQSession extends TransportSession<QQBuddy> {
 //                qqclient.sendClusterIM(clusters.get(qqNum).clusterId,
 //                                        message);
 //            } else {
-                qqclient.sendIM(qqNum, message.getBytes());
+                qqclient.im_Send(qqNum, message.getBytes());
 //            }
 
         } catch (Exception ex) {
@@ -179,7 +179,7 @@ public class QQSession extends TransportSession<QQBuddy> {
         qquser.setServerPort(8000);
         qqclient.setLoginServer(qqserver);
         try {
-			qqclient.login();
+			qqclient.sendLoginKey();
 		}
         catch (Exception e) {
 			Log.debug("Login attempt at server "+qqserver+" failed, trying next.");
