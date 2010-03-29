@@ -392,7 +392,7 @@ public class YahooListener extends SessionAdapter {
     public void contactAcceptedReceived(SessionFriendAcceptedEvent event) {
         final Set<String> groups = new HashSet<String>();
         groups.add(event.getGroupName());
-        final YahooUser user = new YahooUser(event.getFrom(), YahooSession.DEFAULT_GROUPNAME);
+        final YahooUser user = new YahooUser(event.getFrom());
         // TODO clean up the next line. This implementation of constructor for YahooBuddy seems to be inappropriate here.
         final YahooBuddy buddy = new YahooBuddy(getSession().getBuddyManager(), user, null, groups, null);
         getSession().getBuddyManager().storeBuddy(buddy);

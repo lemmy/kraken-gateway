@@ -37,6 +37,7 @@ import org.openymsg.network.FailedLoginException;
 import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.network.YahooUser;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
@@ -343,7 +344,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
         Log.debug("Yahoo: accept add contact " + userID);
         
         try {
-            yahooSession.acceptFriendAuthorization(userID);
+            yahooSession.acceptFriendAuthorization(userID, YahooProtocol.YAHOO);
         } catch (IOException e) {
             Log.debug("Yahoo: Failed to accept add contact request.");
         }
