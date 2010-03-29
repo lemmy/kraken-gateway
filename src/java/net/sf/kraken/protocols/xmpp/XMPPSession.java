@@ -20,8 +20,6 @@ import net.sf.kraken.protocols.xmpp.packet.BuzzExtension;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailBoxPacket;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailNotifyExtension;
 import net.sf.kraken.protocols.xmpp.packet.GoogleNewMailExtension;
-import net.sf.kraken.protocols.xmpp.packet.GoogleRelayExtension;
-import net.sf.kraken.protocols.xmpp.packet.GoogleSharedStatusExtension;
 import net.sf.kraken.protocols.xmpp.packet.GoogleUserSettingExtension;
 import net.sf.kraken.protocols.xmpp.packet.IQWithPacketExtension;
 import net.sf.kraken.protocols.xmpp.packet.ProbePacket;
@@ -114,6 +112,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         config = new ConnectionConfiguration(connecthost, connectport, domain);
         config.setCompressionEnabled(JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".usecompression", false));
 
+        // instead, send the initial presence right after logging in. This
+        // allows us to use a different presence mode than the plain old
+        // 'available' as initial presence.
+        config.setSendPresence(false); 
+
         if (getTransport().getType().equals(TransportType.gtalk) && JiveGlobals.getBooleanProperty("plugin.gateway.gtalk.mailnotifications", true)) {
             ProviderManager.getInstance().addIQProvider(GoogleMailBoxPacket.MAILBOX_ELEMENT, GoogleMailBoxPacket.MAILBOX_NAMESPACE, new GoogleMailBoxPacket.Provider());
             ProviderManager.getInstance().addExtensionProvider(GoogleNewMailExtension.ELEMENT_NAME, GoogleNewMailExtension.NAMESPACE, new GoogleNewMailExtension.Provider());
@@ -139,7 +142,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     /*
      * XMPP connection configuration
      */
-    private ConnectionConfiguration config = null;
+    private final ConnectionConfiguration config;
 
     /**
      * Timer to check for online status.
@@ -155,11 +158,6 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
      * Mail checker
      */
     MailCheck mailCheck;
-
-    /**
-     * The session's current presence
-     */
-    org.jivesoftware.smack.packet.Presence presence;
 
     /**
      * Returns a full JID based off of a username passed in.
@@ -215,7 +213,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
      */
     @Override
     public void logIn(PresenceType presenceType, String verboseStatus) {
-        presence = new org.jivesoftware.smack.packet.Presence(org.jivesoftware.smack.packet.Presence.Type.available);
+        final org.jivesoftware.smack.packet.Presence presence = new org.jivesoftware.smack.packet.Presence(org.jivesoftware.smack.packet.Presence.Type.available);
         if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".avatars", true) && getAvatar() != null) {
             Avatar avatar = getAvatar();
             // Same thing in this case, so lets go ahead and set them.
@@ -224,7 +222,16 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
             ext.setPhotoHash(avatar.getLegacyIdentifier());
             presence.addExtension(ext);
         }
+        final Presence.Mode pMode = ((XMPPTransport) getTransport())
+                .convertGatewayStatusToXMPP(presenceType);
+        if (pMode != null) {
+            presence.setMode(pMode);
+        }
+        if (verboseStatus != null && verboseStatus.trim().length() > 0) {
+            presence.setStatus(verboseStatus);
+        }
         setPendingPresenceAndStatus(presenceType, verboseStatus);
+        
         if (!this.isLoggedIn()) {
             listener = new XMPPListener(this);
             presenceHandler = new XMPPPresenceHandler(this);
@@ -239,6 +246,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                         conn.addConnectionListener(listener);
                         try {
                             conn.login(userName, registration.getPassword(), StringUtils.randomString(10));
+                            conn.sendPacket(presence); // send initial presence.
                             conn.getChatManager().addChatListener(listener);
                             conn.addPacketListener(presenceHandler, new PacketTypeFilter(org.jivesoftware.smack.packet.Presence.class));
                             // Use this to filter out anything we don't care about
@@ -274,9 +282,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
 
                             if (getTransport().getType().equals(TransportType.gtalk) && JiveGlobals.getBooleanProperty("plugin.gateway.gtalk.mailnotifications", true)) {
                                 conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleUserSettingExtension(false, true, false), IQ.Type.SET));
-                                conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleRelayExtension()));
                                 conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleMailNotifyExtension()));
-                                conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleSharedStatusExtension()));
                                 mailCheck = new MailCheck();
                                 timer.schedule(mailCheck, timerInterval, timerInterval);
                             }
@@ -369,22 +375,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
      */
     @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
-        org.jivesoftware.smack.packet.Presence.Mode mode = ((XMPPTransport)getTransport()).convertGatewayStatusToXMPP(presenceType);
-        if (mode != null && mode != presence.getMode()) {
-            presence.setMode(mode);
-        }
-        if (presence.getType() != org.jivesoftware.smack.packet.Presence.Type.available) {
-            presence.setType(org.jivesoftware.smack.packet.Presence.Type.available);
-        }
-        if (verboseStatus != null) {
-            presence.setStatus(verboseStatus);
-        }
-        else {
-            presence.setStatus("");
-        }
+        setPresenceAndStatus(presenceType, verboseStatus);
+        final org.jivesoftware.smack.packet.Presence presence = constructCurrentLegacyPresencePacket();
+
         try {
             conn.sendPacket(presence);
-            setPresenceAndStatus(presenceType, verboseStatus);
         }
         catch (IllegalStateException e) {
             Log.debug("XMPP: Not connected while trying to change status.");
@@ -541,11 +536,41 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     }
 
     /**
+     * Returns a (legacy/Smack-based) Presence stanza that represents the
+     * current presence of this session. The Presence includes relevant Mode,
+     * Status and VCardUpdate information.
+     * 
+     * This method uses the fields {@link TransportSession#presence} and
+     * {@link TransportSession#verboseStatus} to generate the result.
+     * 
+     * @return A Presence packet representing the current presence state of this
+     *         session.
+     */
+    public Presence constructCurrentLegacyPresencePacket() {
+        final org.jivesoftware.smack.packet.Presence presence = new org.jivesoftware.smack.packet.Presence(
+                org.jivesoftware.smack.packet.Presence.Type.available);
+        final Presence.Mode pMode = ((XMPPTransport) getTransport())
+                .convertGatewayStatusToXMPP(this.presence);
+        if (pMode != null) {
+            presence.setMode(pMode);
+        }
+        if (verboseStatus != null && verboseStatus.trim().length() > 0) {
+            presence.setStatus(verboseStatus);
+        }
+        final Avatar avatar = getAvatar();
+        if (avatar != null) {
+            final VCardUpdateExtension ext = new VCardUpdateExtension();
+            ext.setPhotoHash(avatar.getLegacyIdentifier());
+            presence.addExtension(ext);
+        }
+        return presence;
+    }
+    
+    /**
      * @see net.sf.kraken.session.TransportSession#updateLegacyAvatar(String, byte[])
      */
     @Override
-    public void updateLegacyAvatar(String type, byte[] data) {
-        final byte[] tmpData = data;
+    public void updateLegacyAvatar(String type, final byte[] data) {
         new Thread() {
             @Override
             public void run() {
@@ -554,20 +579,13 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                 VCard vCard = new VCard();
                 try {
                     vCard.load(conn);
-                    vCard.setAvatar(tmpData, avatar.getMimeType());
+                    vCard.setAvatar(data, avatar.getMimeType());
                     vCard.save(conn);
 
-                    // Same thing in this case, so lets go ahead and set them.
                     avatar.setLegacyIdentifier(avatar.getXmppHash());
-                    VCardUpdateExtension ext = (VCardUpdateExtension)presence.getExtension("x", NameSpace.VCARD_TEMP_X_UPDATE);
-                    if (ext != null) {
-                        ext.setPhotoHash(avatar.getLegacyIdentifier());
-                    }
-                    else {
-                        ext = new VCardUpdateExtension();
-                        ext.setPhotoHash(avatar.getLegacyIdentifier());
-                        presence.addExtension(ext);
-                    }
+                    
+                    // Same thing in this case, so lets go ahead and set them.
+                    final org.jivesoftware.smack.packet.Presence presence = constructCurrentLegacyPresencePacket();
                     conn.sendPacket(presence);
                 }
                 catch (XMPPException e) {
