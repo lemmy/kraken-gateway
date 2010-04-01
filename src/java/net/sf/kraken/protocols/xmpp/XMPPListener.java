@@ -1,3 +1,13 @@
+/**
+ * $Revision$
+ * $Date$
+ *
+ * Copyright 2006-2010 Daniel Henninger.  All rights reserved.
+ *
+ * This software is published under the terms of the GNU Public License (GPL),
+ * a copy of which is included in this distribution.
+ */
+
 package net.sf.kraken.protocols.xmpp;
 
 import java.lang.ref.WeakReference;

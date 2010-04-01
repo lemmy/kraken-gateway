@@ -1,10 +1,10 @@
 /**
- * $Revision: $
- * $Date: $
+ * $Revision$
+ * $Date$
  *
- * Copyright 2008 Daniel Henninger.  All rights reserved.
+ * Copyright 2006-2010 Daniel Henninger.  All rights reserved.
  *
- * This software is published under the terms of the GNU Lesser Public License (LGPL),
+ * This software is published under the terms of the GNU Public License (GPL),
  * a copy of which is included in this distribution.
  */
 

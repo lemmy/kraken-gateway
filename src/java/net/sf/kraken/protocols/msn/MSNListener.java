@@ -2,7 +2,7 @@
  * $Revision$
  * $Date$
  *
- * Copyright 2008 Daniel Henninger.  All rights reserved.
+ * Copyright 2006-2010 Daniel Henninger.  All rights reserved.
  *
  * This software is published under the terms of the GNU Public License (GPL),
  * a copy of which is included in this distribution.
@@ -135,7 +135,7 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
     /**
      * Handles incoming system messages from MSN.
      *
-     * @param switchboard Switchboard session the message is associated with.
+     * @param messenger Messenger session the message is associated with.
      * @param message MSN message.
      */
     public void systemMessageReceived(MsnMessenger messenger, MsnSystemMessage message) {    

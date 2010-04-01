@@ -2,11 +2,12 @@
  * $Revision$
  * $Date$
  *
- * Copyright 2008 Daniel Henninger.  All rights reserved.
+ * Copyright 2006-2010 Daniel Henninger.  All rights reserved.
  *
  * This software is published under the terms of the GNU Public License (GPL),
  * a copy of which is included in this distribution.
  */
+
 package net.sf.kraken.protocols.qq;
 
 import java.lang.ref.WeakReference;
@@ -302,7 +303,7 @@ public class QQListener implements IQQListener {
     /**
      * Handles a standard instant message being sent to us.
      * 
-     * @param e Event of the message.
+     * @param p Event of the message.
      */
     private void processNormalIM(ReceiveIMPacket p) {
         NormalIM im = p.normalIM;
@@ -322,7 +323,7 @@ public class QQListener implements IQQListener {
     /**
      * Handles an event when a friend has come online.
      * 
-     * @param e Event to be handled.
+     * @param p Event to be handled.
      */
     private void processFriendOnline(_08GetOnlineOpReplyPacket p) {
         try {
@@ -352,7 +353,7 @@ public class QQListener implements IQQListener {
     /**
      * Handles an event where a friend changes their status.
      * 
-     * @param e Event representing change.
+     * @param p Event representing change.
      */
     private void processFriendChangeStatus(FriendChangeStatusPacket p) {
         try {

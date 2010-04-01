@@ -2,7 +2,7 @@
  * $Revision$
  * $Date$
  *
- * Copyright 2010 Daniel Henninger.  All rights reserved.
+ * Copyright 2006-2010 Daniel Henninger.  All rights reserved.
  *
  * This software is published under the terms of the GNU Public License (GPL),
  * a copy of which is included in this distribution.
@@ -484,7 +484,7 @@ public class SSIHierarchy {
     /**
      * Deletes a buddy from the contact list.
      * 
-     * @param oscarBuddy
+     * @param buddy
      *            the buddy to be deleted.
      */
     public void delete(BuddyItem buddy) {

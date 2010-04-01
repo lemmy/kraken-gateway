@@ -2,7 +2,7 @@
  * $Revision$
  * $Date$
  *
- * Copyright 2008 Daniel Henninger.  All rights reserved.
+ * Copyright 2006-2010 Daniel Henninger.  All rights reserved.
  *
  * This software is published under the terms of the GNU Public License (GPL),
  * a copy of which is included in this distribution.
@@ -83,7 +83,7 @@ public class StringUtils {
      * standard. This method will return an empty String if the input is null or empty.
      *
      * @author Donoiu Cristian, GPL
-     * @param  The String whose non-valid characters we want to remove.
+     * @param  s The String whose non-valid characters we want to remove.
      * @return The in String, stripped of non-valid characters.
      */
     public static String removeInvalidXMLCharacters(String s) {
