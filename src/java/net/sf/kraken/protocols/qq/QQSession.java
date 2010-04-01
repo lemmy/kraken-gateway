@@ -176,10 +176,10 @@ public class QQSession extends TransportSession<QQBuddy> {
         //qqclient.setTcpLoginPort(8000);
         qqListener = new QQListener(this);
         qqclient.addQQListener(qqListener);
-        qquser.setServerPort(8000);
-        qqclient.setLoginServer(qqserver);
+        //qquser.setServerPort(8000);
+        qqclient.setLoginServer("sz.tencent.com");
         try {
-			qqclient.sendLoginKey();
+			qqclient.sendTouch();
 		}
         catch (Exception e) {
 			Log.debug("Login attempt at server "+qqserver+" failed, trying next.");
