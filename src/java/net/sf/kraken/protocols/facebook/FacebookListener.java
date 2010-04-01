@@ -16,9 +16,11 @@ import net.sf.jfacebookiml.FacebookMessage;
 import net.sf.jfacebookiml.FacebookUser;
 import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.type.PresenceType;
+import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.NotFoundException;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message.Type;
 
 public class FacebookListener implements FacebookEventListener {
@@ -70,11 +72,15 @@ public class FacebookListener implements FacebookEventListener {
 	}
 
 	public void receivedTypingEvent(String from, Boolean isTyping) {
-		if (isTyping) {
-			getSession().getTransport().sendComposingNotification(getSession().getJID(), getSession().getTransport().convertIDToJID(from));
+        final ChatStateEventSource chatStateEventSource = getSession().getTransport().getChatStateEventSource();
+        final JID receiver = getSession().getJID();
+        final JID sender = getSession().getTransport().convertIDToJID(from);
+
+        if (isTyping) {
+            chatStateEventSource.isComposing(sender, receiver);
 		}
 		else {
-            getSession().getTransport().sendComposingPausedNotification(getSession().getJID(), getSession().getTransport().convertIDToJID(from));
+            chatStateEventSource.isPaused(sender, receiver);
 		}
 	}
 

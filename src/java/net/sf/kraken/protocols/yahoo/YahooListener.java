@@ -18,6 +18,7 @@ import java.util.Set;
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.type.TransportLoginStatus;
+import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
@@ -293,14 +294,15 @@ public class YahooListener extends SessionAdapter {
         Log.debug(event.toString());
         if (event.isTyping()) {
             final BaseTransport<YahooBuddy> transport = getSession().getTransport();
+            final ChatStateEventSource chatStateEventSource = transport.getChatStateEventSource();
             final JID localJid = getSession().getJID();
             final JID legacyJid = transport.convertIDToJID(event.getFrom());
 
             if (event.isOn()) {
-                transport.sendComposingNotification(localJid, legacyJid);
+                chatStateEventSource.isComposing(legacyJid, localJid);
             }
             else {
-                transport.sendComposingPausedNotification(localJid, legacyJid);
+                chatStateEventSource.isPaused(legacyJid, localJid);
             }
         }
     }

@@ -62,11 +62,13 @@ import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportType;
 import net.sf.kraken.util.StringUtils;
+import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 /**
@@ -346,23 +348,18 @@ public abstract class BasicFlapConnection extends AbstractFlapConnection {
             TypingCmd tc = (TypingCmd) cmd;
             String sn = tc.getScreenname();
 
+            final ChatStateEventSource chatStateEventSource = getMainSession().getTransport().getChatStateEventSource();
+            final JID receiver = getMainSession().getJID();
+            final JID sender = getMainSession().getTransport().convertIDToJID(sn);
+            
             if (tc.getTypingState() == TypingCmd.STATE_TYPING) {
-                getMainSession().getTransport().sendComposingNotification(
-                        getMainSession().getJID(),
-                        getMainSession().getTransport().convertIDToJID(sn)
-                );
+                chatStateEventSource.isComposing(sender, receiver);
             }
             else if (tc.getTypingState() == TypingCmd.STATE_PAUSED) {
-                getMainSession().getTransport().sendComposingPausedNotification(
-                        getMainSession().getJID(),
-                        getMainSession().getTransport().convertIDToJID(sn)
-                );
+                chatStateEventSource.sendIsPaused(sender, receiver);
             }
             else if (tc.getTypingState() == TypingCmd.STATE_NO_TEXT) {
-                getMainSession().getTransport().sendChatInactiveNotification(
-                        getMainSession().getJID(),
-                        getMainSession().getTransport().convertIDToJID(sn)
-                );
+                chatStateEventSource.isInactive(sender, receiver);
             }
         }
     }

@@ -21,6 +21,9 @@ import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.session.TransportSessionManager;
 import net.sf.kraken.session.cluster.TransportSessionRouter;
 import net.sf.kraken.type.*;
+import net.sf.kraken.util.chatstate.ChatStateChangeEvent;
+import net.sf.kraken.util.chatstate.ChatStateEventListener;
+import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentHelper;
@@ -69,9 +72,11 @@ import java.util.concurrent.locks.Lock;
  *
  * @author Daniel Henninger
  */
-public abstract class BaseTransport<B extends TransportBuddy> implements Component, RosterEventListener, UserEventListener, PacketInterceptor, SessionEventListener, VCardListener {
+public abstract class BaseTransport<B extends TransportBuddy> implements Component, RosterEventListener, UserEventListener, PacketInterceptor, SessionEventListener, VCardListener, ChatStateEventListener {
 
     static Logger Log = Logger.getLogger(BaseTransport.class);
+
+    private final ChatStateEventSource chatStateEventSource = new ChatStateEventSource(this);
 
     /**
      * Create a new BaseTransport instance.
@@ -1055,6 +1060,13 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
     }
 
     /**
+     * @return the chat state managing object of the transport
+     */
+    public ChatStateEventSource getChatStateEventSource() {
+        return chatStateEventSource;
+    }
+
+    /**
      * Retains the version string for later requests.
      */
     private String versionString = null;
@@ -1548,6 +1560,15 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
      * @param packet Packet to be sent.
      */
     public void sendPacket(Packet packet) {
+        // Prevent future chat state notifications from being send out for
+        // contacts that are offline.
+        if (packet instanceof Presence) {
+            final Presence presence = (Presence) packet;
+            if (presence.getType() == Presence.Type.unavailable && presence.getFrom().getNode() != null) {
+                this.chatStateEventSource.isGone(presence.getFrom(), presence.getTo());
+            }
+        }
+        
         Log.debug(getType().toString()+": Sending packet: "+packet.toXML());
         try {
             this.componentManager.sendPacket(this, packet);
@@ -1572,6 +1593,7 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setTo(to);
         m.setBody(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(msg));
         if (type.equals(Message.Type.chat) || type.equals(Message.Type.normal)) {
+            chatStateEventSource.isActive(from, to);
             Element xEvent = m.addChildElement("x", "jabber:x:event");
 //            xEvent.addElement("id");
             xEvent.addElement("composing");
@@ -1693,7 +1715,58 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         
         sendPacket(stanza);
     }
-    
+
+    /* (non-Javadoc)
+     * @see net.sf.kraken.util.chatstate.ChatStateEventListener#chatStateChange(net.sf.kraken.util.chatstate.ChatStateEvent)
+     */
+    public void chatStateChange(ChatStateChangeEvent event) {
+        if (this.getJID().getDomain().equals(event.sender.getDomain())) {
+            // a local user is receiving a chat state event
+            switch (event.type) {
+                case active:
+                    // No need to do anything here. "Active" chat states are
+                    // included in each outgoing message. Sending them again
+                    // here would only lead to duplicate messages.
+                    //sendChatActiveNotification(event.receiver, event.sender);
+                    break;
+
+                case composing:
+                    sendComposingNotification(event.receiver, event.sender);
+                    break;
+
+                case gone:
+                    sendChatGoneNotification(event.receiver, event.sender);
+                    break;
+
+                case inactive:
+                    sendChatInactiveNotification(event.receiver, event.sender);
+                    break;
+
+                case paused:
+                    sendComposingPausedNotification(event.receiver, event.sender);
+                    break;
+
+                default:
+                    // The code should include cases for every possible state.
+                    throw new AssertionError(event.type);
+            }
+        }
+        else if (this.getJID().getDomain().equals(event.receiver.getDomain())) {
+            // a local user is sending an event
+            try {
+                getSessionManager().getSession(event.sender).sendChatState(event.receiver, event.type);
+            }
+            catch (NotFoundException e) {
+                Log.debug("A local user that does not have a session with us is "
+                        + "sending chat state messages to alegacy user. Event:" + event);
+            }
+        }
+        else {
+            Log.warn("Cannot send chat state event, as nor the sender or recipient "
+                    + "appears to be a locally registered (and online) user. Event: " + event);
+        }
+    }
+
     /**
      * Sends a typing notification through the component manager.
      *

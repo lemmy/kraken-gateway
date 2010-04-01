@@ -22,10 +22,12 @@ import net.sf.jmyspaceiml.packet.InstantMessage;
 import net.sf.jmyspaceiml.packet.MediaMessage;
 import net.sf.jmyspaceiml.packet.ProfileMessage;
 import net.sf.jmyspaceiml.packet.StatusMessage;
+import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.NotFoundException;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 /**
@@ -56,17 +58,15 @@ public class MySpaceIMListener implements MessageListener, ContactListener {
     
     public void processIncomingMessage(ActionMessage msgPacket) {
         Log.debug("MySpaceIM: Received action message packet: "+msgPacket);
+        final ChatStateEventSource chatStateEventSource = getSession().getTransport().getChatStateEventSource();
+        final JID receiver = getSession().getJID();
+        final JID sender = getSession().getTransport().convertIDToJID(msgPacket.getFrom());
+        
         if (msgPacket.getAction().equals(ActionMessage.ACTION_TYPING)) {
-            getSession().getTransport().sendComposingNotification(
-                    getSession().getJID(),
-                    getSession().getTransport().convertIDToJID(msgPacket.getFrom())
-            );
+            chatStateEventSource.isComposing(sender, receiver);
         }
         else if (msgPacket.getAction().equals(ActionMessage.ACTION_STOPTYPING)) {
-            getSession().getTransport().sendComposingPausedNotification(
-                    getSession().getJID(),
-                    getSession().getTransport().convertIDToJID(msgPacket.getFrom())
-            );
+            chatStateEventSource.isPaused(sender, receiver);
         }
     }
     

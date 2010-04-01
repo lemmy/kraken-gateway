@@ -13,9 +13,6 @@ package net.sf.kraken.protocols.msn;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.jml.DisplayPictureListener;
 import net.sf.jml.MsnContact;
@@ -51,6 +48,7 @@ import net.sf.jml.net.Session;
 import net.sf.jml.net.SessionListener;
 import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.type.TransportLoginStatus;
+import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
@@ -81,8 +79,6 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
     public MSNListener(MSNSession session) {
         //this.msnSessionRef = new WeakReference<MSNSession>(session);
         this.msnSession = session;
-        sessionReaper = new SessionReaper();
-        timer.schedule(sessionReaper, reaperInterval, reaperInterval);
     }
 
     /**
@@ -90,26 +86,6 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
      */
     //public WeakReference<MSNSession> msnSessionRef = null;
     public MSNSession msnSession = null;
-
-    /**
-     * Timer to check for stale typing notifications.
-     */
-    private Timer timer = new Timer();
-
-    /**
-     * Interval at which typing notifications are reaped.
-     */
-    private int reaperInterval = 5000; // 5 seconds
-
-    /**
-     * The actual reaper task.
-     */
-    private SessionReaper sessionReaper;
-
-    /**
-     * Record of active typing notifications.
-     */
-    private ConcurrentHashMap<String,Date> typingNotificationMap = new ConcurrentHashMap<String,Date>();
 
     /**
      * Returns the MSN session this listener is attached to.
@@ -130,6 +106,11 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
                 getSession().getTransport().convertIDToJID(friend.getEmail().toString()),
                 message.getContent()
         );
+        
+        // TODO: this will cause a duplicate chat state message to be sent. Prevent this!
+        final JID to = getSession().getJID();
+        final JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
+        getSession().getTransport().getChatStateEventSource().isActive(from, to);
     }
 
     /**
@@ -151,11 +132,9 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
      */
     public void controlMessageReceived(MsnSwitchboard switchboard, MsnControlMessage message, MsnContact friend) {
         if (message.getTypingUser() != null) {
-            getSession().getTransport().sendComposingNotification(
-                    getSession().getJID(),
-                    getSession().getTransport().convertIDToJID(friend.getEmail().toString())
-            );
-            typingNotificationMap.put(friend.getEmail().toString(), new Date());
+            final JID to = getSession().getJID();
+            final JID from = getSession().getTransport().convertIDToJID(friend.getEmail().toString());
+            getSession().getTransport().getChatStateEventSource().isComposing(from, to);
         }
         else {
             Log.debug("MSN: Received unknown control msg to " + switchboard + " from " + friend + ": " + message);
@@ -487,74 +466,6 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
         }
     }
 
-    /**
-     * Clean up any active typing notifications that are stale.
-     */
-    private class SessionReaper extends TimerTask {
-        /**
-         * Silence any typing notifications that are stale.
-         */
-        @Override
-        public void run() {
-            cancelTypingNotifications();
-        }
-    }
-
-    /**
-     * Any typing notification that hasn't been heard in 10 seconds will be killed.
-     */
-    private void cancelTypingNotifications() {
-        for (String source : typingNotificationMap.keySet()) {
-            if (typingNotificationMap.get(source).getTime() < ((new Date().getTime()) - 10000)) {
-                getSession().getTransport().sendChatInactiveNotification(
-                        getSession().getJID(),
-                        getSession().getTransport().convertIDToJID(source)
-                );
-                typingNotificationMap.remove(source);
-            }
-        }
-    }
-
-    /**
-     * Cleans up any leftover entities.
-     */
-    public void cleanup() {
-        try {
-            timer.cancel();
-        }
-        catch (Exception e) {
-            // Ignore
-        }
-        try {
-            typingNotificationMap.clear();
-        }
-        catch (Exception e) {
-            // Ignore
-        }
-        try {
-            timer.purge();
-        }
-        catch (Exception e) {
-            // Ignore
-        }
-        timer = null;
-        try {
-            sessionReaper.cancel();
-        }
-        catch (Exception e) {
-            // Ignore
-        }
-        sessionReaper = null;
-    }
-
-    /**
-     * Retrieves the session reaper.
-     * @return Session reaper associated with session.
-     */
-    public SessionReaper getSessionReaper() {
-        return sessionReaper;
-    }
-
 	public void contactAddInGroupCompleted(MsnMessenger arg0, MsnContact arg1,
 			MsnGroup arg2) {
 		// TODO Auto-generated method stub
@@ -605,8 +516,9 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
 	}
 
 	public void contactLeaveSwitchboard(MsnSwitchboard arg0, MsnContact arg1) {
-		// TODO Auto-generated method stub
-		
+        final JID to = getSession().getJID();
+        final JID from = getSession().getTransport().convertIDToJID(arg1.getEmail().toString());
+        getSession().getTransport().getChatStateEventSource().isGone(from, to);
 	}
 
 	public void switchboardClosed(MsnSwitchboard arg0) {

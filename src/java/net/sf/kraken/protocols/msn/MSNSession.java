@@ -182,15 +182,6 @@ public class MSNSession extends TransportSession<MSNBuddy> {
             }
             msnMessenger.logout();
         }
-        if (msnListener != null) {
-            try {
-                msnListener.cleanup();
-            }
-            catch (Exception e) {
-                // No problem, we tried our best to do it smoothly.
-            }
-            msnListener = null;
-        }
     }
 
     /**
