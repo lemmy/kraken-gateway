@@ -27,7 +27,6 @@ import net.sf.kraken.protocols.xmpp.packet.VCardUpdateExtension;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
-import net.sf.kraken.type.NameSpace;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.SupportedFeature;
 import net.sf.kraken.type.TransportLoginStatus;
@@ -133,6 +132,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
      */
     private XMPPListener listener = null;
 
+    /**
+     * Run thread.
+     */
+    private Thread runThread = null;
+
 	/**
 	 * Instance that will handle all presence stanzas sent from the legacy
 	 * domain
@@ -235,7 +239,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         if (!this.isLoggedIn()) {
             listener = new XMPPListener(this);
             presenceHandler = new XMPPPresenceHandler(this);
-            new Thread() {
+            runThread = new Thread() {
                 @Override
                 public void run() {
                     String userName = generateUsername(registration.getUsername());
@@ -297,7 +301,8 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                         sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionfailed", "kraken"));
                     }
                 }
-            }.start();
+            };
+            runThread.start();
         }
     }
 
@@ -368,6 +373,15 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         conn = null;
         listener = null;
         presenceHandler = null;
+        if (runThread != null) {
+            try {
+                runThread.interrupt();
+            }
+            catch (Exception e) {
+                // Ignore
+            }
+            runThread = null;
+        }
     }
 
     /**
@@ -507,7 +521,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                 case paused:    state = ChatState.paused;    break;
                 case inactive:  state = ChatState.inactive;  break;
                 case gone:      state = ChatState.gone;      break;
-            };
+            }
 
             Message message = new Message();
             message.addExtension(new ChatStateExtension(state));

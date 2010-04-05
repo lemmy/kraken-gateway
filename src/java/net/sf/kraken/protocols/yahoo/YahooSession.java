@@ -89,6 +89,11 @@ public class YahooSession extends TransportSession<YahooBuddy> {
     }
 
     /**
+     * Run thread.
+     */
+    private Thread runThread;
+
+    /**
      * Yahoo session
      */
     private Session yahooSession;
@@ -112,7 +117,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
             yahooListener = new YahooListener(this);
             yahooSession.addSessionListener(yahooListener);
 
-            new Thread() {
+            runThread = new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -179,7 +184,8 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                         setLoginStatus(TransportLoginStatus.LOGGED_OUT);
                     }
                 }
-            }.start();
+            };
+            runThread.start();
         }
     }
 
@@ -218,6 +224,15 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                 // If this fails it's ok, move on
             }
             yahooSession = null;
+        }
+        if (runThread != null) {
+            try {
+                runThread.interrupt();
+            }
+            catch (Exception e) {
+                // Ignore
+            }
+            runThread = null;
         }
     }
 
