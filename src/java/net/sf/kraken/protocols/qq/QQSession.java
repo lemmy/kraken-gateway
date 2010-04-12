@@ -87,9 +87,11 @@ public class QQSession extends TransportSession<QQBuddy> {
     @Override
     public void updateStatus(PresenceType presenceType, String verboseStatus) {
         if (isLoggedIn()) {
-        	if (presenceType.equals(PresenceType.away) ||
-        			presenceType.equals(PresenceType.xa) ||
-        			presenceType.equals(PresenceType.dnd)) {
+            if (presenceType.equals(PresenceType.dnd)) {
+                qqclient.status_Busy();
+            }
+        	else if (presenceType.equals(PresenceType.away) ||
+        			presenceType.equals(PresenceType.xa)) {
         		qqclient.status_Away();
         	}
         	else {
@@ -128,10 +130,8 @@ public class QQSession extends TransportSession<QQBuddy> {
      */
     @Override
     public void acceptAddContact(JID jid) {
-        final String userID = getTransport().convertJIDToID(jid);
-        Log.debug("QQ: accept-adding is currently not implemented."
-                + " Cannot accept-add: " + userID);
-        // TODO: Currently unimplemented
+        int qqNum = Integer.parseInt(getTransport().convertJIDToID(jid));
+        qqclient.user_ApproveAdd(qqNum);
     }
     
     @Override
