@@ -34,6 +34,7 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.smackx.packet.DelayInformation;
 import org.jivesoftware.util.JiveGlobals;
@@ -165,7 +166,12 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
                     }
 
                 }
-                transport.sendMessage(localJID, legacyJID, message.getBody());
+                if (message.getType() == Type.error) {
+                    Log.debug("Received an error message! Message: " + message.toXML());
+                    transport.sendMessage(localJID, legacyJID, message.getBody(), Message.Type.error);
+                } else {
+                    transport.sendMessage(localJID, legacyJID, message.getBody());
+                }
             }
 //            if (message.getProperty("time") == null || message.getProperty("time").equals("")) {
 //            }

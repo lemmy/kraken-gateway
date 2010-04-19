@@ -85,7 +85,9 @@ public class OSCARTransport extends BaseTransport<OSCARBuddy> {
             return username.matches("\\d+");
         }
         else {
-            return username.matches("\\w+") || username.matches("\\w+@[\\w\\.]+");
+            // Any e-mail address will do. Don't bother to check. See
+            // http://www.regular-expressions.info/email.html
+            return username.trim().length() > 0;
         }
     }
 

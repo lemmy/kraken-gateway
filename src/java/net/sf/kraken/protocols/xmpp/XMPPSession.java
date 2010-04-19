@@ -512,6 +512,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
      */
     @Override
     public void sendChatState(JID jid, ChatStateType chatState) {
+        final Presence presence = conn.getRoster().getPresence(jid.toString());
+        if (presence == null  || presence.getType().equals(Presence.Type.unavailable)) {
+            // don't send chat state to contacts that are offline.
+            return;
+        }
         Chat chat = conn.getChatManager().createChat(getTransport().convertJIDToID(jid), listener);
         try {
             ChatState state = ChatState.active;
