@@ -35,9 +35,9 @@ public class ProbePacket extends Packet {
         if (getTo() != null) {
             buf.append(" to=\"").append(StringUtils.escapeForXML(getTo())).append("\"");
         }
-        //if (getFrom() != null) {
-        //    buf.append(" from=\"").append(StringUtils.escapeForXML(getFrom())).append("\"");
-        //}
+        if (getFrom() != null) {
+            buf.append(" from=\"").append(StringUtils.escapeForXML(getFrom())).append("\"");
+        }
         buf.append(" type=\"probe\"");
         buf.append("/>");
         

@@ -175,6 +175,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     MailCheck mailCheck;
 
     /**
+     * XMPP Resource - the resource we are using (randomly generated)
+     */
+    private String xmppResource = StringUtils.randomString(10);
+
+    /**
      * Returns a full JID based off of a username passed in.
      *
      * If it already looks like a JID, returns what was passed in.
@@ -263,7 +268,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                         conn.connect();
                         conn.addConnectionListener(listener);
                         try {
-                            conn.login(userName, registration.getPassword(), StringUtils.randomString(10));
+                            conn.login(userName, registration.getPassword(), xmppResource);
                             conn.sendPacket(presence); // send initial presence.
                             conn.getChatManager().addChatListener(listener);
                             conn.addPacketListener(presenceHandler, new PacketTypeFilter(org.jivesoftware.smack.packet.Presence.class));
@@ -469,8 +474,8 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                     catch (XMPPException e) {
                         Log.debug("XMPP: Unable to add roster item to group.");
                     }
-                    newgroups.remove(group.getName());
                 }
+                newgroups.remove(group.getName());
             }
             else {
                 if (group.contains(user2Update)) {
@@ -631,8 +636,8 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     public void syncUsers() {
         for (RosterEntry entry : conn.getRoster().getEntries()) {
             getBuddyManager().storeBuddy(new XMPPBuddy(getBuddyManager(), entry.getUser(), entry.getName(), entry.getGroups(), entry));
-            // TODO: This should pass the correct from and probepacket should reenable setting from address.  Temporary quick fix in place.
-            ProbePacket probe = new ProbePacket(getJID().toString(), entry.getUser());
+            ProbePacket probe = new ProbePacket(this.getJID()+"/"+xmppResource, entry.getUser());
+            Log.debug("XMPP: Sending the following probe packet: "+probe.toXML());
             try {
                 conn.sendPacket(probe);
             }

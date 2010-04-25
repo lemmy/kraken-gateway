@@ -62,7 +62,7 @@ public class XMPPPresenceHandler implements PacketListener{
 			throw new IllegalArgumentException(getClass().getName()
 					+ " can only be used to handle presence packets. "
 					+ "Please modify the caller code accordingly "
-					+ "(use a appropiate PacketFilter).");
+					+ "(use a appropriate PacketFilter).");
 		}
 
 		final org.jivesoftware.smack.packet.Presence presence = (org.jivesoftware.smack.packet.Presence) packet;
@@ -127,7 +127,7 @@ public class XMPPPresenceHandler implements PacketListener{
 			    }
 			}
 			catch (NotFoundException e) {
-			    Log.debug("XMPP: Received presense notification for contact that's not in the buddy manager of user " + session.getJID() + ". GTalk is known to do this occasionally: "+presence.getFrom());
+			    Log.debug("XMPP: Received presence notification for contact that's not in the buddy manager of user " + session.getJID() + ". GTalk is known to do this occasionally: "+presence.getFrom());
 			    // We cannot add this buddy to the buddy manager, as that would result into an auto-accept of the contact sending the data.
 			}
 		}
