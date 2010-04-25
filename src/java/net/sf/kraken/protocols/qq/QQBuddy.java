@@ -12,6 +12,7 @@ package net.sf.kraken.protocols.qq;
 
 import java.util.Collection;
 
+import net.sf.jqql.beans.ContactInfo;
 import net.sf.jqql.beans.QQFriend;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
@@ -25,7 +26,11 @@ public class QQBuddy extends TransportBuddy {
         super(manager, String.valueOf(qqFriend.qqNum), nickname, groups);
         this.qqFriend = qqFriend;
     }
+    public QQBuddy(TransportBuddyManager<QQBuddy> manager, int qqnum, Collection<String> groups) {
+        super(manager, String.valueOf(qqnum), String.valueOf(qqnum), groups);
+    }
 
     public QQFriend qqFriend = null;
+    public ContactInfo contactInfo = null;
     
 }

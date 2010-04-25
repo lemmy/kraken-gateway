@@ -92,7 +92,7 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
      * @param message Message received.
      */
     public void processMessage(Chat chat, org.jivesoftware.smack.packet.Message message) {
-        Log.debug("Received XMPP/GTalk message: "+message.toXML());
+        Log.debug("Received "+getSession().getTransport().getType().name()+" message: "+message.toXML());
         try {
             final BaseTransport<XMPPBuddy> transport = getSession().getTransport();
             final JID legacyJID = transport.convertIDToJID(message.getFrom());
@@ -162,7 +162,7 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
                     }
                     catch (IllegalArgumentException ex) {
                         Log.warn("Illegal chat state notification "
-                                + "recieved from legacy domain: " + chatState);
+                                + "received from legacy domain: " + chatState);
                     }
 
                 }

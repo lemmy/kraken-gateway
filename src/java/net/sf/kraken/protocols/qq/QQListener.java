@@ -96,6 +96,9 @@ public class QQListener implements IQQListener {
             case QQEvent.FRIEND_GET_GROUP_NAMES_OK:
                 processGroupNames(e);
                 break;
+            case QQEvent.USER_GET_INFO_OK:
+                processFriendInfo(e);
+                break;
     //        case QQEvent.QQ_GET_CLUSTER_INFO_SUCCESS:
     //            processClusterInfo(e);
     //            break;
@@ -131,26 +134,27 @@ public class QQListener implements IQQListener {
 
     private void processFriendList(GetFriendListReplyPacket p) {
         Log.debug("QQ: processing friend list");
-        try {
-            for (QQFriend f : p.friends) {
-                Log.debug("Found QQ friend: "+f);
-                friends.put(f.qqNum, f);
-                
-                String groupName = friendGroup.get(f.qqNum);
-                if (groupName == null || groupName.trim().length() < 1) {
-                    groupName = defaultGroupName;
-                }
-                List<String> gl = new ArrayList<String>();
-                gl.add(groupName);
-                QQBuddy qqBuddy = new QQBuddy(getSession().getBuddyManager(), f, f.nick, gl);
-                getSession().getBuddyManager().storeBuddy(qqBuddy);
-            }
-            if (p.position != 0xFFFF) {
-                getSession().getQQClient().user_GetList(p.position);
-            }
-        } catch (Exception ex) {
-            Log.error("Failed to process friend list: ", ex);
-        }
+        // For whatever reason, this no longer returns anything useful.  So we go another route to get info on our peeps.
+//        try {
+//            for (QQFriend f : p.friends) {
+//                Log.debug("Found QQ friend: "+f);
+//                friends.put(f.qqNum, f);
+//
+//                String groupName = friendGroup.get(f.qqNum);
+//                if (groupName == null || groupName.trim().length() < 1) {
+//                    groupName = defaultGroupName;
+//                }
+//                List<String> gl = new ArrayList<String>();
+//                gl.add(groupName);
+//                QQBuddy qqBuddy = new QQBuddy(getSession().getBuddyManager(), f, f.nick, gl);
+//                getSession().getBuddyManager().storeBuddy(qqBuddy);
+//            }
+//            if (p.position != 0xFFFF) {
+//                getSession().getQQClient().user_GetList(p.position);
+//            }
+//        } catch (Exception ex) {
+//            Log.error("Failed to process friend list: ", ex);
+//        }
         
         // Lets try the actual sync.
         try {
@@ -161,6 +165,8 @@ public class QQListener implements IQQListener {
         }
         
         getSession().getBuddyManager().activate();
+
+        getSession().getQQClient().user_GetOnline();
     }
 
     private void processGroupFriend(QQEvent e) {
@@ -173,17 +179,42 @@ public class QQListener implements IQQListener {
 //                    getSession().getQQClient().getClusterInfo(entry.qqNum);
 //                } else {
                     if (groupNames != null && groupNames.size() > entry.group) {
-                        friendGroup.put(entry.qqNum, groupNames.get(entry.group));
+                        String groupName = groupNames.get(entry.group);
+                        friendGroup.put(entry.qqNum, groupName);
+                        List<String> gl = new ArrayList<String>();
+                        gl.add(groupName);
+                        QQBuddy qqBuddy = new QQBuddy(getSession().getBuddyManager(), entry.qqNum, gl);
+                        getSession().getBuddyManager().storeBuddy(qqBuddy);
                     } else {
                         friendGroup.put(entry.qqNum, defaultGroupName);
+                        List<String> gl = new ArrayList<String>();
+                        gl.add(defaultGroupName);
+                        QQBuddy qqBuddy = new QQBuddy(getSession().getBuddyManager(), entry.qqNum, gl);
+                        getSession().getBuddyManager().storeBuddy(qqBuddy);
                     }
 //                }
+                getSession().getQQClient().user_GetInfo(entry.qqNum);
             }
 //            if (p.beginFrom != 0) {
 //                getSession().getQQClient().getClusterOnlineMember(p.beginFrom);
 //            }
         } catch (Exception ex) {
             Log.error("Failed to process group friend: ", ex);
+        }
+        getSession().getQQClient().user_GetList();
+    }
+
+    private void processFriendInfo(QQEvent e) {
+        Log.debug("QQ: Processing friend info request");
+        GetUserInfoReplyPacket p = (GetUserInfoReplyPacket) e.getSource();
+        try {
+            QQBuddy buddy = getSession().getBuddyManager().getBuddy(getSession().getTransport().convertIDToJID(String.valueOf(p.contactInfo.qq)));
+            buddy.setNickname(p.contactInfo.nick);
+            buddy.contactInfo = p.contactInfo;
+            getSession().getBuddyManager().storeBuddy(buddy);
+        }
+        catch (NotFoundException nfe) {
+            Log.debug("QQ: Received buddy "+p.contactInfo.qq+" that we don't know about.");
         }
     }
 
@@ -198,6 +229,7 @@ public class QQListener implements IQQListener {
         } catch (Exception ex) {
             Log.error("Failed to process group names: ", ex);
         }
+        getSession().getQQClient().user_DownloadGroups(0);
     }
 
 //    private void processClusterInfo(QQEvent e) {
@@ -251,8 +283,6 @@ public class QQListener implements IQQListener {
         getSession().setLoginStatus(TransportLoginStatus.LOGGED_IN);
 
         getSession().getQQClient().user_GetGroupNames();
-        getSession().getQQClient().user_GetOnline();
-        getSession().getQQClient().user_GetList();
     }
 
     private void processStatusChangeOK(ChangeStatusReplyPacket p) {

@@ -34,13 +34,7 @@ import net.sf.kraken.type.TransportType;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
@@ -83,23 +77,34 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         setSupportedFeature(SupportedFeature.attention);
         setSupportedFeature(SupportedFeature.chatstates);
 
+        SASLAuthentication.registerSASLMechanism("DIGEST-MD5", MySASLDigestMD5Mechanism.class);
+
         Log.debug("Creating "+getTransport().getType()+" session for " + registration.getUsername());
         String connecthost;
         Integer connectport;
         String domain;
 
-        connecthost = JiveGlobals.getProperty("plugin.gateway."+getTransport().getType()+".connecthost", (getTransport().getType().equals(TransportType.gtalk) ? "talk.google.com" : "jabber.org"));
+        connecthost = JiveGlobals.getProperty("plugin.gateway."+getTransport().getType()+".connecthost", (getTransport().getType().equals(TransportType.gtalk) ? "talk.google.com" : getTransport().getType().equals(TransportType.facebook) ? "chat.facebook.com" : "jabber.org"));
         connectport = JiveGlobals.getIntProperty("plugin.gateway."+getTransport().getType()+".connectport", 5222);
 
         if (getTransport().getType().equals(TransportType.gtalk)) {
             domain = "gmail.com";
+        }
+        else if (getTransport().getType().equals(TransportType.facebook)) {
+            //if (connecthost.equals("www.facebook.com")) {
+                connecthost = "chat.facebook.com";
+            //}
+            //if (connectport.equals(80)) {
+                connectport = 5222;
+            //}
+            domain = "chat.facebook.com";
         }
         else {
             domain = connecthost;
         }
 
         // For different domains other than 'gmail.com', which is given with Google Application services
-        if (registration.getUsername().indexOf("@") >- 1) {
+        if (registration.getUsername().indexOf("@") > -1) {
             domain = registration.getUsername().substring( registration.getUsername().indexOf("@")+1 );
         }
 
@@ -110,6 +115,12 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
 
         config = new ConnectionConfiguration(connecthost, connectport, domain);
         config.setCompressionEnabled(JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".usecompression", false));
+
+        if (getTransport().getType().equals(TransportType.facebook)) {
+            //SASLAuthentication.supportSASLMechanism("PLAIN", 0);
+            //config.setSASLAuthenticationEnabled(false);
+            //config.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+        }
 
         // instead, send the initial presence right after logging in. This
         // allows us to use a different presence mode than the plain old
@@ -179,8 +190,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         if (getTransport().getType().equals(TransportType.gtalk)) {
             return username+"@"+"gmail.com";
         }
+        else if (getTransport().getType().equals(TransportType.facebook)) {
+            return username+"@"+"chat.facebook.com";
+        }
         else {
-            String connecthost = JiveGlobals.getProperty("plugin.gateway."+getTransport().getType()+".connecthost", (getTransport().getType().equals(TransportType.gtalk) ? "talk.google.com" : "jabber.org"));
+            String connecthost = JiveGlobals.getProperty("plugin.gateway."+getTransport().getType()+".connecthost", (getTransport().getType().equals(TransportType.gtalk) ? "talk.google.com" : getTransport().getType().equals(TransportType.facebook) ? "chat.facebook.com" : "jabber.org"));
             return username+"@"+connecthost;
         }
     }

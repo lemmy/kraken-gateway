@@ -132,7 +132,7 @@ public class KrakenPlugin implements Plugin {
         maybeStartService("sametime");
         
         /* Set up Facebook transport. */
-        transports.put("facebook", new TransportInstance(TransportType.facebook , LocaleUtils.getLocalizedString("gateway.facebook.name", "kraken"), "net.sf.kraken.protocols.facebook.FacebookTransport", componentManager, sessionRouter));
+        transports.put("facebook", new TransportInstance(TransportType.facebook , LocaleUtils.getLocalizedString("gateway.facebook.name", "kraken"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
         maybeStartService("facebook");
         
         /* Set up MySpaceIM transport. */
