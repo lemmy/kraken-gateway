@@ -1592,6 +1592,10 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setFrom(from);
         m.setTo(to);
         m.setBody(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(msg));
+        if (msg.length() == 0) {
+            Log.debug("Dropping empty message packet.");
+            return;
+        }
         if (type.equals(Message.Type.chat) || type.equals(Message.Type.normal)) {
             chatStateEventSource.isActive(from, to);
             Element xEvent = m.addChildElement("x", "jabber:x:event");
@@ -1636,6 +1640,10 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setFrom(from);
         m.setTo(to);
         m.setBody(net.sf.kraken.util.StringUtils.removeInvalidXMLCharacters(msg));
+        if (msg.length() == 0) {
+            Log.debug("Dropping empty message packet.");
+            return;
+        }
         Element delay = m.addChildElement("delay", NameSpace.DELAY);
 //        delay.addAttribute("from", from.toBareJID());
         delay.addAttribute("stamp", UTC_FORMAT.format(time));
