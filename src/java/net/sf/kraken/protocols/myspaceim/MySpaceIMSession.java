@@ -20,6 +20,7 @@ import net.sf.jmyspaceiml.packet.StatusMessage;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -79,6 +80,7 @@ public class MySpaceIMSession extends TransportSession<MySpaceIMBuddy> {
             }
             catch (MSIMException e) {
                 Log.error("MySpace: Failure while logging in:", e);
+                setFailureStatus(ConnectionFailureReason.UNKNOWN);
             }
         }
     }

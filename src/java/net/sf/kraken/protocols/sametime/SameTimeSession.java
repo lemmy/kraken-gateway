@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 
 import org.apache.log4j.Logger;
@@ -115,6 +116,7 @@ public class SameTimeSession extends TransportSession<SameTimeBuddy> {
             }
             catch (DuplicateObjectException e) {
                 Log.error("SameTime: Tried to start up duplicate session for: "+jid);
+                setFailureStatus(ConnectionFailureReason.UNKNOWN);
             }
          }
     }

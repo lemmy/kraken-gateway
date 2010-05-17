@@ -21,6 +21,7 @@ import net.sf.jqql.net.PortGateFactory;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -184,6 +185,7 @@ public class QQSession extends TransportSession<QQBuddy> {
 		}
         catch (Exception e) {
 			Log.debug("Login attempt at server "+qqserver+" failed, trying next.");
+            setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
 		}
     }
 

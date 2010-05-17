@@ -27,6 +27,7 @@ import net.kano.joscar.snaccmd.auth.AuthResponse;
 import net.kano.joscar.snaccmd.auth.ClientVersionInfo;
 import net.kano.joscar.snaccmd.auth.KeyRequest;
 import net.kano.joscar.snaccmd.auth.KeyResponse;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.TransportLoginStatus;
 import net.sf.kraken.type.TransportType;
 
@@ -70,6 +71,7 @@ public class LoginConnection extends AbstractFlapConnection {
         }
         else if (e.getNewState() == ClientFlapConn.STATE_FAILED) {
             getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.connectionfailed", "kraken")+" " + e.getReason());
+            getMainSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
         }
         else if (e.getNewState() == ClientFlapConn.STATE_NOT_CONNECTED) {
             //TODO: Do we need to catch these?
@@ -128,43 +130,51 @@ public class LoginConnection extends AbstractFlapConnection {
                 switch (error) {
                     case (AuthResponse.ERROR_ACCOUNT_DELETED): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.accountdeleted", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         break;
                     }
 
                     case (AuthResponse.ERROR_BAD_INPUT): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.badinput", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         break;
                     }
 
                     case (AuthResponse.ERROR_BAD_PASSWORD): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.badpassword", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         break;
                     }
 
                     case (AuthResponse.ERROR_CLIENT_TOO_OLD): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.oldclient", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
                         break;
                     }
 
                     case (AuthResponse.ERROR_CONNECTING_TOO_MUCH_A):
                     case (AuthResponse.ERROR_CONNECTING_TOO_MUCH_B): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.connectedtoomuch", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
                         break;
                     }
 
                     case (AuthResponse.ERROR_INVALID_SN_OR_PASS_A):
                     case (AuthResponse.ERROR_INVALID_SN_OR_PASS_B): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.baduserorpass", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         break;
                     }
 
                     case (AuthResponse.ERROR_SIGNON_BLOCKED): {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.accountsuspended", "kraken");
+                        getMainSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
                         break;
                     }
 
                     default: {
                         errormsg = LocaleUtils.getLocalizedString("gateway.oscar.unknownerror", "kraken", Arrays.asList(error, ar.getErrorUrl()));
+                        getMainSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
                     }
                 }
 

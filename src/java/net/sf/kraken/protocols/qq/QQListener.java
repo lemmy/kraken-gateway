@@ -24,6 +24,7 @@ import net.sf.jqql.events.IQQListener;
 import net.sf.jqql.events.QQEvent;
 import net.sf.jqql.packets.in.*;
 import net.sf.jqql.packets.in._08._08GetOnlineOpReplyPacket;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
@@ -79,10 +80,12 @@ public class QQListener implements IQQListener {
                 break;
             case QQEvent.LOGIN_FAIL:
                 getSession().sessionDisconnectedNoReconnect(null);
+                getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                 break;
             case QQEvent.LOGIN_UNKNOWN_ERROR:
             case QQEvent.ERROR_CONNECTION_BROKEN:
                 getSession().sessionDisconnected(null);
+                getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
                 break;
             case QQEvent.USER_STATUS_CHANGE_OK:
                 processStatusChangeOK((ChangeStatusReplyPacket)e.getSource());
@@ -114,6 +117,7 @@ public class QQListener implements IQQListener {
             case QQEvent.ERROR_NETWORK:
             case QQEvent.ERROR_RUNTIME:
                 getSession().sessionDisconnected(null);
+                getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                 break;
             case QQEvent.FRIEND_GET_ONLINE_OK:
                 processFriendOnline((_08GetOnlineOpReplyPacket)e.getSource());

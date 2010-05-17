@@ -50,6 +50,7 @@ import net.sf.kraken.pseudoroster.PseudoRosterManager;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -463,6 +464,7 @@ public class SimpleSession extends TransportSession<SimpleBuddy> {
 			if (registerRequest.getHeader(CallIdHeader.NAME) == null) {
 				Log.debug("SimpleSession(" + getJID().getNode() + ").login:  Unable to create a SIP session ID!!");
 				this.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+                setFailureStatus(ConnectionFailureReason.UNKNOWN);
 				return;
 			}
 			else {
@@ -501,6 +503,7 @@ public class SimpleSession extends TransportSession<SimpleBuddy> {
 			catch (Exception e) {
 				Log.debug("SimpleSession(" + jid.getNode() + ").login:  Unable to send login packet.", e);
 				this.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+                setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
 			}
 		}
 	}

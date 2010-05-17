@@ -14,6 +14,7 @@ import net.sf.kraken.BaseTransport;
 import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.muc.MUCTransportSessionManager;
 import net.sf.kraken.registration.Registration;
+import net.sf.kraken.registration.RegistrationHandler;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 import net.sf.kraken.type.*;
@@ -28,9 +29,7 @@ import org.jivesoftware.openfire.vcard.VCardManager;
 import org.jivesoftware.util.Base64;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.NotFoundException;
-import org.xmpp.packet.JID;
-import org.xmpp.packet.Message;
-import org.xmpp.packet.Presence;
+import org.xmpp.packet.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -97,6 +96,19 @@ public abstract class TransportSession<B extends TransportBuddy> {
      */
     public String highestResource = null;
 
+    public IQ getRegistrationPacket() {
+        return registrationPacket;
+    }
+
+    public void setRegistrationPacket(IQ registrationPacket) {
+        this.registrationPacket = registrationPacket;
+    }
+
+    /**
+     * Registration packet that is awaiting a response.
+     */
+    public IQ registrationPacket = null;
+
     /**
      * Is the roster locked for sync editing?
      */
@@ -113,6 +125,11 @@ public abstract class TransportSession<B extends TransportBuddy> {
     public TransportLoginStatus loginStatus = TransportLoginStatus.LOGGED_OUT;
 
     /**
+     * The current reason behind a connection failure, if one has occurred.
+     */
+    public ConnectionFailureReason failureStatus = ConnectionFailureReason.NO_ISSUE;
+
+    /**
      * Supported features.
      */
     public ArrayList<SupportedFeature> supportedFeatures = new ArrayList<SupportedFeature>();
@@ -121,6 +138,12 @@ public abstract class TransportSession<B extends TransportBuddy> {
      * Number of reconnection attempts made.
      */
     public Integer reconnectionAttempts = 0;
+
+    /**
+     * If set, represents a unix timestamp when the session was detached.  The expectation being it'll get cleaned
+     * up if it's been hanging around for too long.
+     */
+    public long detachTimestamp = 0;
 
     /**
      * Current presence status.
@@ -252,6 +275,28 @@ public abstract class TransportSession<B extends TransportBuddy> {
      */
     public int getResourceCount() {
         return resources.size();
+    }
+
+    /**
+     * Detaches the session, leaving it running in the background and "suspended".
+     */
+    public void detachSession() {
+        detachTimestamp = new Date().getTime();
+    }
+
+    /**
+     * Attaches the session, indicating that it's actively used.
+     */
+    public void attachSession() {
+        detachTimestamp = 0;
+    }
+
+    /**
+     * Retrieves the detach timestamp for determining if the session is detached, and if so how long it's been
+     * detached.
+     */
+    public long getDetachTimestamp() {
+        return detachTimestamp;
     }
 
     /**
@@ -459,11 +504,15 @@ public abstract class TransportSession<B extends TransportBuddy> {
         loginStatus = status;
         if (status.equals(TransportLoginStatus.LOGGED_IN)) {
             reconnectionAttempts = 0;
+            setFailureStatus(ConnectionFailureReason.NO_ISSUE);
             getRegistration().setLastLogin(new Date());
             if (pendingPresence != null && pendingVerboseStatus != null) {
                 setPresenceAndStatus(pendingPresence, pendingVerboseStatus);
                 pendingPresence = null;
                 pendingVerboseStatus = null;
+            }
+            if (getRegistrationPacket() != null) {
+                new RegistrationHandler(getTransport()).completeRegistration(this);
             }
         }
     }
@@ -475,6 +524,15 @@ public abstract class TransportSession<B extends TransportBuddy> {
      */
     public TransportLoginStatus getLoginStatus() {
         return loginStatus;
+    }
+
+
+    public ConnectionFailureReason getFailureStatus() {
+        return failureStatus;
+    }
+
+    public void setFailureStatus(ConnectionFailureReason failureStatus) {
+        this.failureStatus = failureStatus;
     }
 
     /**
@@ -495,7 +553,7 @@ public abstract class TransportSession<B extends TransportBuddy> {
      */
     public void sessionDisconnected(String errorMessage) {
         reconnectionAttempts++;
-        if (!JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+"reconnect", true) || (reconnectionAttempts > JiveGlobals.getIntProperty("plugin.gateway."+getTransport().getType()+"reconnectattempts", 3))) {
+        if (getRegistrationPacket() != null || !JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+"reconnect", true) || (reconnectionAttempts > JiveGlobals.getIntProperty("plugin.gateway."+getTransport().getType()+"reconnectattempts", 3))) {
             sessionDisconnectedNoReconnect(errorMessage);
         }
         else {
@@ -522,20 +580,25 @@ public abstract class TransportSession<B extends TransportBuddy> {
     public void sessionDisconnectedNoReconnect(String errorMessage) {
         Log.debug("Disconnecting session "+getJID()+" from "+getTransport().getJID());
         cleanUp();
-        Presence p = new Presence(Presence.Type.unavailable);
-        p.setTo(getJID());
-        p.setFrom(getTransport().getJID());
-        getTransport().sendPacket(p);
-        if (errorMessage != null) {
-            getTransport().sendMessage(
-                    getJIDWithHighestPriority(),
-                    getTransport().getJID(),
-                    errorMessage,
-                    Message.Type.error
-            );
-        }
         setLoginStatus(TransportLoginStatus.LOGGED_OUT);
-        getBuddyManager().sendOfflineForAllAvailablePresences(getJID());
+        if (getRegistrationPacket() != null) {
+            new RegistrationHandler(getTransport()).completeRegistration(this);
+        }
+        else {
+            Presence p = new Presence(Presence.Type.unavailable);
+            p.setTo(getJID());
+            p.setFrom(getTransport().getJID());
+            getTransport().sendPacket(p);
+            if (errorMessage != null) {
+                getTransport().sendMessage(
+                        getJIDWithHighestPriority(),
+                        getTransport().getJID(),
+                        errorMessage,
+                        Message.Type.error
+                );
+            }
+            getBuddyManager().sendOfflineForAllAvailablePresences(getJID());
+        }
         buddyManager.resetBuddies();
         getTransport().getSessionManager().removeSession(getJID());
     }

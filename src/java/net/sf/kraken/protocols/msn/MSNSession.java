@@ -29,6 +29,7 @@ import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddyManager;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.SupportedFeature;
 
@@ -147,6 +148,7 @@ public class MSNSession extends TransportSession<MSNBuddy> {
             }
             catch (Exception e) {
                 Log.debug("MSN user is not able to log in: " + msnMessenger.getOwner().getEmail(), e);
+                setFailureStatus(ConnectionFailureReason.UNKNOWN);
             }
         }
     }

@@ -47,6 +47,11 @@ public class TransportSessionManager<B extends TransportBuddy> {
     private int reaperInterval = 300000; // 5 minutes
 
     /**
+     * How long a detached session is allowed to be suspended before it is cleaned up.
+     */
+    private int detachTimeout = 60000; // 10 minutes
+
+    /**
      * The actual repear task.
      */
     private SessionReaper sessionReaper;
@@ -165,7 +170,7 @@ public class TransportSessionManager<B extends TransportBuddy> {
     private void cleanupOrphanedSessions() {
         SessionManager sessionManager = SessionManager.getInstance();
         for (TransportSession<B> session : getSessions()) {
-            if (sessionManager.getSessionCount(session.getJID().getNode()) == 0) {
+            if ((session.getDetachTimestamp() == 0 || new Date().getTime() - session.getDetachTimestamp() > detachTimeout) && sessionManager.getSessionCount(session.getJID().getNode()) == 0) {
                 transport.registrationLoggedOut(session);
             }
         }

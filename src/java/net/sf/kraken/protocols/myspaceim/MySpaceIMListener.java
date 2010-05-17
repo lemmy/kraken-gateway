@@ -22,6 +22,7 @@ import net.sf.jmyspaceiml.packet.InstantMessage;
 import net.sf.jmyspaceiml.packet.MediaMessage;
 import net.sf.jmyspaceiml.packet.ProfileMessage;
 import net.sf.jmyspaceiml.packet.StatusMessage;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
 import org.apache.log4j.Logger;
@@ -108,6 +109,7 @@ public class MySpaceIMListener implements MessageListener, ContactListener {
         );
         if (msgPacket.isFatal()) {
             getSession().sessionDisconnected(msgPacket.getErrorMessage());
+            getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
         }
     }
 

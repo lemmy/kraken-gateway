@@ -24,10 +24,7 @@ import net.sf.kraken.pseudoroster.PseudoRosterManager;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
-import net.sf.kraken.type.ChatStateType;
-import net.sf.kraken.type.NameSpace;
-import net.sf.kraken.type.PresenceType;
-import net.sf.kraken.type.TransportLoginStatus;
+import net.sf.kraken.type.*;
 import net.sf.kraken.util.StringUtils;
 
 import org.apache.log4j.Logger;
@@ -130,10 +127,12 @@ public class IRCSession extends TransportSession<IRCBuddy> {
                 catch (UnknownHostException e) {
                     Log.debug("IRC: Unable to connect to host:", e);
                     sessionDisconnected("IRC server does not appear to exist.");
+                    setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                 }
                 catch (IOException e) {
                     Log.debug("IRC: Connection error while trying to connect ot IRC server:", e);
                     sessionDisconnected("Connection failed while trying to contact IRC server..");
+                    setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                 }
             }
         }.start();

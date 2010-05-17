@@ -19,6 +19,7 @@ import net.sf.kraken.registration.Registration;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 
 import org.apache.log4j.Logger;
@@ -94,6 +95,7 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
             }
             catch (GGException e) {
                 Log.debug("GaduGadu: Unable to establish connection:", e);
+                setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
             }
         }
     }

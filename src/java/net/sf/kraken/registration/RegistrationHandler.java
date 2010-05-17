@@ -14,8 +14,10 @@ import java.util.List;
 
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.session.TransportSession;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.NameSpace;
 
+import net.sf.kraken.type.PresenceType;
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -38,7 +40,7 @@ import org.xmpp.packet.PacketError.Condition;
 /**
  * Handles IQ-register stanzas (as defined by XEP-077) that are used to register
  * or deregister a particular XMPP entity from/to a gateway.
- * 
+ *
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
  * @author Daniel Henninger
  * @see <a
@@ -53,9 +55,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
     /**
      * Creates a new RegistrationHandler that can service the transport provided
      * in the first argument.
-     * 
-     * @param parent
-     *            The transport that is serviced by the new instance.
+     *
+     * @param parent The transport that is serviced by the new instance.
      */
     public RegistrationHandler(BaseTransport parent) {
         if (parent == null) {
@@ -72,6 +73,7 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
      * @see
      * org.jivesoftware.openfire.ChannelHandler#process(org.xmpp.packet.Packet)
      */
+
     public void process(IQ packet) throws UnauthorizedException,
             PacketException {
 
@@ -85,7 +87,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
         final Element child = (packet).getChildElement();
         if (child != null) {
             xmlns = child.getNamespaceURI();
-        } else {
+        }
+        else {
             xmlns = null;
         }
 
@@ -105,22 +108,23 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
             // User wants to unregister. =(
             // this.convinceNotToLeave() ... kidding.
             handleDeregister(packet);
-        } else {
+        }
+        else {
             // handle the request
             switch (packet.getType()) {
-            case get:
-                // client requests registration form
-                getRegistrationForm(packet);
-                break;
+                case get:
+                    // client requests registration form
+                    getRegistrationForm(packet);
+                    break;
 
-            case set:
-                // client is providing (filled out) registration form
-                setRegistrationForm(packet);
-                break;
+                case set:
+                    // client is providing (filled out) registration form
+                    setRegistrationForm(packet);
+                    break;
 
-            default:
-                // ignore result and error stanzas.
-                break;
+                default:
+                    // ignore result and error stanzas.
+                    break;
             }
         }
     }
@@ -128,9 +132,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
     /**
      * Processes an IQ-register request that is expressing the wish to
      * deregister from a gateway.
-     * 
-     * @param packet
-     *            the IQ-register stanza.
+     *
+     * @param packet the IQ-register stanza.
      */
     private void handleDeregister(final IQ packet) {
         final IQ result = IQ.createResultIQ(packet);
@@ -155,7 +158,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
 
         try {
             deleteRegistration(from);
-        } catch (UserNotFoundException e) {
+        }
+        catch (UserNotFoundException e) {
             Log.debug("Error cleaning up contact list of: " + from);
             result.setError(Condition.registration_required);
         }
@@ -166,11 +170,9 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
      * Handles a IQ-register 'get' request, which is to be interpreted as a
      * request for a registration form template. The template will be prefilled
      * with data, if the requestee has a current registration with the gateway.
-     * 
-     * @param packet
-     *            the IQ-register 'get' stanza.
-     * @throws UnauthorizedException
-     *             if the user is not allowed to make use of the gateway.
+     *
+     * @param packet the IQ-register 'get' stanza.
+     * @throws UnauthorizedException if the user is not allowed to make use of the gateway.
      */
     private void getRegistrationForm(IQ packet) throws UnauthorizedException {
         final JID from = packet.getFrom();
@@ -244,17 +246,20 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
             response.addElement("username").addText(curUsername);
             if (curPassword == null) {
                 response.addElement("password");
-            } else {
+            }
+            else {
                 response.addElement("password").addText(curPassword);
             }
             if (nicknameTerm != null) {
                 if (curNickname == null) {
                     response.addElement("nick");
-                } else {
+                }
+                else {
                     response.addElement("nick").addText(curNickname);
                 }
             }
-        } else {
+        }
+        else {
             response.addElement("username");
             response.addElement("password");
             if (nicknameTerm != null) {
@@ -274,21 +279,19 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
     /**
      * Handles a IQ-register 'set' request, which is to be interpreted as a
      * request to create a new registration.
-     * 
-     * @param packet
-     *            the IQ-register 'set' stanza.
-     * @throws UnauthorizedException
-     *             if the user isn't allowed to register.
+     *
+     * @param packet the IQ-register 'set' stanza.
+     * @throws UnauthorizedException if the user isn't allowed to register.
      */
     private void setRegistrationForm(IQ packet) throws UnauthorizedException {
         final JID from = packet.getFrom();
 
         final boolean registered;
-        Collection<Registration> registrations = RegistrationManager
-                .getInstance().getRegistrations(from, parent.transportType);
+        Collection<Registration> registrations = RegistrationManager.getInstance().getRegistrations(from, parent.transportType);
         if (registrations.iterator().hasNext()) {
             registered = true;
-        } else {
+        }
+        else {
             registered = false;
         }
 
@@ -312,9 +315,11 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                 final String var = field.getVariable();
                 if (var.equals("username")) {
                     username = field.getValues().get(0);
-                } else if (var.equals("password")) {
+                }
+                else if (var.equals("password")) {
                     password = field.getValues().get(0);
-                } else if (var.equals("nick")) {
+                }
+                else if (var.equals("nick")) {
                     nickname = field.getValues().get(0);
                 }
             }
@@ -369,7 +374,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
             rosterlessMode = true;
             Log.info("Registering " + packet.getFrom() + " as " + username
                     + " in rosterless mode.");
-        } else {
+        }
+        else {
             rosterlessMode = false;
             Log.info("Registering " + packet.getFrom() + " as " + username
                     + " (without making use of rosterless mode).");
@@ -377,16 +383,24 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
 
         // Here's where the true magic lies: create the registration!
         try {
-            addNewRegistration(from, username, password, nickname,
-                    rosterlessMode);
-            final IQ result = IQ.createResultIQ(packet);
+            addNewRegistration(from, username, password, nickname, rosterlessMode);
+
+            registrations = RegistrationManager.getInstance().getRegistrations(from, parent.transportType);
+            Registration registration = registrations.iterator().next();
+            TransportSession session = parent.registrationLoggedIn(registration, from, PresenceType.available, "", -1);
+            session.setRegistrationPacket(packet);
+            session.detachSession();
+            parent.getSessionManager().storeSession(from, session);
+
+            //final IQ result = IQ.createResultIQ(packet);
             // I believe this shouldn't be included. Leaving it around just in
             // case.
             // Element response =
             // DocumentHelper.createElement(QName.get("query", IQ_REGISTER));
             // result.setChildElement(response);
-            parent.sendPacket(result);
-        } catch (UserNotFoundException e) {
+            //parent.sendPacket(result);
+        }
+        catch (UserNotFoundException e) {
             Log.warn("Someone attempted to register with the gateway "
                     + "who is not registered with the server: " + from);
             final IQ eresult = IQ.createResultIQ(packet);
@@ -399,7 +413,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
             em.setBody(LocaleUtils.getLocalizedString(
                     "gateway.base.registrationdeniednoacct", "kraken"));
             parent.sendPacket(em);
-        } catch (IllegalAccessException e) {
+        }
+        catch (IllegalAccessException e) {
             Log.warn("Someone who is not a user of this server "
                     + "tried to register with the transport: " + from);
             final IQ eresult = IQ.createResultIQ(packet);
@@ -412,7 +427,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
             em.setBody(LocaleUtils.getLocalizedString(
                     "gateway.base.registrationdeniedbyhost", "kraken"));
             parent.sendPacket(em);
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             Log.warn("Someone attempted to register with the "
                     + "gateway with an invalid username: " + from);
             final IQ eresult = IQ.createResultIQ(packet);
@@ -428,28 +444,48 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
         }
     }
 
+    public void completeRegistration(TransportSession session) {
+        final IQ result = IQ.createResultIQ(session.getRegistrationPacket());
+        if (!session.getFailureStatus().equals(ConnectionFailureReason.NO_ISSUE)) {
+            // Ooh there was a connection issue, we're going to report that back!
+            if (session.getFailureStatus().equals(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT)) {
+                result.setError(Condition.not_authorized);
+            }
+            else if (session.getFailureStatus().equals(ConnectionFailureReason.CAN_NOT_CONNECT)) {
+                result.setError(Condition.service_unavailable);
+            }
+            else if (session.getFailureStatus().equals(ConnectionFailureReason.LOCKED_OUT)) {
+                result.setError(Condition.forbidden);
+            }
+            else {
+                result.setError(Condition.undefined_condition);
+            }
+        }
+        parent.sendPacket(result);
+
+        session.setRegistrationPacket(null);
+
+        // Lets ask them what their presence is, maybe log them in immediately.
+        final Presence p = new Presence(Presence.Type.probe);
+        p.setTo(session.getJID());
+        p.setFrom(parent.getJID());
+        parent.sendPacket(p);
+    }
+
     /**
      * Adds a registration with this transport, or updates an existing one.
-     * 
-     * @param jid
-     *            JID of user to add registration to.
-     * @param username
-     *            Legacy username of registration.
-     * @param password
-     *            Legacy password of registration.
-     * @param nickname
-     *            Legacy nickname of registration.
-     * @param noRosterItem
-     *            True if the transport is not to show up in the user's roster.
-     * @throws UserNotFoundException
-     *             if registration or roster not found.
-     * @throws IllegalAccessException
-     *             if jid is not from this server.
-     * @throws IllegalArgumentException
-     *             if username is not valid for this transport type.
+     *
+     * @param jid          JID of user to add registration to.
+     * @param username     Legacy username of registration.
+     * @param password     Legacy password of registration.
+     * @param nickname     Legacy nickname of registration.
+     * @param noRosterItem True if the transport is not to show up in the user's roster.
+     * @throws UserNotFoundException    if registration or roster not found.
+     * @throws IllegalAccessException   if jid is not from this server.
+     * @throws IllegalArgumentException if username is not valid for this transport type.
      */
     public void addNewRegistration(JID jid, String username, String password,
-            String nickname, Boolean noRosterItem)
+                                   String nickname, Boolean noRosterItem)
             throws UserNotFoundException, IllegalAccessException {
         Log.debug("Adding or updating registration for : " + jid.toString()
                 + " / " + username);
@@ -474,14 +510,15 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                         + " creating a new one: " + registration);
                 RegistrationManager.getInstance().deleteRegistration(
                         registration);
-            } else {
+            }
+            else {
                 Log.debug("Existing registration found that can be updated: "
                         + registration);
                 if ((registration.getPassword() != null && password == null)
                         || (registration.getPassword() == null && password != null)
                         || (registration.getPassword() != null
-                                && password != null && !registration
-                                .getPassword().equals(password))) {
+                        && password != null && !registration
+                        .getPassword().equals(password))) {
                     Log.debug("Updating password for existing registration: "
                             + registration);
                     registration.setPassword(password);
@@ -490,8 +527,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                 if ((registration.getNickname() != null && nickname == null)
                         || (registration.getNickname() == null && nickname != null)
                         || (registration.getNickname() != null
-                                && nickname != null && !registration
-                                .getNickname().equals(nickname))) {
+                        && nickname != null && !registration
+                        .getNickname().equals(nickname))) {
                     Log.debug("Updating nickname for existing registration: "
                             + registration);
                     registration.setNickname(nickname);
@@ -509,7 +546,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                     final TransportSession relatedSession = parent.sessionManager
                             .getSession(registration.getJID().getNode());
                     parent.registrationLoggedOut(relatedSession);
-                } catch (NotFoundException e) {
+                }
+                catch (NotFoundException e) {
                     // No worries, move on.
                 }
             }
@@ -526,7 +564,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                     + "from other transports for: " + jid);
             try {
                 parent.cleanUpRoster(jid, !noRosterItem);
-            } catch (UserNotFoundException ee) {
+            }
+            catch (UserNotFoundException ee) {
                 throw new UserNotFoundException("Unable to find roster.");
             }
         }
@@ -537,29 +576,23 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                         + jid);
                 parent.addOrUpdateRosterItem(jid, parent.getJID(), parent
                         .getDescription(), "Transports");
-            } catch (UserNotFoundException e) {
+            }
+            catch (UserNotFoundException e) {
                 throw new UserNotFoundException(
                         "User not registered with server.");
             }
-        } else {
+        }
+        else {
             Log.debug("Not adding Transport roster item to the roster of: "
                     + jid + " (as this was explicitly requested).");
         }
-
-        // Lets ask them what their presence is, maybe log them in immediately.
-        final Presence p = new Presence(Presence.Type.probe);
-        p.setTo(jid);
-        p.setFrom(parent.getJID());
-        parent.sendPacket(p);
     }
 
     /**
      * Removes a registration from this transport.
-     * 
-     * @param jid
-     *            JID of user to add registration to.
-     * @throws UserNotFoundException
-     *             if registration or roster not found.
+     *
+     * @param jid JID of user to add registration to.
+     * @throws UserNotFoundException if registration or roster not found.
      */
     public void deleteRegistration(JID jid) throws UserNotFoundException {
         Collection<Registration> registrations = RegistrationManager
@@ -575,7 +608,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
                 parent.registrationLoggedOut(session);
             }
             parent.sessionManager.removeSession(jid);
-        } catch (NotFoundException e) {
+        }
+        catch (NotFoundException e) {
             // Ok then.
         }
 
@@ -587,7 +621,8 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
         // Clean up the user's contact list.
         try {
             parent.cleanUpRoster(jid, false, true);
-        } catch (UserNotFoundException e) {
+        }
+        catch (UserNotFoundException e) {
             throw new UserNotFoundException("Unable to find roster.");
         }
     }

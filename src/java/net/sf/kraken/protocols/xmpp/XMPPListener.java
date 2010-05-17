@@ -23,6 +23,7 @@ import net.sf.kraken.protocols.xmpp.packet.GoogleMailThread;
 import net.sf.kraken.protocols.xmpp.packet.GoogleNewMailExtension;
 import net.sf.kraken.protocols.xmpp.packet.IQWithPacketExtension;
 import net.sf.kraken.type.ChatStateType;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.NameSpace;
 
 import org.apache.log4j.Logger;
@@ -197,6 +198,7 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
 
     public void connectionClosedOnError(Exception exception) {
         getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionclosed", "kraken"));
+        getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
     }
 
     public void reconnectingIn(int i) {

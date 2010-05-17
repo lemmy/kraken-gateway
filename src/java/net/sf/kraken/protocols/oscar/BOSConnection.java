@@ -57,6 +57,7 @@ import net.kano.joscar.ssiitem.IconItem;
 import net.kano.joscar.ssiitem.SsiItemObj;
 import net.kano.joscar.ssiitem.SsiItemObjectFactory;
 import net.kano.joscar.ssiitem.VisibilityItem;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
@@ -103,9 +104,11 @@ public class BOSConnection extends BasicFlapConnection {
             CloseFlapCmd cfc = (CloseFlapCmd)cmd;
             if (cfc.getCode() == CloseFlapCmd.CODE_LOGGED_IN_ELSEWHERE) {
                 getMainSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.oscar.multilogin", "kraken"));
+                getMainSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
             }
             else {
                 getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.disconnected", "kraken"));
+                getMainSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
             }
         }
         super.handleFlapPacket(e);

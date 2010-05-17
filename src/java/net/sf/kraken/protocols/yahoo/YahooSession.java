@@ -20,10 +20,7 @@ import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.pseudoroster.PseudoRosterManager;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
-import net.sf.kraken.type.ChatStateType;
-import net.sf.kraken.type.PresenceType;
-import net.sf.kraken.type.SupportedFeature;
-import net.sf.kraken.type.TransportLoginStatus;
+import net.sf.kraken.type.*;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
@@ -141,6 +138,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                                 Message.Type.error
                         );
                         setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+                        setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                     }
                     catch (LoginRefusedException e) {
                         yahooSession.reset();
@@ -148,9 +146,11 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                         AuthenticationState state = e.getStatus();
                         if (state == AuthenticationState.BADUSERNAME) {
                             reason = LocaleUtils.getLocalizedString("gateway.yahoo.unknownuser", "kraken");
+                            setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         }
                         else if (state == AuthenticationState.BAD) {
                             reason = LocaleUtils.getLocalizedString("gateway.yahoo.badpassword", "kraken");
+                            setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         }
                         else if (state == AuthenticationState.LOCKED) {
                             AccountLockedException e2 = (AccountLockedException)e;
@@ -160,6 +160,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                             else {
                                 reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "kraken");
                             }
+                            setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
                         }
 
                         Log.debug("Yahoo login refused for "+getJID()+": "+reason);
@@ -182,6 +183,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                                 Message.Type.error
                         );
                         setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+                        setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                     }
                 }
             };

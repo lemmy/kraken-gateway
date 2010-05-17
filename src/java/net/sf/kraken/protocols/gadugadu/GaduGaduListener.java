@@ -13,6 +13,7 @@ package net.sf.kraken.protocols.gadugadu;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.apache.log4j.Logger;
@@ -61,6 +62,7 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         catch (GGException e) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
             getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.gadugadu.unabletoconnect", "kraken"));
+            getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
         }
     }
 
@@ -73,7 +75,7 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         Log.debug("GaduGadu: Connection error:", exception);
         getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
         getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.gadugadu.connectionlost", "kraken"));
-
+        getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
     }
 
     public void loginOK() {
@@ -92,10 +94,12 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         if (event.getReason() == LoginFailedEvent.INCORRECT_PASSWORD) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
             getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.gadugadu.passwordincorrect", "kraken"));
+            getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
         }
         else {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
             getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.gadugadu.loginfailed", "kraken"));
+            getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
         }
 
     }

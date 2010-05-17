@@ -26,11 +26,7 @@ import net.sf.kraken.protocols.xmpp.packet.ProbePacket;
 import net.sf.kraken.protocols.xmpp.packet.VCardUpdateExtension;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
-import net.sf.kraken.type.ChatStateType;
-import net.sf.kraken.type.PresenceType;
-import net.sf.kraken.type.SupportedFeature;
-import net.sf.kraken.type.TransportLoginStatus;
-import net.sf.kraken.type.TransportType;
+import net.sf.kraken.type.*;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.user.UserNotFoundException;
@@ -313,11 +309,13 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                         catch (XMPPException e) {
                             Log.debug(getTransport().getType()+" user's login/password does not appear to be correct: "+getRegistration().getUsername(), e);
                             sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.xmpp.passwordincorrect", "kraken"));
+                            setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
                         }
                     }
                     catch (XMPPException e) {
                         Log.debug(getTransport().getType()+" user is not able to connect: "+getRegistration().getUsername(), e);
                         sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionfailed", "kraken"));
+                        setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                     }
                 }
             };
