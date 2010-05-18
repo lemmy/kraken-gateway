@@ -92,6 +92,11 @@ public abstract class TransportSession<B extends TransportBuddy> {
     public ConcurrentHashMap<String,Integer> resources = new ConcurrentHashMap<String,Integer>();
 
     /**
+     * List of packets that are pending delivery while a session is detached.
+     */
+    private ArrayList<Packet> pendingPackets = new ArrayList<Packet>();
+
+    /**
      * Current highest resource.
      */
     public String highestResource = null;
@@ -289,6 +294,17 @@ public abstract class TransportSession<B extends TransportBuddy> {
      */
     public void attachSession() {
         detachTimestamp = 0;
+        for (Packet p : pendingPackets) {
+            getTransport().sendPacket(p);
+        }
+        pendingPackets.clear();
+    }
+
+    /**
+     * Stores a pending packet for later delivery
+     */
+    public void storePendingPacket(Packet p) {
+        pendingPackets.add(p);
     }
 
     /**

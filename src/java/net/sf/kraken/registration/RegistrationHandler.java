@@ -460,6 +460,7 @@ public class RegistrationHandler implements ChannelHandler<IQ> {
             else {
                 result.setError(Condition.undefined_condition);
             }
+            result.setType(IQ.Type.error);
         }
         parent.sendPacket(result);
 

@@ -399,6 +399,8 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
                                 session.updateStatus(getPresenceType(packet), packet.getStatus());
                             }
                         }
+                        // Attach the session
+                        session.attachSession();
                     }
                     catch (NotFoundException e) {
                         Log.debug("A new session has come online: " + from);
@@ -1608,6 +1610,17 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
             // TODO: All -real- error handling
             m.setError(Condition.undefined_condition);
         }
+        try {
+            TransportSession session = sessionManager.getSession(to);
+            if (session.getDetachTimestamp() != 0) {
+                // This is a detached session then, so lets store the packet instead of delivering.
+                session.storePendingPacket(m);
+                return;
+            }
+        }
+        catch (NotFoundException e) {
+            // No session?  That's "fine", allow it through, it's probably something from the transport itself.
+        }
         sendPacket(m);
     }
 
@@ -1661,6 +1674,17 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
 //        m.addChildElement("time","");
 //        m.getChildElement("time","").setText(time);
 
+        try {
+            TransportSession session = sessionManager.getSession(to);
+            if (session.getDetachTimestamp() != 0) {
+                // This is a detached session then, so lets store the packet instead of delivering.
+                session.storePendingPacket(m);
+                return;
+            }
+        }
+        catch (NotFoundException e) {
+            // No session?  That's "fine", allow it through, it's probably something from the transport itself.
+        }
         sendPacket(m);
     }
 
