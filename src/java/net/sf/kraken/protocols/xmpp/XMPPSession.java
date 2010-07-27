@@ -173,7 +173,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     /**
      * XMPP Resource - the resource we are using (randomly generated)
      */
-    private String xmppResource = StringUtils.randomString(10);
+    public String xmppResource = StringUtils.randomString(10);
 
     /**
      * Returns a full JID based off of a username passed in.
@@ -267,6 +267,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                             conn.login(userName, registration.getPassword(), xmppResource);
                             conn.sendPacket(presence); // send initial presence.
                             conn.getChatManager().addChatListener(listener);
+                            conn.getRoster().addRosterListener(listener);
                             conn.addPacketListener(presenceHandler, new PacketTypeFilter(org.jivesoftware.smack.packet.Presence.class));
                             // Use this to filter out anything we don't care about
                             conn.addPacketListener(listener, new OrFilter(
@@ -376,6 +377,12 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
             }
             try {
                 conn.getChatManager().removeChatListener(listener);
+            }
+            catch (Exception e) {
+                // Ignore
+            }
+            try {
+                conn.getRoster().removeRosterListener(listener);
             }
             catch (Exception e) {
                 // Ignore
@@ -652,6 +659,10 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         }
 
         getBuddyManager().activate();
+
+        // lets repoll the roster since smack seems to get out of sync...
+        // we'll let the roster listener take care of this though.
+        conn.getRoster().reload();
     }
 
     private class MailCheck extends TimerTask {

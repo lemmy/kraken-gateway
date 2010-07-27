@@ -13,6 +13,7 @@ package net.sf.kraken.protocols.xmpp;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Collection;
 
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.protocols.xmpp.packet.AttentionExtension;
@@ -22,6 +23,7 @@ import net.sf.kraken.protocols.xmpp.packet.GoogleMailSender;
 import net.sf.kraken.protocols.xmpp.packet.GoogleMailThread;
 import net.sf.kraken.protocols.xmpp.packet.GoogleNewMailExtension;
 import net.sf.kraken.protocols.xmpp.packet.IQWithPacketExtension;
+import net.sf.kraken.protocols.xmpp.packet.ProbePacket;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.NameSpace;
@@ -36,6 +38,8 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.packet.Message.Type;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.smackx.packet.DelayInformation;
 import org.jivesoftware.util.JiveGlobals;
@@ -49,7 +53,7 @@ import org.xmpp.packet.Message;
  * @author Daniel Henninger
  * @author Mehmet Ecevit
  */
-public class XMPPListener implements MessageListener, ConnectionListener, ChatManagerListener, PacketListener {
+public class XMPPListener implements MessageListener, ConnectionListener, ChatManagerListener, PacketListener, RosterListener {
 
     static Logger Log = Logger.getLogger(XMPPListener.class);
 
@@ -279,6 +283,35 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
 
     public void setLastGMailThreadDate(Date lastGMailThreadDate) {
         this.lastGMailThreadDate = lastGMailThreadDate;
+    }
+
+    public void entriesAdded(Collection<String> addresses) {
+        for (String addr : addresses) {
+            RosterEntry entry = getSession().conn.getRoster().getEntry(addr);
+            getSession().getBuddyManager().storeBuddy(new XMPPBuddy(getSession().getBuddyManager(), entry.getUser(), entry.getName(), entry.getGroups(), entry));
+            ProbePacket probe = new ProbePacket(getSession().getJID()+"/"+getSession().xmppResource, entry.getUser());
+            Log.debug("XMPP: Sending the following probe packet: "+probe.toXML());
+            try {
+                getSession().conn.sendPacket(probe);
+            }
+            catch (IllegalStateException e) {
+                Log.debug("XMPP: Not connected while trying to send probe.");
+            }
+        }
+    }
+
+    public void entriesUpdated(Collection<String> addresses) {
+        // TODO: Check if we need to do something with this later
+    }
+
+    public void entriesDeleted(Collection<String> addresses) {
+        for (String addr : addresses) {
+            getSession().getBuddyManager().removeBuddy(addr);
+        }
+    }
+
+    public void presenceChanged(org.jivesoftware.smack.packet.Presence presence) {
+        // Uhm why do we need this given that we have a presence listener
     }
 
 }

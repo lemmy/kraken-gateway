@@ -310,6 +310,7 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#contactRequestReceived(org.openymsg.network.event.SessionEvent)
      */
+    /** is gone??
     @Override
     public void contactRequestReceived(SessionEvent event) {
         final Presence p = new Presence(Presence.Type.subscribe);
@@ -317,6 +318,7 @@ public class YahooListener extends SessionAdapter {
         p.setFrom(getSession().getTransport().convertIDToJID(event.getFrom()));
         getSession().getTransport().sendPacket(p);
     }
+    */
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#contactRejectionReceived(org.openymsg.network.event.SessionFriendRejectedEvent)
