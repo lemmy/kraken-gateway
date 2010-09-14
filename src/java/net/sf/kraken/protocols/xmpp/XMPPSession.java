@@ -641,7 +641,8 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
     public void syncUsers() {
         for (RosterEntry entry : conn.getRoster().getEntries()) {
             getBuddyManager().storeBuddy(new XMPPBuddy(getBuddyManager(), entry.getUser(), entry.getName(), entry.getGroups(), entry));
-            ProbePacket probe = new ProbePacket(this.getJID()+"/"+xmppResource, entry.getUser());
+            //ProbePacket probe = new ProbePacket(this.getJID()+"/"+xmppResource, entry.getUser());
+            ProbePacket probe = new ProbePacket(null, entry.getUser());
             Log.debug("XMPP: Sending the following probe packet: "+probe.toXML());
             try {
                 conn.sendPacket(probe);

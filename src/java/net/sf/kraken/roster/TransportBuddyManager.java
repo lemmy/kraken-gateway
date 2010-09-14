@@ -113,7 +113,7 @@ public class TransportBuddyManager<B extends TransportBuddy> {
      * @param status verbose status string of contact.
      */
     public void storePendingStatus(JID jid, PresenceType presence, String status) {
-        if (isActivated()) {
+        if (!isActivated()) {
             pendingPresences.put(jid, presence);
             pendingVerboseStatuses.put(jid, status);
         }

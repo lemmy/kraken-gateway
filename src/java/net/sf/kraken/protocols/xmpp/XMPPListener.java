@@ -289,7 +289,8 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
         for (String addr : addresses) {
             RosterEntry entry = getSession().conn.getRoster().getEntry(addr);
             getSession().getBuddyManager().storeBuddy(new XMPPBuddy(getSession().getBuddyManager(), entry.getUser(), entry.getName(), entry.getGroups(), entry));
-            ProbePacket probe = new ProbePacket(getSession().getJID()+"/"+getSession().xmppResource, entry.getUser());
+            //ProbePacket probe = new ProbePacket(getSession().getJID()+"/"+getSession().xmppResource, entry.getUser());
+            ProbePacket probe = new ProbePacket(null, entry.getUser());
             Log.debug("XMPP: Sending the following probe packet: "+probe.toXML());
             try {
                 getSession().conn.sendPacket(probe);
