@@ -264,16 +264,16 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                         conn.connect();
                         conn.addConnectionListener(listener);
                         try {
-                            conn.login(userName, registration.getPassword(), xmppResource);
-                            conn.sendPacket(presence); // send initial presence.
-                            conn.getChatManager().addChatListener(listener);
-                            conn.getRoster().addRosterListener(listener);
                             conn.addPacketListener(presenceHandler, new PacketTypeFilter(org.jivesoftware.smack.packet.Presence.class));
                             // Use this to filter out anything we don't care about
                             conn.addPacketListener(listener, new OrFilter(
                                     new PacketTypeFilter(GoogleMailBoxPacket.class),
                                     new PacketExtensionFilter(GoogleNewMailExtension.ELEMENT_NAME, GoogleNewMailExtension.NAMESPACE)
                             ));
+                            conn.login(userName, registration.getPassword(), xmppResource);
+                            conn.sendPacket(presence); // send initial presence.
+                            conn.getChatManager().addChatListener(listener);
+                            conn.getRoster().addRosterListener(listener);
 
                             if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".avatars", true) && getAvatar() != null) {
                                 new Thread() {
