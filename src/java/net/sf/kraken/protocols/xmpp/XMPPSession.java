@@ -275,7 +275,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                             conn.getChatManager().addChatListener(listener);
                             conn.getRoster().addRosterListener(listener);
 
-                            if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".avatars", true) && getAvatar() != null) {
+                            if (JiveGlobals.getBooleanProperty("plugin.gateway."+getTransport().getType()+".avatars", !TransportType.facebook.equals(getTransport().getType())) && getAvatar() != null) {
                                 new Thread() {
                                     @Override
                                     public void run() {
@@ -638,17 +638,20 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         }.start();
     }
     
-    public void syncUsers() {
+    private void syncUsers() {
         for (RosterEntry entry : conn.getRoster().getEntries()) {
             getBuddyManager().storeBuddy(new XMPPBuddy(getBuddyManager(), entry.getUser(), entry.getName(), entry.getGroups(), entry));
-            //ProbePacket probe = new ProbePacket(this.getJID()+"/"+xmppResource, entry.getUser());
-            ProbePacket probe = new ProbePacket(null, entry.getUser());
-            Log.debug("XMPP: Sending the following probe packet: "+probe.toXML());
-            try {
-                conn.sendPacket(probe);
-            }
-            catch (IllegalStateException e) {
-                Log.debug("XMPP: Not connected while trying to send probe.");
+            // Facebook does not support presence probes in their XMPP implementation. See http://developers.facebook.com/docs/chat#features
+            if (!TransportType.facebook.equals(getTransport().getType())) {
+                //ProbePacket probe = new ProbePacket(this.getJID()+"/"+xmppResource, entry.getUser());
+                ProbePacket probe = new ProbePacket(null, entry.getUser());
+                Log.debug("XMPP: Sending the following probe packet: "+probe.toXML());
+                try {
+                    conn.sendPacket(probe);
+                }
+                catch (IllegalStateException e) {
+                    Log.debug("XMPP: Not connected while trying to send probe.");
+                }
             }
         }
 

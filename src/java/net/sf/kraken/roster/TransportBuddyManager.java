@@ -67,7 +67,7 @@ public class TransportBuddyManager<B extends TransportBuddy> {
     /**
      * Activates the full functionality of the buddy manager and sends available presences to client.
      */
-    public void activate() {
+    public synchronized void activate() {
         for (JID jid : pendingPresences.keySet()) {
             if (pendingVerboseStatuses.containsKey(jid)) {
                 try {
@@ -112,7 +112,7 @@ public class TransportBuddyManager<B extends TransportBuddy> {
      * @param presence Presence of contact.
      * @param status verbose status string of contact.
      */
-    public void storePendingStatus(JID jid, PresenceType presence, String status) {
+    public synchronized void storePendingStatus(JID jid, PresenceType presence, String status) {
         if (!isActivated()) {
             pendingPresences.put(jid, presence);
             pendingVerboseStatuses.put(jid, status);
@@ -182,6 +182,8 @@ public class TransportBuddyManager<B extends TransportBuddy> {
                 }
                 catch (UserNotFoundException e) {
                     Log.error("TransportBuddyManager: Unable to find roster when adding contact.");
+                } finally {
+                    getSession().unlockRoster(buddy.getJID().toString());
                 }
                 getSession().unlockRoster(buddy.getJID().toString());
             }
