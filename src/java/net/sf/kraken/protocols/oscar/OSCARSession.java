@@ -99,6 +99,9 @@ public class OSCARSession extends TransportSession<OSCARBuddy> {
         if (JiveGlobals.getBooleanProperty("plugin.gateway."+transport.getType()+".crosschat", true)) {
             MY_CAPS.add(CapabilityBlock.BLOCK_ICQCOMPATIBLE);
         }
+        if (transport.getType().equals(TransportType.icq)) {
+            MY_CAPS.add(CapabilityBlock.BLOCK_ICQ_UTF8);
+        }
     }
     
     /**
