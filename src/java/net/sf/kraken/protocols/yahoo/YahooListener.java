@@ -334,46 +334,6 @@ public class YahooListener extends SessionAdapter {
     }
 
     /**
-     * @see org.openymsg.network.event.SessionAdapter#conferenceInviteReceived(org.openymsg.network.event.SessionConferenceEvent)
-     */
-    @Override
-    public void conferenceInviteReceived(SessionConferenceEvent event) {
-        Log.debug(event.toString());
-    }
-
-    /**
-     * @see org.openymsg.network.event.SessionAdapter#conferenceInviteDeclinedReceived(org.openymsg.network.event.SessionConferenceEvent)
-     */
-    @Override
-    public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
-        Log.debug(event.toString());
-    }
-
-    /**
-     * @see org.openymsg.network.event.SessionAdapter#conferenceLogonReceived(org.openymsg.network.event.SessionConferenceEvent)
-     */
-    @Override
-    public void conferenceLogonReceived(SessionConferenceEvent event) {
-        Log.debug(event.toString());
-    }
-
-    /**
-     * @see org.openymsg.network.event.SessionAdapter#conferenceLogoffReceived(org.openymsg.network.event.SessionConferenceEvent)
-     */
-    @Override
-    public void conferenceLogoffReceived(SessionConferenceEvent event) {
-        Log.debug(event.toString());
-    }
-
-    /**
-     * @see org.openymsg.network.event.SessionAdapter#conferenceMessageReceived(org.openymsg.network.event.SessionConferenceEvent)
-     */
-    @Override
-    public void conferenceMessageReceived(SessionConferenceEvent event) {
-        Log.debug(event.toString());
-    }
-
-    /**
      * @see org.openymsg.network.event.SessionAdapter#chatMessageReceived(org.openymsg.network.event.SessionChatEvent)
      */
     @Override
