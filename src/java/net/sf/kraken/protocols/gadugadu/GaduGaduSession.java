@@ -10,6 +10,11 @@
 
 package net.sf.kraken.protocols.gadugadu;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -274,8 +279,15 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
      */
     @Override
     public void sendMessage(JID jid, String message) {
+        // Create polish charset encoder
+        Charset charset = Charset.forName("ISO-8859-2");
+        CharsetEncoder encoder = charset.newEncoder();
         try {
-            iSession.getMessageService().sendMessage(OutgoingMessage.createNewMessage(Integer.parseInt(getTransport().convertJIDToID(jid)), message));
+            ByteBuffer buf = encoder.encode(CharBuffer.wrap(message));
+            iSession.getMessageService().sendMessage(OutgoingMessage.createNewMessage(Integer.parseInt(getTransport().convertJIDToID(jid)), buf.toString()));
+        }
+        catch (CharacterCodingException e) {
+            Log.debug("GaduGadu: Exception while encoding message:", e);
         }
         catch (GGException e) {
             Log.debug("GaduGadu: Exception while sending message:", e);
