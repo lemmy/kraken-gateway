@@ -283,8 +283,11 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
         Charset charset = Charset.forName("ISO-8859-2");
         CharsetEncoder encoder = charset.newEncoder();
         try {
-            ByteBuffer buf = encoder.encode(CharBuffer.wrap(message));
-            iSession.getMessageService().sendMessage(OutgoingMessage.createNewMessage(Integer.parseInt(getTransport().convertJIDToID(jid)), buf.toString()));
+            ByteBuffer bytebuf = encoder.encode(CharBuffer.wrap(message));
+            byte[] bytearray = new byte[bytebuf.remaining()];
+            bytebuf.get(bytearray);
+            String encodedMessage = new String(bytearray);
+            iSession.getMessageService().sendMessage(OutgoingMessage.createNewMessage(Integer.parseInt(getTransport().convertJIDToID(jid)), encodedMessage));
         }
         catch (CharacterCodingException e) {
             Log.debug("GaduGadu: Exception while encoding message:", e);
