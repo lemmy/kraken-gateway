@@ -10,7 +10,7 @@ jainsipapi.jar           | 1.2 (nightly 2007-06-05)
 jainsipri.jar            | 1.2 (nightly 2007-06-05)
 jcip-annotations.jar     | n/a
 jfacebookiml.jar         | svn-20100127
-jggapi.jar               | cvs-20090802
+jggapi.jar               | 1.6.1 (patched [#3])
 jml.jar                  | svn-20100207
 joscar-common.jar        | svn-20091130
 joscar-protocol.jar      | svn-20091130
@@ -36,3 +36,6 @@ Patch Descriptions
 
 2) smack patches
 - patched to fix digest issues (from Eric Sessoms)
+
+3) jggapi patches
+- applied patch from http://projekty.radical.com.pl/issues/43 to fix charset issues
