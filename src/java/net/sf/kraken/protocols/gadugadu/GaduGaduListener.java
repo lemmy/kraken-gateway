@@ -11,8 +11,11 @@
 package net.sf.kraken.protocols.gadugadu;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -81,11 +84,24 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
     public void loginOK() {
         Log.debug("GaduGadu: Login successful");
         getSession().setLoginStatus(TransportLoginStatus.LOGGED_IN);
+        getSession().loadRoster();
+
         try {
-            getSession().iSession.getContactListService().importContactList();
+            getSession().getTransport().syncLegacyRoster(getSession().getJID(), getSession().getBuddyManager().getBuddies());
         }
-        catch (GGException e) {
-            Log.debug("GaduGadu: Unable to retrieve contact list.");
+        catch (UserNotFoundException e) {
+            Log.debug("GaduGadu: User not found while syncing legacy roster:", e);
+        }
+        getSession().getBuddyManager().activate();
+
+        // If we do not have any pseudo roster items, lets see what we can get from the server.
+        if (getSession().getPseudoRoster().getContacts().isEmpty()) {
+            try {
+                getSession().iSession.getContactListService().importContactList();
+            }
+            catch (GGException e) {
+                Log.debug("GaduGadu: Unable to retrieve contact list.");
+            }
         }
     }
 
@@ -139,7 +155,19 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         for (Object localUserObj : collection) {
             LocalUser localUser = (LocalUser)localUserObj;
             if (localUser.getUin() > 0) {
-                getSession().getBuddyManager().storeBuddy(new GaduGaduBuddy(getSession().getBuddyManager(), localUser));
+                 String ggContact = Integer.toString(localUser.getUin());
+                 String nickname = localUser.getNickName();
+                 List<String> groups = new ArrayList<String>();
+                 groups.add(localUser.getGroup());
+                 if (getSession().getPseudoRoster().hasItem(ggContact)) {
+                    PseudoRosterItem rosterItem = getSession().getPseudoRoster().getItem(ggContact);
+                    rosterItem.setNickname(nickname);
+                    rosterItem.setGroups(groups);
+                }
+                else {
+                    PseudoRosterItem rosterItem = getSession().getPseudoRoster().createItem(ggContact, nickname, groups);
+                    getSession().getBuddyManager().storeBuddy(new GaduGaduBuddy(getSession().getBuddyManager(), localUser, rosterItem));
+                }
                 try {
                     getSession().iSession.getPresenceService().addMonitoredUser(new User(localUser.getUin()));
                 }
@@ -151,13 +179,6 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
                 Log.debug("GaduGadu: Ignoring user with UIN less than -1: "+localUser);
             }
         }
-        try {
-            getSession().getTransport().syncLegacyRoster(getSession().getJID(), getSession().getBuddyManager().getBuddies());
-        }
-        catch (UserNotFoundException e) {
-            Log.debug("GaduGadu: User not found while syncing legacy roster:", e);
-        }
-        getSession().getBuddyManager().activate();
     }
 
     public void localStatusChanged(ILocalStatus iLocalStatus) {

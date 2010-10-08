@@ -10,13 +10,12 @@
 
 package net.sf.kraken.protocols.gadugadu;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
+import net.sf.kraken.pseudoroster.PseudoRoster;
+import net.sf.kraken.pseudoroster.PseudoRosterItem;
+import net.sf.kraken.pseudoroster.PseudoRosterManager;
 import net.sf.kraken.registration.Registration;
-import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
 import net.sf.kraken.type.ConnectionFailureReason;
@@ -60,6 +59,7 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
         super(registration, jid, transport, priority);
 
         idNumber = Integer.parseInt(registration.getUsername());
+        pseudoRoster = PseudoRosterManager.getInstance().getPseudoRoster(registration);
     }
 
     /* Session instance */
@@ -73,6 +73,27 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
 
     /* ID number of account */
     int idNumber;
+
+    /* Locally stored roster -- GaduGadu's own roster doesn't work well */
+    private PseudoRoster pseudoRoster;
+
+    public PseudoRoster getPseudoRoster() {
+        return pseudoRoster;
+    }    
+
+    /**
+     * Loads the stored roster and adds them to have their presence monitored.
+     */
+    void loadRoster() {
+        for (String contact : pseudoRoster.getContacts()) {
+            try {
+                iSession.getPresenceService().addMonitoredUser(new User(Integer.getInteger(contact)));
+            }
+            catch (GGException e) {
+                Log.debug("GaduGadu: Error while setting up user to be monitored during add:", e);
+            }
+        }
+    }
 
     /**
      * @see net.sf.kraken.session.TransportSession#logIn(net.sf.kraken.type.PresenceType, String)
@@ -169,29 +190,26 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
      */
     @Override
     public void addContact(JID jid, String nickname, ArrayList<String> groups) {
-        Collection<LocalUser> buddyList = new ArrayList<LocalUser>();
-        for (TransportBuddy buddy : getBuddyManager().getBuddies()) {
-            LocalUser localUser = ((GaduGaduBuddy)buddy).toLocalUser();
-            buddyList.add(localUser);
-        }
+        String contact = getTransport().convertJIDToID(jid);
         if (nickname == null || nickname.length() < 1) {
             nickname = jid.toBareJID();
         }
         LocalUser newUser = new LocalUser();
-        newUser.setUin(Integer.parseInt(getTransport().convertJIDToID(jid)));
+        newUser.setUin(Integer.parseInt(contact));
         newUser.setDisplayName(nickname);
         if (groups.size() > 0) {
             newUser.setGroup(groups.get(0));
         }
-        getBuddyManager().storeBuddy(new GaduGaduBuddy(getBuddyManager(), newUser));
-        buddyList.add(newUser);
-        try {
-            iSession.getContactListService().clearContactList();
-            iSession.getContactListService().exportContactList(buddyList);
+        PseudoRosterItem rosterItem;
+        if (pseudoRoster.hasItem(contact)) {
+            rosterItem = pseudoRoster.getItem(contact);
+            rosterItem.setNickname(nickname);
+            rosterItem.setGroups(groups);
         }
-        catch (GGException e) {
-            Log.debug("GaduGadu: Error while uploading contact list during add.");
+        else {
+            rosterItem = pseudoRoster.createItem(contact, nickname, groups);
         }
+        getBuddyManager().storeBuddy(new GaduGaduBuddy(getBuddyManager(), newUser, rosterItem));
         try {
             iSession.getPresenceService().addMonitoredUser(new User(newUser.getUin()));
         }
@@ -205,7 +223,8 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
      */
     @Override
     public void removeContact(GaduGaduBuddy contact) {
-        Collection<LocalUser> buddyList = new ArrayList<LocalUser>();
+        String ggContact = getTransport().convertJIDToID(contact.getJID());
+        pseudoRoster.removeItem(ggContact);
         for (GaduGaduBuddy buddy : getBuddyManager().getBuddies()) {
             if (buddy.getJID().equals(contact.getJID())) {
                 LocalUser byeUser = buddy.toLocalUser();
@@ -215,17 +234,8 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
                 catch (GGException e) {
                     Log.debug("GaduGadu: Error while removing user from being monitored during delete:", e);
                 }
-                continue;
+                break;
             }
-            LocalUser localUser = buddy.toLocalUser();
-            buddyList.add(localUser);
-        }
-        try {
-            iSession.getContactListService().clearContactList();
-            iSession.getContactListService().exportContactList(buddyList);
-        }
-        catch (GGException e) {
-            Log.debug("GaduGadu: Error while uploading contact list during delete:", e);
         }
     }
 
@@ -234,27 +244,15 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
      */
     @Override
     public void updateContact(GaduGaduBuddy contact) {
-        Collection<LocalUser> buddyList = new ArrayList<LocalUser>();
-        for (GaduGaduBuddy buddy : getBuddyManager().getBuddies()) {
-            if (buddy.getJID().equals(contact.getJID())) {
-                if (!buddy.getNickname().equals(contact.getNickname())) {
-                	buddy.setBuddyNickname(contact.getNickname());
-                }
-                String newGroup = (String)contact.getGroups().toArray()[0];
-                String origGroup = (String)buddy.getGroups().toArray()[0];
-                if (!origGroup.equals(newGroup)) {
-                    buddy.setBuddyGroups(Arrays.asList(newGroup));
-                }
-            }
-            LocalUser localUser = buddy.toLocalUser();
-            buddyList.add(localUser);
+        String ggContact = getTransport().convertJIDToID(contact.getJID());
+        if (pseudoRoster.hasItem(ggContact)) {
+            PseudoRosterItem rosterItem = pseudoRoster.getItem(ggContact);
+            rosterItem.setNickname(contact.getNickname());
+            rosterItem.setGroups((List<String>)contact.getGroups());
         }
-        try {
-            iSession.getContactListService().clearContactList();
-            iSession.getContactListService().exportContactList(buddyList);
-        }
-        catch (GGException e) {
-            Log.debug("GaduGadu: Error while uploading contact list during update:", e);
+        else {
+            PseudoRosterItem rosterItem = pseudoRoster.createItem(ggContact, contact.getNickname(), (List<String>)contact.getGroups());
+            getBuddyManager().storeBuddy(new GaduGaduBuddy(getBuddyManager(), rosterItem));
         }
     }
     

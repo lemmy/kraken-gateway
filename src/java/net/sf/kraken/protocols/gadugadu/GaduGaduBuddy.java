@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.kraken.pseudoroster.PseudoRosterItem;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 import pl.mn.communicator.LocalUser;
@@ -23,7 +24,7 @@ import pl.mn.communicator.LocalUser;
  */
 public class GaduGaduBuddy extends TransportBuddy {
 
-    public GaduGaduBuddy(TransportBuddyManager<GaduGaduBuddy> manager, LocalUser localUser) {
+    public GaduGaduBuddy(TransportBuddyManager<GaduGaduBuddy> manager, LocalUser localUser, PseudoRosterItem item) {
         super(manager, Integer.toString(localUser.getUin()), localUser.getDisplayName(), null);
         if (localUser.getGroup() != null) {
             this.groups = Arrays.asList(localUser.getGroup());
@@ -33,14 +34,16 @@ public class GaduGaduBuddy extends TransportBuddy {
         gaduNickName = localUser.getNickName();
         gaduTelephone = localUser.getTelephone();
         gaduEmailAddress = localUser.getEmailAddress();
+        pseudoRosterItem = item;
     }
 
-    public GaduGaduBuddy(TransportBuddyManager<GaduGaduBuddy> manager, String uin, String nickname, String group) {
-        super(manager, uin, nickname, null);
-        if (group != null) {
-            this.groups = Arrays.asList(group);
-        }
+    public GaduGaduBuddy(TransportBuddyManager<GaduGaduBuddy> manager, PseudoRosterItem item) {
+        super(manager, item.getUsername(), item.getNickname(), item.getGroups());
+        pseudoRosterItem = item;
     }
+
+
+    public PseudoRosterItem pseudoRosterItem = null;
 
     private String gaduFirstName = null;
     private String gaduLastName = null;
