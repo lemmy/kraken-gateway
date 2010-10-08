@@ -301,7 +301,7 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
                             syncUsers();
 
                             if (getTransport().getType().equals(TransportType.gtalk) && JiveGlobals.getBooleanProperty("plugin.gateway.gtalk.mailnotifications", true)) {
-                                conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleUserSettingExtension(false, true, false), IQ.Type.SET));
+                                conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleUserSettingExtension(null, true, null), IQ.Type.SET));
                                 conn.sendPacket(new IQWithPacketExtension(generateFullJID(getRegistration().getUsername()), new GoogleMailNotifyExtension()));
                                 mailCheck = new MailCheck();
                                 timer.schedule(mailCheck, timerInterval, timerInterval);

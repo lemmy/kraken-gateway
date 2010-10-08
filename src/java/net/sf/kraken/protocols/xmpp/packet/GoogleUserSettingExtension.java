@@ -38,9 +38,9 @@ public class GoogleUserSettingExtension implements PacketExtension {
         return NAMESPACE;
     }
 
-    private Boolean autoAcceptSuggestions;
-    private Boolean mailNotifications;
-    private Boolean archivingEnabled;
+    private Boolean autoAcceptSuggestions = null;
+    private Boolean mailNotifications = null;
+    private Boolean archivingEnabled = null;
 
     public Boolean getAutoAcceptSuggestions() {
         return autoAcceptSuggestions;
