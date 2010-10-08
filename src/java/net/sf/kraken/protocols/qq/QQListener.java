@@ -79,13 +79,13 @@ public class QQListener implements IQQListener {
                 processSuccessfulLogin();
                 break;
             case QQEvent.LOGIN_FAIL:
-                getSession().sessionDisconnectedNoReconnect(null);
                 getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+                getSession().sessionDisconnectedNoReconnect(null);
                 break;
             case QQEvent.LOGIN_UNKNOWN_ERROR:
             case QQEvent.ERROR_CONNECTION_BROKEN:
-                getSession().sessionDisconnected(null);
                 getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
+                getSession().sessionDisconnected(null);
                 break;
             case QQEvent.USER_STATUS_CHANGE_OK:
                 processStatusChangeOK((ChangeStatusReplyPacket)e.getSource());
@@ -116,8 +116,8 @@ public class QQListener implements IQQListener {
                 break;
             case QQEvent.ERROR_NETWORK:
             case QQEvent.ERROR_RUNTIME:
+                getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);                
                 getSession().sessionDisconnected(null);
-                getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
                 break;
             case QQEvent.FRIEND_GET_ONLINE_OK:
                 processFriendOnline((_08GetOnlineOpReplyPacket)e.getSource());

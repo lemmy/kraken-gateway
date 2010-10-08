@@ -202,8 +202,8 @@ public class XMPPListener implements MessageListener, ConnectionListener, ChatMa
     }
 
     public void connectionClosedOnError(Exception exception) {
+        getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);        
         getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.xmpp.connectionclosed", "kraken"));
-        getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
     }
 
     public void reconnectingIn(int i) {

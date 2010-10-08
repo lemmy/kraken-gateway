@@ -103,12 +103,12 @@ public class BOSConnection extends BasicFlapConnection {
         if (cmd instanceof CloseFlapCmd) {
             CloseFlapCmd cfc = (CloseFlapCmd)cmd;
             if (cfc.getCode() == CloseFlapCmd.CODE_LOGGED_IN_ELSEWHERE) {
-                getMainSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.oscar.multilogin", "kraken"));
                 getMainSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
+                getMainSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.oscar.multilogin", "kraken"));
             }
             else {
+                getMainSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);                
                 getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.disconnected", "kraken"));
-                getMainSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
             }
         }
         super.handleFlapPacket(e);

@@ -108,8 +108,8 @@ public class MySpaceIMListener implements MessageListener, ContactListener {
                 Message.Type.error
         );
         if (msgPacket.isFatal()) {
+            getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);            
             getSession().sessionDisconnected(msgPacket.getErrorMessage());
-            getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
         }
     }
 

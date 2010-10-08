@@ -70,8 +70,8 @@ public class LoginConnection extends AbstractFlapConnection {
 //            }
         }
         else if (e.getNewState() == ClientFlapConn.STATE_FAILED) {
-            getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.connectionfailed", "kraken")+" " + e.getReason());
             getMainSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+            getMainSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.oscar.connectionfailed", "kraken")+" " + e.getReason());
         }
         else if (e.getNewState() == ClientFlapConn.STATE_NOT_CONNECTED) {
             //TODO: Do we need to catch these?

@@ -433,14 +433,14 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
         Log.debug("MSN: Exception occurred for "+messenger.getOwner().getEmail()+" : "+throwable);        
         if (throwable instanceof IncorrectPasswordException) {
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
             getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
         }
         else if (throwable instanceof LoginException) {
             // This can be a number of things, but generally it's a failed username and password.
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
             getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.passwordincorrect", "kraken"));
         }
         else if (throwable instanceof MsnProtocolException) {
             Log.debug("MSN: Protocol exception: "+throwable.toString());
@@ -462,8 +462,8 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
         else if (throwable instanceof IOException) {
             Log.debug("MSN: IO error: "+throwable.toString());
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "kraken"));
             getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "kraken"));
         }
         else {
             Log.debug("MSN: Unknown error: "+throwable.toString(), throwable);
@@ -545,14 +545,14 @@ public class MSNListener implements MsnContactListListener, MsnMessageListener, 
         if (message.toString().startsWith("OUT OTH")) {
             // Forced disconnect because account logged in elsewhere
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
-            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.otherloggedin", "kraken"));
             getSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
+            getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.otherloggedin", "kraken"));
         }
         else if (message.toString().startsWith("OUT SDH")) {
             // Forced disconnect from server for maintenance
             getSession().setLoginStatus(TransportLoginStatus.DISCONNECTED);
+            getSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);            
             getSession().sessionDisconnectedNoReconnect(LocaleUtils.getLocalizedString("gateway.msn.disconnect", "kraken"));
-            getSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
         }
     }
     

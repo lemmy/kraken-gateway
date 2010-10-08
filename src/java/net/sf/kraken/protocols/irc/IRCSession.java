@@ -126,13 +126,13 @@ public class IRCSession extends TransportSession<IRCBuddy> {
                 }
                 catch (UnknownHostException e) {
                     Log.debug("IRC: Unable to connect to host:", e);
-                    sessionDisconnected("IRC server does not appear to exist.");
                     setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+                    sessionDisconnected("IRC server does not appear to exist.");
                 }
                 catch (IOException e) {
                     Log.debug("IRC: Connection error while trying to connect ot IRC server:", e);
-                    sessionDisconnected("Connection failed while trying to contact IRC server..");
                     setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+                    sessionDisconnected("Connection failed while trying to contact IRC server..");
                 }
             }
         }.start();
