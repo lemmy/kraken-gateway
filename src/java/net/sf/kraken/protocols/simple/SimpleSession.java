@@ -465,6 +465,7 @@ public class SimpleSession extends TransportSession<SimpleBuddy> {
 				Log.debug("SimpleSession(" + getJID().getNode() + ").login:  Unable to create a SIP session ID!!");
 				this.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
                 setFailureStatus(ConnectionFailureReason.UNKNOWN);
+                sessionDisconnected("Unable to create SIP session ID!");
 				return;
 			}
 			else {
@@ -504,6 +505,7 @@ public class SimpleSession extends TransportSession<SimpleBuddy> {
 				Log.debug("SimpleSession(" + jid.getNode() + ").login:  Unable to send login packet.", e);
 				this.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
                 setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+                sessionDisconnected("Unable to send login packet!");
 			}
 		}
 	}

@@ -117,6 +117,7 @@ public class SameTimeSession extends TransportSession<SameTimeBuddy> {
             catch (DuplicateObjectException e) {
                 Log.error("SameTime: Tried to start up duplicate session for: "+jid);
                 setFailureStatus(ConnectionFailureReason.UNKNOWN);
+                sessionDisconnected("Duplicate session.");
             }
          }
     }

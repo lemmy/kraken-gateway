@@ -81,6 +81,7 @@ public class MySpaceIMSession extends TransportSession<MySpaceIMBuddy> {
             catch (MSIMException e) {
                 Log.error("MySpace: Failure while logging in:", e);
                 setFailureStatus(ConnectionFailureReason.UNKNOWN);
+                sessionDisconnected("Failure while logging in.");
             }
         }
     }

@@ -149,6 +149,7 @@ public class MSNSession extends TransportSession<MSNBuddy> {
             catch (Exception e) {
                 Log.debug("MSN user is not able to log in: " + msnMessenger.getOwner().getEmail(), e);
                 setFailureStatus(ConnectionFailureReason.UNKNOWN);
+                sessionDisconnected("Unable to log in.");
             }
         }
     }

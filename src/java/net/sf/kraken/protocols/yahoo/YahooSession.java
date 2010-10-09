@@ -139,6 +139,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                         );
                         setLoginStatus(TransportLoginStatus.LOGGED_OUT);
                         setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+                        sessionDisconnected(reason);
                     }
                     catch (LoginRefusedException e) {
                         yahooSession.reset();
@@ -147,10 +148,12 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                         if (state == AuthenticationState.BADUSERNAME) {
                             reason = LocaleUtils.getLocalizedString("gateway.yahoo.unknownuser", "kraken");
                             setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+                            sessionDisconnectedNoReconnect(reason);
                         }
                         else if (state == AuthenticationState.BAD) {
                             reason = LocaleUtils.getLocalizedString("gateway.yahoo.badpassword", "kraken");
                             setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+                            sessionDisconnectedNoReconnect(reason);
                         }
                         else if (state == AuthenticationState.LOCKED) {
                             AccountLockedException e2 = (AccountLockedException)e;
@@ -161,6 +164,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                                 reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "kraken");
                             }
                             setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
+                            sessionDisconnectedNoReconnect(reason);
                         }
 
                         Log.debug("Yahoo login refused for "+getJID()+": "+reason);
@@ -184,6 +188,7 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                         );
                         setLoginStatus(TransportLoginStatus.LOGGED_OUT);
                         setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+                        sessionDisconnected(LocaleUtils.getLocalizedString("gateway.yahoo.unknownerror", "kraken"));
                     }
                 }
             };

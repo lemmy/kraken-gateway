@@ -117,6 +117,7 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
             catch (GGException e) {
                 Log.debug("GaduGadu: Unable to establish connection:", e);
                 setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+                sessionDisconnected("Unable to establish connection.");
             }
         }
     }
