@@ -86,8 +86,12 @@ public class GaduGaduSession extends TransportSession<GaduGaduBuddy> {
      */
     void loadRoster() {
         for (String contact : pseudoRoster.getContacts()) {
+            User user = new User(Integer.valueOf(contact));
+            // Load actual buddy roster
+            getBuddyManager().storeBuddy(new GaduGaduBuddy(getBuddyManager(), pseudoRoster.getItem(contact)));
+            // Set up each roster item to be monitored for presence
             try {
-                iSession.getPresenceService().addMonitoredUser(new User(Integer.getInteger(contact)));
+                iSession.getPresenceService().addMonitoredUser(user);
             }
             catch (GGException e) {
                 Log.debug("GaduGadu: Error while setting up user to be monitored during add:", e);
