@@ -17,6 +17,7 @@ import java.util.Set;
 
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.pseudoroster.PseudoRosterItem;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.TransportLoginStatus;
 import net.sf.kraken.util.chatstate.ChatStateEventSource;
 
@@ -24,11 +25,9 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
-import org.openymsg.network.Status;
-import org.openymsg.network.YahooUser;
+import org.openymsg.network.*;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionChatEvent;
-import org.openymsg.network.event.SessionConferenceEvent;
 import org.openymsg.network.event.SessionErrorEvent;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
@@ -52,6 +51,7 @@ import org.xmpp.packet.Presence;
  * @author Daniel Henninger
  * Heavily inspired by Noah Campbell's work.
  */
+@SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
 public class YahooListener extends SessionAdapter {
 
     static Logger Log = Logger.getLogger(YahooListener.class);
@@ -277,13 +277,36 @@ public class YahooListener extends SessionAdapter {
     @Override
     public void inputExceptionThrown(SessionExceptionEvent event) {
         Log.debug("Input error from yahoo: "+event.getMessage(), event.getException());
-        // Lets keep this silent for now.  Not bother the end user with it.
-//        getSession().getTransport().sendMessage(
-//                getSession().getJID(),
-//                getSession().getTransport().getJID(),
-//                "Input error from yahoo: "+event.getMessage(),
-//                Message.Type.error
-//        );
+        if (event.getException().getClass().equals(LoginRefusedException.class)) {
+            String reason = LocaleUtils.getLocalizedString("gateway.yahoo.loginrefused", "kraken");
+            LoginRefusedException e = (LoginRefusedException)event.getException();
+            AuthenticationState state = e.getStatus();
+            if (state == AuthenticationState.BADUSERNAME) {
+                reason = LocaleUtils.getLocalizedString("gateway.yahoo.unknownuser", "kraken");
+                getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+                getSession().sessionDisconnectedNoReconnect(reason);
+            }
+            else if (state == AuthenticationState.BAD) {
+                reason = LocaleUtils.getLocalizedString("gateway.yahoo.badpassword", "kraken");
+                getSession().setFailureStatus(ConnectionFailureReason.USERNAME_OR_PASSWORD_INCORRECT);
+                getSession().sessionDisconnectedNoReconnect(reason);
+            }
+            else if (state == AuthenticationState.LOCKED) {
+                AccountLockedException e2 = (AccountLockedException)e;
+                if(e2.getWebPage() != null) {
+                    reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlockedwithurl", "kraken", Arrays.asList(e2.getWebPage().toString()));
+                }
+                else {
+                    reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "kraken");
+                }
+                getSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
+                getSession().sessionDisconnectedNoReconnect(reason);
+            }
+            else {
+                getSession().setFailureStatus(ConnectionFailureReason.UNKNOWN);
+                getSession().sessionDisconnectedNoReconnect(reason);
+            }
+        }
     }
 
     /**
