@@ -292,13 +292,7 @@ public class YahooListener extends SessionAdapter {
                 getSession().sessionDisconnectedNoReconnect(reason);
             }
             else if (state == AuthenticationState.LOCKED) {
-                AccountLockedException e2 = (AccountLockedException)e;
-                if(e2.getWebPage() != null) {
-                    reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlockedwithurl", "kraken", Arrays.asList(e2.getWebPage().toString()));
-                }
-                else {
-                    reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "kraken");
-                }
+                reason = LocaleUtils.getLocalizedString("gateway.yahoo.accountlocked", "kraken");
                 getSession().setFailureStatus(ConnectionFailureReason.LOCKED_OUT);
                 getSession().sessionDisconnectedNoReconnect(reason);
             }
