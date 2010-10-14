@@ -185,7 +185,6 @@ public class TransportBuddyManager<B extends TransportBuddy> {
                 } finally {
                     getSession().unlockRoster(buddy.getJID().toString());
                 }
-                getSession().unlockRoster(buddy.getJID().toString());
             }
         }
         else {
