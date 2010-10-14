@@ -194,6 +194,9 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         else if (getTransport().getType().equals(TransportType.facebook)) {
             return username+"@"+"chat.facebook.com";
         }
+        else if (getTransport().getType().equals(TransportType.livejournal)) {
+            return username+"@"+"livejournal.com";
+        }
         else {
             String connecthost = JiveGlobals.getProperty("plugin.gateway."+getTransport().getType()+".connecthost", (getTransport().getType().equals(TransportType.gtalk) ? "talk.google.com" : getTransport().getType().equals(TransportType.facebook) ? "chat.facebook.com" : "jabber.org"));
             return username+"@"+connecthost;
