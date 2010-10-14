@@ -119,7 +119,7 @@ public abstract class TransportBuddy {
     /**
      * Specific requested subscription status, if desired.
      */
-    public RosterItem.SubType subtype = null;
+    public RosterItem.SubType subtype = RosterItem.SUB_TO;
 
     /**
      * Specific requested ask status, if desired.
