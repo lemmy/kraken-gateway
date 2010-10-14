@@ -806,10 +806,14 @@
 <form action="" name="gatewayForm">
 
 <% aimSettings.printSettingsDialog(); %>
+<% facebookSettings.printSettingsDialog(); %>
 <% gadugaduSettings.printSettingsDialog(); %>
+<% gtalkSettings.printSettingsDialog(); %>
 <% icqSettings.printSettingsDialog(); %>
 <% ircSettings.printSettingsDialog(); %>
+<% livejournalSettings.printSettingsDialog(); %>
 <% msnSettings.printSettingsDialog(); %>
+<% xmppSettings.printSettingsDialog(); %>
 <% yahooSettings.printSettingsDialog(); %>
 
 <br><br>
@@ -818,14 +822,10 @@
 
 <p><fmt:message key="gateway.web.settings.unstable.notice" /></p>
 
-<% facebookSettings.printSettingsDialog(); %>
-<% gtalkSettings.printSettingsDialog(); %>
 <% qqSettings.printSettingsDialog(); %>
-<% livejournalSettings.printSettingsDialog(); %>
 <% myspaceimSettings.printSettingsDialog(); %>
 <% sametimeSettings.printSettingsDialog(); %>
 <% simpleSettings.printSettingsDialog(); %>
-<% xmppSettings.printSettingsDialog(); %>
 
 </form>
 <br clear="all">
