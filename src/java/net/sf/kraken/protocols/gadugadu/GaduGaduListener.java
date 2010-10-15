@@ -155,11 +155,11 @@ public class GaduGaduListener implements ConnectionListener, LoginListener, Mess
         for (Object localUserObj : collection) {
             LocalUser localUser = (LocalUser)localUserObj;
             if (localUser.getUin() > 0) {
-                 String ggContact = Integer.toString(localUser.getUin());
-                 String nickname = localUser.getNickName();
-                 List<String> groups = new ArrayList<String>();
-                 groups.add(localUser.getGroup());
-                 if (getSession().getPseudoRoster().hasItem(ggContact)) {
+                String ggContact = Integer.toString(localUser.getUin());
+                String nickname = localUser.getDisplayName();
+                List<String> groups = new ArrayList<String>();
+                groups.add(localUser.getGroup());
+                if (getSession().getPseudoRoster().hasItem(ggContact)) {
                     PseudoRosterItem rosterItem = getSession().getPseudoRoster().getItem(ggContact);
                     rosterItem.setNickname(nickname);
                     rosterItem.setGroups(groups);
