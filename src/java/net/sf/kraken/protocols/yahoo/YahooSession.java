@@ -122,9 +122,9 @@ public class YahooSession extends TransportSession<YahooBuddy> {
                         yahooSession.login(registration.getUsername(), registration.getPassword());
                         setLoginStatus(TransportLoginStatus.LOGGED_IN);
 
-                        yahooSession.setStatus(((YahooTransport)getTransport()).convertXMPPStatusToYahoo(getPresence()));
-
-                        syncUsers();
+//                        yahooSession.setStatus(((YahooTransport)getTransport()).convertXMPPStatusToYahoo(getPresence()));
+//
+//                        syncUsers();
                     }
                     catch (FailedLoginException e) {
                         yahooSession.reset();

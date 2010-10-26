@@ -10,6 +10,7 @@
 
 package net.sf.kraken.protocols.yahoo;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,18 +27,7 @@ import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.LocaleUtils;
 import org.jivesoftware.util.NotFoundException;
 import org.openymsg.network.*;
-import org.openymsg.network.event.SessionAdapter;
-import org.openymsg.network.event.SessionChatEvent;
-import org.openymsg.network.event.SessionErrorEvent;
-import org.openymsg.network.event.SessionEvent;
-import org.openymsg.network.event.SessionExceptionEvent;
-import org.openymsg.network.event.SessionFileTransferEvent;
-import org.openymsg.network.event.SessionFriendAcceptedEvent;
-import org.openymsg.network.event.SessionFriendEvent;
-import org.openymsg.network.event.SessionFriendRejectedEvent;
-import org.openymsg.network.event.SessionListEvent;
-import org.openymsg.network.event.SessionNewMailEvent;
-import org.openymsg.network.event.SessionNotifyEvent;
+import org.openymsg.network.event.*;
 import org.openymsg.support.MessageDecoder;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
@@ -52,7 +42,7 @@ import org.xmpp.packet.Presence;
  * Heavily inspired by Noah Campbell's work.
  */
 @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
-public class YahooListener extends SessionAdapter {
+public class YahooListener implements SessionListener {
 
     static Logger Log = Logger.getLogger(YahooListener.class);
 
@@ -92,7 +82,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#messageReceived(org.openymsg.network.event.SessionEvent)
      */
-    @Override
     public void messageReceived(SessionEvent event) {
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
@@ -105,7 +94,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#offlineMessageReceived(org.openymsg.network.event.SessionEvent)
      */
-    @Override
     public void offlineMessageReceived(SessionEvent event) {
         getSession().getTransport().sendMessage(
                 getSession().getJID(),
@@ -117,7 +105,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#newMailReceived(org.openymsg.network.event.SessionNewMailEvent)
      */
-    @Override
     public void newMailReceived(SessionNewMailEvent event) {
         if (JiveGlobals.getBooleanProperty("plugin.gateway.yahoo.mailnotifications", true) && (emailInitialized || event.getMailCount() > 0)) {
             if (!emailInitialized) {
@@ -143,7 +130,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    @Override
     public void friendsUpdateReceived(SessionFriendEvent event) {
         YahooUser user = event.getUser();
         Log.debug("Yahoo: Got status update: "+user);
@@ -180,7 +166,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendAddedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    @Override
     public void friendAddedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- added is now added, do we want to use this
 //        Presence p = new Presence(Presence.Type.subscribe);
@@ -192,7 +177,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#friendRemovedReceived(org.openymsg.network.event.SessionFriendEvent)
      */
-    @Override
     public void friendRemovedReceived(SessionFriendEvent event) {
         // TODO: This means a friend -we- removed is now gone, do we want to use this
 //        Presence p = new Presence(Presence.Type.unsubscribe);
@@ -204,21 +188,18 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatJoinReceived(org.openymsg.network.event.SessionChatEvent)
      */
-    @Override
     public void chatJoinReceived(SessionChatEvent sessionChatEvent) {
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatExitReceived(org.openymsg.network.event.SessionChatEvent)
      */
-    @Override
     public void chatExitReceived(SessionChatEvent sessionChatEvent) {
     }
 
     /**
      * @see org.openymsg.network.event.SessionAdapter#connectionClosed(org.openymsg.network.event.SessionEvent)
      */
-    @Override
     public void connectionClosed(SessionEvent event) {
         Log.debug(event == null ? "closed event is null":event.toString());
         if (getSession().isLoggedIn()) {
@@ -230,7 +211,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#fileTransferReceived(org.openymsg.network.event.SessionFileTransferEvent)
      */
-    @Override
     public void fileTransferReceived(SessionFileTransferEvent event) {
         Log.debug(event.toString());
     }
@@ -239,7 +219,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#listReceived(org.openymsg.network.event.SessionListEvent)
      */
-    @Override
     public void listReceived(SessionListEvent event) {
         // We just got the entire contact list.  Lets sync up.
         getSession().syncUsers();
@@ -248,7 +227,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#buzzReceived(org.openymsg.network.event.SessionEvent)
      */
-    @Override
     public void buzzReceived(SessionEvent event) {
         getSession().getTransport().sendAttentionNotification(
                 getSession().getJID(),
@@ -260,7 +238,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#errorPacketReceived(org.openymsg.network.event.SessionErrorEvent)
      */
-    @Override
     public void errorPacketReceived(SessionErrorEvent event) {
         Log.debug("Error from yahoo: "+event.getMessage()+", Code:"+event.getCode());
         getSession().getTransport().sendMessage(
@@ -274,7 +251,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#inputExceptionThrown(org.openymsg.network.event.SessionExceptionEvent)
      */
-    @Override
     public void inputExceptionThrown(SessionExceptionEvent event) {
         Log.debug("Input error from yahoo: "+event.getMessage(), event.getException());
         if (event.getException().getClass().equals(LoginRefusedException.class)) {
@@ -306,7 +282,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#notifyReceived(org.openymsg.network.event.SessionNotifyEvent)
      */
-    @Override
     public void notifyReceived(SessionNotifyEvent event) {
         Log.debug(event.toString());
         if (event.isTyping()) {
@@ -340,7 +315,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#contactRejectionReceived(org.openymsg.network.event.SessionFriendRejectedEvent)
      */
-    @Override
     public void contactRejectionReceived(SessionFriendRejectedEvent event) {
         // TODO: Is this correct?  unsubscribed for a rejection?
         Log.debug(event.toString());
@@ -353,7 +327,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatMessageReceived(org.openymsg.network.event.SessionChatEvent)
      */
-    @Override
     public void chatMessageReceived(SessionChatEvent event) {
         Log.debug(event.toString());
     }
@@ -361,7 +334,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatUserUpdateReceived(org.openymsg.network.event.SessionChatEvent)
      */
-    @Override
     public void chatUserUpdateReceived(SessionChatEvent event) {
         Log.debug(event.toString());
     }
@@ -369,7 +341,6 @@ public class YahooListener extends SessionAdapter {
     /**
      * A contact has accepted our subscription request
      */
-    @Override
     public void contactAcceptedReceived(SessionFriendAcceptedEvent event) {
         final Set<String> groups = new HashSet<String>();
         groups.add(event.getGroupName());
@@ -387,9 +358,159 @@ public class YahooListener extends SessionAdapter {
     /**
      * @see org.openymsg.network.event.SessionAdapter#chatConnectionClosed(org.openymsg.network.event.SessionEvent)
      */
-    @Override
     public void chatConnectionClosed(SessionEvent event) {
         Log.debug(event.toString());
+    }
+
+        /**
+     * Dispatches an event immediately to all listeners, instead of queuing. it.
+     *
+     * @param event
+     *            The event to be dispatched.
+     */
+    public void dispatch(FireEvent event) {
+        final SessionEvent ev = event.getEvent();
+
+        switch (event.getType()) {
+        case LOGOFF:
+            connectionClosed(ev);
+            break;
+        case Y6_STATUS_UPDATE:
+            friendsUpdateReceived((SessionFriendEvent) ev);
+            break;
+        case MESSAGE:
+            messageReceived(ev);
+            break;
+        case X_OFFLINE:
+            offlineMessageReceived(ev);
+            break;
+        case NEWMAIL:
+            newMailReceived((SessionNewMailEvent) ev);
+            break;
+        case CONTACTNEW:
+            //TODO: contactRequestReceived((SessionAuthorizationEvent) ev);
+            break;
+        case CONFDECLINE:
+            //TODO: conferenceInviteDeclinedReceived((SessionConferenceDeclineInviteEvent) ev);
+            break;
+        case CONFINVITE:
+            //TODO: conferenceInviteReceived((SessionConferenceInviteEvent) ev);
+            break;
+        case CONFLOGON:
+            //TODO: conferenceLogonReceived((SessionConferenceLogonEvent) ev);
+            break;
+        case CONFLOGOFF:
+            //TODO: conferenceLogoffReceived((SessionConferenceLogoffEvent) ev);
+            break;
+        case CONFMSG:
+            //TODO: conferenceMessageReceived((SessionConferenceMessageEvent) ev);
+            break;
+        case FILETRANSFER:
+            fileTransferReceived((SessionFileTransferEvent) ev);
+            break;
+        case NOTIFY:
+            if (ev instanceof SessionNotifyEvent) {
+                notifyReceived((SessionNotifyEvent) ev);
+            }
+            else {
+                // probably a SessionPictureEvent, not handled
+            }
+            break;
+        case LIST:
+            listReceived((SessionListEvent) ev);
+            break;
+        case FRIENDADD:
+            SessionFriendEvent friendAddEvent = (SessionFriendEvent) ev;
+            if (friendAddEvent.isFailure()) {
+                //TODO: friendsUpdateFailureReceived((SessionFriendFailureEvent) ev);
+            }
+            else {
+                friendAddedReceived((SessionFriendEvent) ev);
+            }
+            break;
+        case FRIENDREMOVE:
+            friendRemovedReceived((SessionFriendEvent) ev);
+            break;
+        case GOTGROUPRENAME:
+            //TODO: groupRenameReceived((SessionGroupEvent) ev);
+            break;
+        case CONTACTREJECT:
+            contactRejectionReceived((SessionFriendRejectedEvent) ev);
+            break;
+        case CHATJOIN:
+            chatJoinReceived((SessionChatEvent) ev);
+            break;
+        case CHATEXIT:
+            chatExitReceived((SessionChatEvent) ev);
+            break;
+        case CHATDISCONNECT:
+            chatConnectionClosed(ev);
+            break;
+        case CHATMSG:
+            chatMessageReceived((SessionChatEvent) ev);
+            break;
+        case X_CHATUPDATE:
+            chatUserUpdateReceived((SessionChatEvent) ev);
+            break;
+        case X_ERROR:
+            errorPacketReceived((SessionErrorEvent) ev);
+            break;
+        case X_EXCEPTION:
+            inputExceptionThrown((SessionExceptionEvent) ev);
+            break;
+        case X_BUZZ:
+            buzzReceived(ev);
+            break;
+        case LOGON:
+            logonReceived(ev);
+            break;
+        case X_CHATCAPTCHA:
+            //TODO: chatCaptchaReceived((SessionChatEvent) ev);
+            break;
+        case PICTURE:
+            //TODO: pictureReceived((SessionPictureEvent) ev);
+            break;
+        case Y7_AUTHORIZATION:
+            if (ev instanceof SessionAuthorizationEvent) {
+                //TODO: contactRequestReceived((SessionAuthorizationEvent) ev);
+            }
+            else if (ev instanceof SessionFriendRejectedEvent) {
+                contactRejectionReceived((SessionFriendRejectedEvent) ev);
+            }
+            else if (ev instanceof SessionFriendAcceptedEvent) {
+                contactAcceptedReceived((SessionFriendAcceptedEvent) ev);
+            }
+            else {
+                throw new IllegalArgumentException("Don't know how to handle '" + event.getType() + "' event: " + event);
+            }
+            break;
+        default:
+            throw new IllegalArgumentException("Don't know how to handle service type '" + event.getType() + "'");
+        }
+    }
+
+    /**
+     * Listens for logon event (successful logon)
+     * @param ev Sessino event
+     */
+    private void logonReceived(SessionEvent ev) {
+        try {
+            getSession().getYahooSession().setStatus(((YahooTransport)getSession().getTransport()).convertXMPPStatusToYahoo(getSession().getPresence()));
+        }
+        catch (IOException e) {
+            Log.debug("Yahoo login caused IO exception:", e);
+
+            getSession().getTransport().sendMessage(
+                    getSession().getJID(),
+                    getSession().getTransport().getJID(),
+                    LocaleUtils.getLocalizedString("gateway.yahoo.unknownerror", "kraken"),
+                    Message.Type.error
+            );
+            getSession().setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+            getSession().setFailureStatus(ConnectionFailureReason.CAN_NOT_CONNECT);
+            getSession().sessionDisconnected(LocaleUtils.getLocalizedString("gateway.yahoo.unknownerror", "kraken"));
+        }
+        getSession().syncUsers();
     }
 
 }
