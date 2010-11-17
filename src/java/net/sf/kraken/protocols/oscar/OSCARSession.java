@@ -127,7 +127,7 @@ public class OSCARSession extends TransportSession<OSCARBuddy> {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {
             loginConn = new LoginConnection(new ConnDescriptor(
-                    JiveGlobals.getProperty(propertyPrefix+".connecthost", "login.oscar.aol.com"),
+                    JiveGlobals.getProperty(propertyPrefix+".connecthost", (this.getTransport().getType().equals(TransportType.icq) ? "login.icq.com" : "login.oscar.aol.com")),
                     JiveGlobals.getIntProperty(propertyPrefix+".connectport", 5190)),
                     this);
             loginConn.connect();
