@@ -463,6 +463,7 @@
     GatewaySettings msnSettings = new GatewaySettings(out, plugin, TransportType.msn, LocaleUtils.getLocalizedString("gateway.msn.service", "kraken"));
     GatewaySettings myspaceimSettings = new GatewaySettings(out, plugin, TransportType.myspaceim, LocaleUtils.getLocalizedString("gateway.myspaceim.service", "kraken"));
     GatewaySettings qqSettings = new GatewaySettings(out, plugin, TransportType.qq, LocaleUtils.getLocalizedString("gateway.qq.service", "kraken"));
+    GatewaySettings renrenSettings = new GatewaySettings(out, plugin, TransportType.renren, LocaleUtils.getLocalizedString("gateway.renren.service", "kraken"));
     GatewaySettings sametimeSettings = new GatewaySettings(out, plugin, TransportType.sametime, LocaleUtils.getLocalizedString("gateway.sametime.service", "kraken"));
     GatewaySettings simpleSettings = new GatewaySettings(out, plugin, TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.service", "kraken"));
     GatewaySettings xmppSettings = new GatewaySettings(out, plugin, TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.service", "kraken"));
@@ -824,6 +825,7 @@
 
 <% qqSettings.printSettingsDialog(); %>
 <% myspaceimSettings.printSettingsDialog(); %>
+<% renrenSettings.printSettingsDialog(); %>
 <% sametimeSettings.printSettingsDialog(); %>
 <% simpleSettings.printSettingsDialog(); %>
 

@@ -138,6 +138,10 @@ public class KrakenPlugin implements Plugin {
         /* Set up MySpaceIM transport. */
         transports.put("myspaceim", new TransportInstance(TransportType.myspaceim , LocaleUtils.getLocalizedString("gateway.myspaceim.name", "kraken"), "net.sf.kraken.protocols.myspaceim.MySpaceIMTransport", componentManager, sessionRouter));
         maybeStartService("myspaceim");
+
+        /* Set up RenRen transport. */
+        transports.put("renren", new TransportInstance(TransportType.renren , LocaleUtils.getLocalizedString("gateway.renren.name", "kraken"), "net.sf.kraken.protocols.xmpp.XMPPTransport", componentManager, sessionRouter));
+        maybeStartService("renren");
     }
 
     public void destroyPlugin() {

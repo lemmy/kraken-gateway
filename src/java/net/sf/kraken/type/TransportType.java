@@ -90,6 +90,11 @@ public enum TransportType {
     qq ("qq"),
 
     /**
+     * RenRen (a 'special' XMPP server)
+     */
+    renren ("xmpp"),
+
+    /**
      * IBM Lotus sametime service.
      */
     sametime ("sametime"),

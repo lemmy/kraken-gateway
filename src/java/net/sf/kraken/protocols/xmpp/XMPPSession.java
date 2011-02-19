@@ -95,6 +95,11 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
             //}
             domain = "chat.facebook.com";
         }
+        else if (getTransport().getType().equals(TransportType.renren)) {
+            connecthost = "talk.renren.com";
+            connectport = 5222;
+            domain = "renren.com";
+        }
         else {
             domain = connecthost;
         }
@@ -193,6 +198,9 @@ public class XMPPSession extends TransportSession<XMPPBuddy> {
         }
         else if (getTransport().getType().equals(TransportType.facebook)) {
             return username+"@"+"chat.facebook.com";
+        }
+        else if (getTransport().getType().equals(TransportType.renren)) {
+            return username+"@"+"renren.com";
         }
         else if (getTransport().getType().equals(TransportType.livejournal)) {
             return username+"@"+"livejournal.com";

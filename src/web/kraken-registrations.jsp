@@ -39,6 +39,7 @@
     trEnabled.put("msn", plugin.getTransportInstance("msn").isEnabled());
     trEnabled.put("myspaceim", plugin.getTransportInstance("myspaceim").isEnabled());
     trEnabled.put("qq", plugin.getTransportInstance("qq").isEnabled());
+    trEnabled.put("renren", plugin.getTransportInstance("renren").isEnabled());
     trEnabled.put("sametime", plugin.getTransportInstance("sametime").isEnabled());
     trEnabled.put("simple", plugin.getTransportInstance("simple").isEnabled());
     trEnabled.put("xmpp", plugin.getTransportInstance("xmpp").isEnabled());
@@ -106,6 +107,9 @@
         if (webManager.getPageProperty("kraken-registrations", "filterQQ", 0) != 0) {
             filteropts.add("qq");
         }
+        if (webManager.getPageProperty("kraken-registrations", "filterRENREN", 0) != 0) {
+            filteropts.add("renren");
+        }
         if (webManager.getPageProperty("kraken-registrations", "filterSAMETIME", 0) != 0) {
             filteropts.add("sametime");
         }
@@ -132,6 +136,7 @@
         filteropts.add("msn");
         filteropts.add("myspaceim");
         filteropts.add("qq");
+        filteropts.add("renren");
         filteropts.add("sametime");
         filteropts.add("simple");
         filteropts.add("xmpp");
@@ -149,6 +154,7 @@
     webManager.setPageProperty("kraken-registrations", "filterMSN", filteropts.contains("msn") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterMYSPACEIM", filteropts.contains("myspaceim") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterQQ", filteropts.contains("qq") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterRENREN", filteropts.contains("renren") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterSAMETIME", filteropts.contains("sametime") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterSIMPLE", filteropts.contains("simple") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterXMPP", filteropts.contains("xmpp") ? 1 : 0);
@@ -477,6 +483,7 @@
 			<% if (trEnabled.get("msn")) { %> <option value="msn"><fmt:message key="gateway.msn.shortservice" /></option> <% } %>
             <% if (trEnabled.get("myspaceim")) { %> <option value="myspaceim"><fmt:message key="gateway.myspaceim.shortservice" /></option> <% } %>
             <% if (trEnabled.get("qq")) { %> <option value="qq"><fmt:message key="gateway.qq.shortservice" /></option> <% } %>
+            <% if (trEnabled.get("renren")) { %> <option value="renren"><fmt:message key="gateway.renren.shortservice" /></option> <% } %>
             <% if (trEnabled.get("sametime")) { %> <option value="sametime"><fmt:message key="gateway.sametime.shortservice" /></option> <% } %>
             <% if (trEnabled.get("simple")) { %> <option value="simple"><fmt:message key="gateway.simple.shortservice" /></option> <% } %>
             <% if (trEnabled.get("xmpp")) { %> <option value="xmpp"><fmt:message key="gateway.xmpp.shortservice" /></option> <% } %>
@@ -621,6 +628,11 @@
                 <img src="images/qq.png" border="0" alt="<fmt:message key="gateway.qq.shortservice" />" title="<fmt:message key="gateway.qq.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.qq.shortservice" /></span>-->
             </label>
+            <label for="filterRENRENcheckbox">
+                <input type="checkbox" name="filter[]" value="renren" <%= ((filteropts.contains("renren")) ? "checked" : "") %> id="filterRENRENcheckbox">
+                <img src="images/renren.png" border="0" alt="<fmt:message key="gateway.renren.shortservice" />" title="<fmt:message key="gateway.renren.shortservice" />"/>
+                <!--<span><fmt:message key="gateway.renren.shortservice" /></span>-->
+            </label>
             <label for="filterSAMETIMEcheckbox">
                 <input type="checkbox" name="filter[]" value="sametime" <%= ((filteropts.contains("sametime")) ? "checked" : "") %> id="filterSAMETIMEcheckbox">
                 <img src="images/sametime.png" border="0" alt="<fmt:message key="gateway.sametime.shortservice" />" title="<fmt:message key="gateway.sametime.shortservice" />"/>
@@ -694,7 +706,7 @@
             <% if (ClusterManager.isClusteringStarted()) { %>
             <td><%= result.clusterNode != null ? result.clusterNode : "&nbsp;" %></td>
             <% } %>
-            <td><span class="jive-gateway-<%= result.linestatus %> jive-gateway-<%= result.type.toUpperCase() %><%= ((result.sessionActive) ? "on" : "off") %>"><span id="registrationUsername<%= result.id %>"><%= result.username %></span><% if(result.sessionActive){ %><span id="registrationLogoff<%= result.id %>"> [<a href="javascript:noop()" onclick="logoutSession(<%= result.id %>)">logout</a>]</span> <% } %></td>
+            <td><span class="jive-gateway-<%= result.linestatus %> jive-gateway-<%= result.type.toUpperCase() %><%= ((result.sessionActive) ? "on" : "off") %>"><span id="registrationUsername<%= result.id %>"><%= result.username %></span><% if(result.sessionActive){ %><span id="registrationLogoff<%= result.id %>"> [<a href="javascript:noop()" onclick="logoutSession(<%= result.id %>)">logout</a>]</span> <% } %></span></td>
 			<td><%= result.lastLogin %></td>
 			<td align="center"><a href="javascript:noop()" onClick="<% if (!trEnabled.get(result.type)) { %>alert('You must enable this transport to modify registrations.'); return false;<% } else { %>toggleEdit(<%= result.id %>); return false<% } %>"><img src="images/edit-16x16.gif" alt="<fmt:message key="global.edit" />" border="0"></a></td>
             <td align="center"><a href="javascript:noop()" onClick="<% if (!trEnabled.get(result.type)) { %>alert('You must enable this transport to delete registrations.'); return false;<% } else { %>if (confirm('<fmt:message key="gateway.web.registrations.confirmdelete" />')) { deleteRegistration('<%= result.id %>'); return false; } else { return false; }<% } %>"><img src="images/delete-16x16.gif" alt="<fmt:message key="global.delete" />" border="0"></a></td>
