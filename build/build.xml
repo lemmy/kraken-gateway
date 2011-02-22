@@ -200,7 +200,16 @@
                 </or>
             </not>
         </condition>
+        <condition property="java.not.ok" value="true">
+            <not>
+                <or>
+                    <contains string="${ant.java.version}" substring="1.5"/>
+                    <contains string="${ant.java.version}" substring="1.6"/>
+                </or>
+            </not>
+        </condition>
         <fail if="ant.not.ok" message="Must use Ant 1.6 or higher to build."/>
+        <fail if="java.not.ok" message="Must use JDK 1.5.x or higher to build Openfire"/>
     </target>
 
     <!-- -check-openfire ====================================================================== -->
