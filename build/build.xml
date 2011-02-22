@@ -196,10 +196,11 @@
                 <or>
                     <contains string="${ant.version}" substring="1.6"/>
                     <contains string="${ant.version}" substring="1.7"/>
+                    <contains string="${ant.version}" substring="1.8"/>
                 </or>
             </not>
         </condition>
-        <fail if="ant.not.ok" message="Must use Ant 1.6 or 1.7 to build."/>
+        <fail if="ant.not.ok" message="Must use Ant 1.6 or higher to build."/>
     </target>
 
     <!-- -check-openfire ====================================================================== -->
