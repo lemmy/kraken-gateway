@@ -56,12 +56,14 @@ public class KrakenPlugin implements Plugin {
     public Hashtable<String,TransportInstance> transports;
 
     public KrakenPlugin() {
-        setLoggerProperty("log4j.appender.openfire", "net.sf.kraken.util.Log4JToOpenfireAppender");
-        setLoggerProperty("log4j.appender.openfiredebug", "net.sf.kraken.util.DebugOnlyLog4JToOpenfireAppender");
-        setLoggerProperty("log4j.rootLogger", "TRACE, openfire");
+
     }
 
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
+        setLoggerProperty("log4j.appender.openfire", "net.sf.kraken.util.Log4JToOpenfireAppender");
+        setLoggerProperty("log4j.appender.openfiredebug", "net.sf.kraken.util.DebugOnlyLog4JToOpenfireAppender");
+        setLoggerProperty("log4j.net.sf.kraken", "TRACE, openfire");
+
         this.pluginDirectory = pluginDirectory;
         this.pluginManager = manager;
         
