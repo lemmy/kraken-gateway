@@ -137,7 +137,6 @@ hr {
 <li>SIMPLE support is only tested with OpenSER, may work with others</li>
 <li>No buddy icon support for Yahoo.</li>
 <li>MySpaceIM logins do not work.  Something is wrong with the hash.</li>
-<li>There have been a lot of reported issues with MSN that we are still tracking down.</li>
 </ul>
 
 
@@ -145,25 +144,45 @@ hr {
     
 <strong>Bug Fixes</strong>
 <ul>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-7'>KR-7</a>] -         Error while removing OSCAR contacts</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-10'>KR-10</a>] -         Illegal XML coming when speaking with smarterchild AIM bot</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-68'>KR-68</a>] -         MSN Transport - Memleak in JML (DisplayPictureDuelManager)</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-105'>KR-105</a>] -         Yahoo Status of Contacts get jumbled up with each other</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-107'>KR-107</a>] -         reconnect on disconnect broken?</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-137'>KR-137</a>] -         &quot;Your authorization has been removed!&quot; after reconnect</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-138'>KR-138</a>] -         XMPP server connection dropping when joining an IRC room.</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-139'>KR-139</a>] -         disconnect on message XML parsing error</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-144'>KR-144</a>] -         Facebook buddy list not showing up</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-145'>KR-145</a>] -         Yahoo users can't log in</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-146'>KR-146</a>] -         Empty &quot;RootItem&quot; causes exception upon logging in, preventing login altogether</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-148'>KR-148</a>] -         Yahoo Buddy List Has a Synchronization Problem</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-149'>KR-149</a>] -         AIM support does not appear to be working correctly</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-7'>KR-7</a>] -         Error while removing OSCAR contacts fixed</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-10'>KR-10</a>] -         Illegal XML coming when speaking with smarterchild AIM bot fixed</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-68'>KR-68</a>] -         MSN Transport - Memleak in JML (DisplayPictureDuelManager)fixed</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-105'>KR-105</a>] -         Yahoo Status of Contacts were get jumbled up with each other</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-107'>KR-107</a>] -         Reconnect on disconnect was broken</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-137'>KR-137</a>] -         &quot;Your authorization has been removed!&quot; was showing up after reconnect</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-138'>KR-138</a>] -         XMPP server connection was dropping when joining an IRC room.</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-139'>KR-139</a>] -         Disconnection was occurring on message XML parsing error</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-144'>KR-144</a>] -         Facebook buddy list was not showing up</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-145'>KR-145</a>] -         Yahoo users could not log in</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-146'>KR-146</a>] -         Empty &quot;RootItem&quot; causesd exception upon logging in, preventing login altogether</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-148'>KR-148</a>] -         Yahoo Buddy List was having a Synchronization Problem</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-149'>KR-149</a>] -         AIM support was failing under Trillian, fixed</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-155'>KR-155</a>] -         QQ Transport was not coming online</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-156'>KR-156</a>] -         Gtalk was not getting presence on login</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-157'>KR-157</a>] -         Registration Menu did not allow some valid IMs for AIM</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-161'>KR-161</a>] -         Could not see people online if they are already online when I sign in</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-163'>KR-163</a>] -         Offline messages from MSN -while online- were not working</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-181'>KR-181</a>] -         Facebook XMPP switched style of contacts which had broken Kraken</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-183'>KR-183</a>] -         XMPP transports were not reporting bad credentials properly</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-184'>KR-184</a>] -         Facebook XMPP was connecting &quot;sort of&quot; and then failing</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-187'>KR-187</a>] -         Cyrillic text was broken in messages to ICQ7 clients</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-190'>KR-190</a>] -         Wrong transfer of Polish letters fixed</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-191'>KR-191</a>] -         GaduGadu was not properly storing (or retrieving?) contact list</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-193'>KR-193</a>] -         Chat History option was changing in Gtalk</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-196'>KR-196</a>] -         Buddies in contact lists were showing up as 'none' instead of 'to'</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-204'>KR-204</a>] -         ICQ login servers changed, updated accordingly</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-210'>KR-210</a>] -         Kraken now compatible with Openfire 3.7.0 logging</li>
 </ul>
         
 <strong>New Features/Improvements</strong>
 <ul>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-74'>KR-74</a>] -         Add ability to kill a gateway session</li>
-   <li>[<a href='http://jira.blathersource.org/browse/KR-135'>KR-135</a>] -         Replace old jabber icon with the new XMPP icon</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-27'>KR-27</a>] -         Legacy accounts are now verified before registration is considered a success.</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-74'>KR-74</a>] -         Added ability to kill a gateway session</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-135'>KR-135</a>] -         Replaced old jabber icon with the new XMPP icon</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-159'>KR-159</a>] -         Added support for retrieval of all registrations from xmlrpc</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-162'>KR-162</a>] -         Registrations for anonymous users are now deleted on session destruction</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-174'>KR-174</a>] -         Switched Facebook to be XMPP based</li>
+   <li>[<a href='http://jira.blathersource.org/browse/KR-195'>KR-195</a>] -         XMPP based transports promoted to Stable status</li>
 </ul>
 
 <h2>1.1.2 -- <span style="font-weight: normal;">September 3, 2009</span></h2>
