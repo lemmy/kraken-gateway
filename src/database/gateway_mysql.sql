@@ -46,4 +46,4 @@ CREATE TABLE ofGatewayVCards (
    PRIMARY KEY (jid)
 );
 
-INSERT INTO ofVersion (name, version) VALUES ('gateway', 9);
+INSERT INTO ofVersion (name, version) VALUES ('gateway', 11);

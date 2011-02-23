@@ -46,4 +46,4 @@ CREATE TABLE ofGatewayVCards (
 );
 CREATE INDEX ofGatewayVCards_jid_idx ON ofGatewayVCards (jid);
 
-INSERT INTO ofVersion (name, version) VALUES ('gateway', 9);
+INSERT INTO ofVersion (name, version) VALUES ('gateway', 11);
