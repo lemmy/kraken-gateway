@@ -264,15 +264,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="openfire" />
     <orderEntry type="module-library">
-      <library name="classes">
-        <CLASSES>
-          <root url="file://$USER_HOME$/Projects/kraken/openfire/work/classes" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="jfacebookiml.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jfacebookiml.jar!/" />
@@ -312,6 +303,26 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../openfire/build/lib/merge/standard.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="classes">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../openfire/work/classes" />
+          <root url="file://$MODULE_DIR$/../openfire/work/classes" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../openfire/work/classes" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../openfire/target/openfire/lib/openfire.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

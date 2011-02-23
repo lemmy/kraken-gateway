@@ -72,7 +72,7 @@ public class DebugOnlyLog4JToOpenfireAppender extends AppenderSkeleton {
 	 *
 	 * @see org.apache.log4j.AppenderSkeleton#close()
 	 */
-	@Override
+	//@Override
 	public void close()
 	{
 		// There's nothing here to close.
@@ -83,7 +83,7 @@ public class DebugOnlyLog4JToOpenfireAppender extends AppenderSkeleton {
 	 *
 	 * @see org.apache.log4j.AppenderSkeleton#requiresLayout()
 	 */
-	@Override
+	//@Override
 	public boolean requiresLayout()
 	{
 		// we're doing this quick and dirty.
