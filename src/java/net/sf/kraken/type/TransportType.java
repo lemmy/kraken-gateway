@@ -105,6 +105,11 @@ public enum TransportType {
     simple ("simple"),
 
     /**
+     * Skype servers.
+     */
+    skype ("skype"),
+    
+    /**
      * Short message service.
      */
     sms ("sms"),

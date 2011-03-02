@@ -407,6 +407,8 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
 
                         session = this.registrationLoggedIn(registration, from, getPresenceType(packet), packet.getStatus(), packet.getPriority());
                         sessionManager.storeSession(from, session);
+                    } catch (Exception e) {
+                    	System.out.println(e);
                     }
                     finally {
                         l.unlock();

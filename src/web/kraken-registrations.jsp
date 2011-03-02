@@ -42,6 +42,7 @@
     trEnabled.put("renren", plugin.getTransportInstance("renren").isEnabled());
     trEnabled.put("sametime", plugin.getTransportInstance("sametime").isEnabled());
     trEnabled.put("simple", plugin.getTransportInstance("simple").isEnabled());
+    trEnabled.put("skype", plugin.getTransportInstance("skype").isEnabled());
     trEnabled.put("xmpp", plugin.getTransportInstance("xmpp").isEnabled());
     trEnabled.put("yahoo", plugin.getTransportInstance("yahoo").isEnabled());
 
@@ -116,6 +117,9 @@
         if (webManager.getPageProperty("kraken-registrations", "filterSIMPLE", 0) != 0) {
             filteropts.add("simple");
         }
+        if (webManager.getPageProperty("kraken-registrations", "filterSKYPE", 0) != 0) {
+            filteropts.add("skype");
+        }
         if (webManager.getPageProperty("kraken-registrations", "filterXMPP", 0) != 0) {
             filteropts.add("xmpp");
         }
@@ -139,6 +143,7 @@
         filteropts.add("renren");
         filteropts.add("sametime");
         filteropts.add("simple");
+        filteropts.add("skype");
         filteropts.add("xmpp");
         filteropts.add("yahoo");
     }
@@ -157,6 +162,7 @@
     webManager.setPageProperty("kraken-registrations", "filterRENREN", filteropts.contains("renren") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterSAMETIME", filteropts.contains("sametime") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterSIMPLE", filteropts.contains("simple") ? 1 : 0);
+    webManager.setPageProperty("kraken-registrations", "filterSKYPE", filteropts.contains("skype") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterXMPP", filteropts.contains("xmpp") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterYAHOO", filteropts.contains("yahoo") ? 1 : 0);
     webManager.setPageProperty("kraken-registrations", "filterSIGNEDON", filteropts.contains("signedon") ? 1 : 0);
@@ -486,6 +492,7 @@
             <% if (trEnabled.get("renren")) { %> <option value="renren"><fmt:message key="gateway.renren.shortservice" /></option> <% } %>
             <% if (trEnabled.get("sametime")) { %> <option value="sametime"><fmt:message key="gateway.sametime.shortservice" /></option> <% } %>
             <% if (trEnabled.get("simple")) { %> <option value="simple"><fmt:message key="gateway.simple.shortservice" /></option> <% } %>
+            <% if (trEnabled.get("skype")) { %> <option value="skype"><fmt:message key="gateway.skype.shortservice" /></option> <% } %>
             <% if (trEnabled.get("xmpp")) { %> <option value="xmpp"><fmt:message key="gateway.xmpp.shortservice" /></option> <% } %>
 			<% if (trEnabled.get("yahoo")) { %> <option value="yahoo"><fmt:message key="gateway.yahoo.shortservice" /></option> <% } %>
 			</select><br>
@@ -642,6 +649,11 @@
                 <input type="checkbox" name="filter[]" value="simple" <%= ((filteropts.contains("simple")) ? "checked" : "") %> id="filterSIMPLEcheckbox">
                 <img src="images/simple.png" border="0" alt="<fmt:message key="gateway.simple.shortservice" />" title="<fmt:message key="gateway.simple.shortservice" />"/>
                 <!--<span><fmt:message key="gateway.simple.shortservice" /></span>-->
+            </label>
+            <label for="filterSKYPEcheckbox">
+                <input type="checkbox" name="filter[]" value="skype" <%= ((filteropts.contains("skype")) ? "checked" : "") %> id="filterSSKYPEcheckbox">
+                <img src="images/skype.png" border="0" alt="<fmt:message key="gateway.skype.shortservice" />" title="<fmt:message key="gateway.skype.shortservice" />"/>
+                <!--<span><fmt:message key="gateway.skype.shortservice" /></span>-->
             </label>
             <label for="filterXMPPcheckbox">
                 <input type="checkbox" name="filter[]" value="xmpp" <%= ((filteropts.contains("xmpp")) ? "checked" : "") %> id="filterXMPPcheckbox">

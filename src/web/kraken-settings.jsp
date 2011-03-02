@@ -466,6 +466,7 @@
     GatewaySettings renrenSettings = new GatewaySettings(out, plugin, TransportType.renren, LocaleUtils.getLocalizedString("gateway.renren.service", "kraken"));
     GatewaySettings sametimeSettings = new GatewaySettings(out, plugin, TransportType.sametime, LocaleUtils.getLocalizedString("gateway.sametime.service", "kraken"));
     GatewaySettings simpleSettings = new GatewaySettings(out, plugin, TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.service", "kraken"));
+    GatewaySettings skypeSettings = new GatewaySettings(out, plugin, TransportType.skype, LocaleUtils.getLocalizedString("gateway.skype.service", "kraken"));
     GatewaySettings xmppSettings = new GatewaySettings(out, plugin, TransportType.xmpp, LocaleUtils.getLocalizedString("gateway.xmpp.service", "kraken"));
     GatewaySettings yahooSettings = new GatewaySettings(out, plugin, TransportType.yahoo, LocaleUtils.getLocalizedString("gateway.yahoo.service", "kraken"));
 %>
@@ -828,6 +829,7 @@
 <% renrenSettings.printSettingsDialog(); %>
 <% sametimeSettings.printSettingsDialog(); %>
 <% simpleSettings.printSettingsDialog(); %>
+<% skypeSettings.printSettingsDialog(); %>
 
 </form>
 <br clear="all">

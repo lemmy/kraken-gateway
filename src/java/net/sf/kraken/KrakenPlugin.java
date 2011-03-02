@@ -121,6 +121,10 @@ public class KrakenPlugin implements Plugin {
         transports.put("simple", new TransportInstance(TransportType.simple, LocaleUtils.getLocalizedString("gateway.simple.name", "kraken"), "net.sf.kraken.protocols.simple.SimpleTransport", componentManager, sessionRouter));
         maybeStartService("simple");
 
+        /* Set up Skype transport. */
+        transports.put("skype", new TransportInstance(TransportType.skype, LocaleUtils.getLocalizedString("gateway.skype.name", "kraken"), "net.sf.kraken.protocols.skype.SkypeTransport", componentManager, sessionRouter));
+        maybeStartService("skype");
+        
         /* Set up Gadu-Gadu transport. */
         transports.put("gadugadu", new TransportInstance(TransportType.gadugadu, LocaleUtils.getLocalizedString("gateway.gadugadu.name", "kraken"), "net.sf.kraken.protocols.gadugadu.GaduGaduTransport", componentManager, sessionRouter));
         maybeStartService("gadugadu");
