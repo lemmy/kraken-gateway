@@ -29,6 +29,7 @@ import com.skype.Friend;
 import com.skype.Profile;
 import com.skype.Skype;
 import com.skype.SkypeException;
+import com.skype.User;
 import com.skype.User.Status;
 
 public class SkypeSession extends TransportSession<SkypeBuddy> {
@@ -160,6 +161,14 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void cleanUp() {
+	    // remove all listeners
+	    try {
+	        User.removeAllListener();
+	        Skype.getContactList().removeAllListener();
+	        Skype.removeAllListeners();
+	    } catch (SkypeException e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	/* (non-Javadoc)
