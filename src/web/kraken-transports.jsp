@@ -527,7 +527,7 @@
 
 <head>
 <title><fmt:message key="gateway.web.transports.title" /></title>
-<meta name="pageID" content="kraken-settings">
+<meta name="pageID" content="kraken-transports">
 <style type="text/css">
 <!-- @import url("style/kraken.css"); -->
 </style>

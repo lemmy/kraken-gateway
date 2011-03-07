@@ -75,7 +75,7 @@
 
                     String inputId = var.getText();
                     out.println("<tr valign='middle'>");
-                    out.println("<td align='right' width='1%'><label for='" + inputId + "'>" +
+                    out.println("<td align='right' width='20%'><label for='" + inputId + "'>" +
                             descStr + "</label>:</td>");
                     out.print("<td><input type='text' id='" + inputId + "' name='" + inputId + "'" +
                             (size != null ? " size='" + size.getText() + "'" : "") +
@@ -115,7 +115,7 @@
                     String checkId = var.getText();
                     boolean hasChildren = node.elements("item").size() > 0;
                     out.println("<tr valign='top'>");
-                    out.print("<td align='right' width='1%'><input type='checkbox' id='" +
+                    out.print("<td align='right' width='20%'><input type='checkbox' id='" +
                             checkId + "' name='" + checkId + "' value='true' " +
                             (setting ? " checked='checked'" : ""));
                     if (hasChildren) {
@@ -209,10 +209,9 @@
                 Element mainPanel = optConfig.getRootElement().element("mainpanel");
 %>
     <!-- Options Window -->
-    <div class="jive-gatewayPanel" id="jiveoptions" style="display: none;">
-		<div>
+        <div>
             <form id="jiveoptionsform" action="" onSubmit="return false">
-                <table border="0" cellpadding="0" cellspacing="0">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
                         <td align="left">
 <%
@@ -236,8 +235,7 @@
                 <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.saveoptions", "kraken") %>" onclick="saveOptions(); return false" class="jive-formButton">
                 <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "kraken") %>" onclick="cancelOptions(); return true" class="jive-formButton">
             </form>
-		</div>
-	</div>
+        </div>
 
 
 <%
