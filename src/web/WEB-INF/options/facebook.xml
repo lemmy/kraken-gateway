@@ -9,4 +9,8 @@
         <item type="text" sysprop="plugin.gateway.facebook.connecthost" var="host" desckey="gateway.web.settings.host" default="chat.facebook.com"/>
         <item type="text" sysprop="plugin.gateway.facebook.connectport" var="port" desckey="gateway.web.settings.port" default="5222"/>
     </rightpanel>
+    <bottompanel>
+        <item type="text" sysprop="plugin.gateway.facebook.platform.apikey" var="apikey" desckey="gateway.facebook.apikey" default=""/>
+        <item type="text" sysprop="plugin.gateway.facebook.platform.apisecret" var="apisecret" desckey="gateway.facebook.apisecret" default=""/>
+    </bottompanel>
 </optionsconfig>
