@@ -440,7 +440,7 @@
 <%
                 if (bottomPanel != null && bottomPanel.nodeCount() > 0) {
                     out.println("<table border='0' cellpadding='1' cellspacing='2'>");
-                    for (Object nodeObj : rightPanel.elements("item")) {
+                    for (Object nodeObj : bottomPanel.elements("item")) {
                         Element node = (Element)nodeObj;
                         printConfigNode(node);
                     }
