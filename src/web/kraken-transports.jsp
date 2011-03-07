@@ -37,8 +37,8 @@
         Integer jsID = 0; // Javascript incrementable id
         String connectHost = null;
         String connectPort = null;
-        String userPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.settings.noneselected", "kraken") + "]";
-        String groupPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.settings.noneselected", "kraken") + "]";
+        String userPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.transports.noneselected", "kraken") + "]";
+        String groupPermText = "[" + LocaleUtils.getLocalizedString("gateway.web.transports.noneselected", "kraken") + "]";
         String userPermEntry = "";
         String groupPermEntry = "";
         Integer globalPermSetting = 1;
@@ -203,7 +203,7 @@
 
                     String inputId = gatewayType.toString() + var.getText();
                     out.println("<tr valign='middle'>");
-                    out.println("<td align='right' width='1%'><label for='" + inputId + "'>" +
+                    out.println("<td align='right' width='20%'><label for='" + inputId + "'>" +
                             descStr + "</label>:</td>");
                     out.print("<td><input type='text' id='" + inputId + "' name='" + inputId + "'" +
                             (size != null ? " size='" + size.getText() + "'" : "") +
@@ -251,7 +251,7 @@
                     String checkId = gatewayType.toString() + var.getText();
                     boolean hasChildren = node.elements("item").size() > 0;
                     out.println("<tr valign='top'>");
-                    out.print("<td align='right' width='1%'><input type='checkbox' id='" +
+                    out.print("<td align='right' width='20%'><input type='checkbox' id='" +
                             checkId + "' name='" + checkId + "' value='true' " +
                             (setting ? " checked='checked'" : ""));
                     if (hasChildren) {
@@ -371,9 +371,9 @@
 			<strong><%= this.description %></strong>
 		</label>
 		<div class="jive-gatewayButtons">
-            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>tests); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>testsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.tests", "kraken") %></a>
-            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>options); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>optionsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.options", "kraken") %></a>
-			<a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>perms); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>permsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.settings.permissions", "kraken") %></a>
+            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>tests); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>testsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.transports.tests", "kraken") %></a>
+            <a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>options); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>optionsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.transports.options", "kraken") %></a>
+			<a href="#" onclick="togglePanel(jive<%= this.gatewayType.toString().toUpperCase() %>perms); return false" id="jive<%= this.gatewayType.toString().toUpperCase() %>permsLink" <%= ((!this.gwEnabled) ? "style='display:none'" : "") %>><%= LocaleUtils.getLocalizedString("gateway.web.transports.permissions", "kraken") %></a>
 		</div>
 	</div>
     <!-- JID display -->
@@ -389,11 +389,11 @@
 			<b>Tests not supported for QQ (yet).</b>
 			<% } else { %>
             <form id="jive<%= this.gatewayType.toString().toUpperCase() %>testsform" action="" onSubmit="return false">
-                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttohost", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testhost"><%= connectHost %></span><br />
-                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.connecttoport", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testport"><%= connectPort %></span><br />
+                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.transports.connecttohost", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testhost"><%= connectHost %></span><br />
+                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.transports.connecttoport", "kraken") %>:</span> <span id="<%= this.gatewayType.toString() %>testport"><%= connectPort %></span><br />
 
                 <span id="<%= this.gatewayType.toString() %>testsresults" class="saveResultsMsg"></span>
-                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.testconnection", "kraken") %>" onclick="testConnect('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
+                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.transports.testconnection", "kraken") %>" onclick="testConnect('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
             </form>
 			<% } %>
         </div>
@@ -436,10 +436,10 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="left">
+                        <td align="left" colspan="2">
 <%
                 if (bottomPanel != null && bottomPanel.nodeCount() > 0) {
-                    out.println("<table border='0' cellpadding='1' cellspacing='2'>");
+                    out.println("<table border='0' cellpadding='1' cellspacing='2' width='100%'>");
                     for (Object nodeObj : bottomPanel.elements("item")) {
                         Element node = (Element)nodeObj;
                         printConfigNode(node);
@@ -455,8 +455,8 @@
                 </table>
 
                 <span id="<%= this.gatewayType.toString() %>optionsresults" class="saveResultsMsg"></span>
-                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.saveoptions", "kraken") %>" onclick="saveOptions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
-                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "kraken") %>" onclick="cancelOptions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
+                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.transports.saveoptions", "kraken") %>" onclick="saveOptions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
+                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.transports.cancelchanges", "kraken") %>" onclick="cancelOptions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
             </form>
 		</div>
 	</div>
@@ -464,31 +464,31 @@
     <div class="jive-gatewayPanel" id="jive<%= this.gatewayType.toString().toUpperCase() %>perms" style="display: none;">
 		<div>
             <form id="jive<%= this.gatewayType.toString().toUpperCase() %>permsform" action=""  onSubmit="return false">
-                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="all" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 1 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registerall", "kraken") %><br>
-                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="specific" onClick="showSpecificChoices('<%= this.gatewayType.toString() %>')"  <%= (this.globalPermSetting == 2 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registersome", "kraken") %><br>
+                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="all" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 1 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.transports.registerall", "kraken") %><br>
+                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="specific" onClick="showSpecificChoices('<%= this.gatewayType.toString() %>')"  <%= (this.globalPermSetting == 2 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.transports.registersome", "kraken") %><br>
                 <div id="<%= this.gatewayType.toString() %>userreg_specific" style="<%= (this.globalPermSetting == 2 ? "" : "display: none; ") %>margin: 0; padding: 0; font-size: 80%">
                     <table border="0" cellpadding="0" cellspacing="0" style="margin-left: 30.0px" width='100%'>
                         <tr valign="top">
                             <td align="left" style="padding-right: 15.0px" width='50%'>
-                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.users", "kraken") %></span> <a href="javascript:noop()" onClick="activateModifyUsers('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.settings.modifyusers", "kraken") %>)</a><br />
+                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.transports.users", "kraken") %></span> <a href="javascript:noop()" onClick="activateModifyUsers('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.transports.modifyusers", "kraken") %>)</a><br />
                                 <div id="<%= this.gatewayType.toString() %>userpermtextdiv" style="margin: 0; padding: 0" class='permissionListDiv'><span id="<%= this.gatewayType.toString() %>userpermtext"><%= this.userPermText %></span></div>
                                 <div id="<%= this.gatewayType.toString() %>userpermentrydiv" style="margin: 0; padding: 0; display:none" class='permissionListDiv'><textarea style="margin: 0" class='permissionListTextArea' rows="5" cols="20" id="<%= this.gatewayType.toString() %>userpermentry" name="<%= this.gatewayType.toString() %>userpermentry"><%= this.userPermEntry %></textarea></div>
                             </td>
                             <td align="left" style="margin-left: 15.0px" width='50%'>
-                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.settings.groups", "kraken") %></span> <a href="javascript:noop()" onClick="activateModifyGroups('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.settings.modifygroups", "kraken") %>)</a><br />
+                                <span style="font-weight: bold"><%= LocaleUtils.getLocalizedString("gateway.web.transports.groups", "kraken") %></span> <a href="javascript:noop()" onClick="activateModifyGroups('<%= this.gatewayType.toString() %>'); return false">(<%= LocaleUtils.getLocalizedString("gateway.web.transports.modifygroups", "kraken") %>)</a><br />
                                 <div id="<%= this.gatewayType.toString() %>grouppermtextdiv" style="margin: 0; padding: 0" class='permissionListDiv'><span id="<%= this.gatewayType.toString() %>grouppermtext"><%= this.groupPermText %></span></div>
                                 <div id="<%= this.gatewayType.toString() %>grouppermentrydiv" style="margin: 0; padding: 0; display:none" class='permissionListDiv'><textarea style="margin: 0" class='permissionListTextArea' rows="5" cols="20" id="<%= this.gatewayType.toString() %>grouppermentry" name="<%= this.gatewayType.toString() %>grouppermentry"><%= this.groupPermEntry %></textarea></div>
                             </td>
                         </tr>
                     </table>
                 </div>
-                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="manual" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 3 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.registernone", "kraken") %><br>
+                <input type="radio" name="<%= this.gatewayType.toString() %>userreg" value="manual" onClick="hideSpecificChoices('<%= this.gatewayType.toString() %>')" <%= (this.globalPermSetting == 3 ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.transports.registernone", "kraken") %><br>
                 <br>
-                <input type="checkbox" name="<%= this.gatewayType.toString() %>strictperms" value="true" <%= (this.globalPermStrict ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.settings.permsstrict", "kraken") %><br>
+                <input type="checkbox" name="<%= this.gatewayType.toString() %>strictperms" value="true" <%= (this.globalPermStrict ? "checked='checked'" : "") %> /> <%= LocaleUtils.getLocalizedString("gateway.web.transports.permsstrict", "kraken") %><br>
 
                 <span id="<%= this.gatewayType.toString() %>permsresults" class="saveResultsMsg"></span>
-                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.savepermissions", "kraken") %>" onclick="savePermissions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
-                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.settings.cancelchanges", "kraken") %>" onclick="cancelPermissions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
+                <input type="submit" name="submit" value="<%= LocaleUtils.getLocalizedString("gateway.web.transports.savepermissions", "kraken") %>" onclick="savePermissions('<%= this.gatewayType.toString() %>'); return false" class="jive-formButton">
+                <input type="reset" name="cancel" value="<%= LocaleUtils.getLocalizedString("gateway.web.transports.cancelchanges", "kraken") %>" onclick="cancelPermissions('<%= this.gatewayType.toString() %>'); return true" class="jive-formButton">
             </form>
 		</div>
 	</div>
@@ -526,7 +526,7 @@
 <html>
 
 <head>
-<title><fmt:message key="gateway.web.settings.title" /></title>
+<title><fmt:message key="gateway.web.transports.title" /></title>
 <meta name="pageID" content="kraken-settings">
 <style type="text/css">
 <!-- @import url("style/kraken.css"); -->
@@ -650,13 +650,13 @@
         }
         ConfigManager.saveSettings(transportID, transportSettings);
         document.getElementById(transportID+"optionsresults").style.display = "";
-        document.getElementById(transportID+"optionsresults").innerHTML = "<span class='successresults'><img src='images/success-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.settings.settingssaved' /></span>";
+        document.getElementById(transportID+"optionsresults").innerHTML = "<span class='successresults'><img src='images/success-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.transports.settingssaved' /></span>";
         setTimeout("to_saveOptions('"+transportID+"')", 5000);
     }
 
     function cancelOptions(transportID) {
         document.getElementById(transportID+"optionsresults").style.display = "";
-        document.getElementById(transportID+"optionsresults").innerHTML = "<span class='warningresults'><img src='images/warning-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.settings.cancelledchanges' /></span>";
+        document.getElementById(transportID+"optionsresults").innerHTML = "<span class='warningresults'><img src='images/warning-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.transports.cancelledchanges' /></span>";
         setTimeout("to_saveOptions('"+transportID+"')", 5000);
     }
 
@@ -673,10 +673,10 @@
     function cb_testConnect(result) {
         document.getElementById(testTransportID+"testsresults").style.display = "";
         if (result) {
-            document.getElementById(testTransportID+"testsresults").innerHTML = "<span class='successresults'><img src='images/success-16x16.gif' alt='' align='absmiddle' /><fmt:message key='gateway.web.settings.success' /></span>";
+            document.getElementById(testTransportID+"testsresults").innerHTML = "<span class='successresults'><img src='images/success-16x16.gif' alt='' align='absmiddle' /><fmt:message key='gateway.web.transports.success' /></span>";
         }
         else {
-            document.getElementById(testTransportID+"testsresults").innerHTML = "<span class='failureresults'><img src='images/failure-16x16.gif' alt='' align='absmiddle' /><fmt:message key='gateway.web.settings.failed' /></span>";
+            document.getElementById(testTransportID+"testsresults").innerHTML = "<span class='failureresults'><img src='images/failure-16x16.gif' alt='' align='absmiddle' /><fmt:message key='gateway.web.transports.failed' /></span>";
         }
         setTimeout("to_testConnect('"+testTransportID+"')", 5000);
         testTransportID = null;
@@ -761,14 +761,14 @@
                 userList[i] = userList[i].substr(0, charPos);
             }
         }
-        document.getElementById(transportID+"userpermtext").innerHTML = (userList.length > 0 ? userList.join(" ") : "[<fmt:message key='gateway.web.settings.noneselected'/>]");
+        document.getElementById(transportID+"userpermtext").innerHTML = (userList.length > 0 ? userList.join(" ") : "[<fmt:message key='gateway.web.transports.noneselected'/>]");
         document.getElementById(transportID+"userpermentry").value = userList.join(" ");
-        document.getElementById(transportID+"grouppermtext").innerHTML = (groupList.length > 0 ? groupList.join(" ") : "[<fmt:message key='gateway.web.settings.noneselected'/>]");
+        document.getElementById(transportID+"grouppermtext").innerHTML = (groupList.length > 0 ? groupList.join(" ") : "[<fmt:message key='gateway.web.transports.noneselected'/>]");
         document.getElementById(transportID+"grouppermentry").value = groupList.join(" ");
         deactivateModifyUsers(transportID);
         deactivateModifyGroups(transportID);
         document.getElementById(transportID+"permsresults").style.display = "";
-        document.getElementById(transportID+"permsresults").innerHTML = "<span class='successresults'><img src='images/success-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.settings.permissionssaved' /></span>";
+        document.getElementById(transportID+"permsresults").innerHTML = "<span class='successresults'><img src='images/success-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.transports.permissionssaved' /></span>";
         setTimeout("to_savePermissions('"+transportID+"')", 5000);
     }
 
@@ -776,7 +776,7 @@
         deactivateModifyUsers(transportID);
         deactivateModifyGroups(transportID);
         document.getElementById(transportID+"permsresults").style.display = "";
-        document.getElementById(transportID+"permsresults").innerHTML = "<span class='warningresults'><img src='images/warning-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.settings.cancelledchanges' /></span>";
+        document.getElementById(transportID+"permsresults").innerHTML = "<span class='warningresults'><img src='images/warning-16x16.gif' align='absmiddle' /><fmt:message key='gateway.web.transports.cancelledchanges' /></span>";
         setTimeout("to_savePermissions('"+transportID+"')", 5000);
     }
 
@@ -852,7 +852,7 @@
 </head>
 
 <body>
-<p><fmt:message key="gateway.web.settings.instructions" /></p>
+<p><fmt:message key="gateway.web.transports.instructions" /></p>
 
 <form action="" name="gatewayForm">
 
@@ -869,9 +869,9 @@
 
 <br><br>
 
-<div id="jive-title"><fmt:message key="gateway.web.settings.unstable.title" /></div>
+<div id="jive-title"><fmt:message key="gateway.web.transports.unstable.title" /></div>
 
-<p><fmt:message key="gateway.web.settings.unstable.notice" /></p>
+<p><fmt:message key="gateway.web.transports.unstable.notice" /></p>
 
 <% qqSettings.printSettingsDialog(); %>
 <% myspaceimSettings.printSettingsDialog(); %>
