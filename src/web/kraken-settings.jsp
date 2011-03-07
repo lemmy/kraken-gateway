@@ -263,7 +263,6 @@
 <script src="dwr/engine.js" type="text/javascript"></script>
 <script src="dwr/util.js" type="text/javascript"></script>
 <script src="dwr/interface/ConfigManager.js" type="text/javascript"></script>
-<script src="dwr/interface/ConnectionTester.js" type="text/javascript"></script>
 <script type="text/javascript" >
     DWREngine.setErrorHandler(handleError);
     window.onerror = handleError;
@@ -288,7 +287,7 @@
     );
 
     function saveOptions(transportID) {
-        var transportSettings = new Object();
+        var globalSettings = new Object();
         for (var x in optionTypes) {
             var optType = optionTypes[x];
             var optionId = transportID+optType;
