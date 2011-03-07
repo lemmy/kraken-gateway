@@ -102,6 +102,7 @@
             }
             Element leftPanel = optConfig.getRootElement().element("leftpanel");
             Element rightPanel = optConfig.getRootElement().element("rightpanel");
+            Element bottomPanel = optConfig.getRootElement().element("bottompanel");
             if (leftPanel != null && leftPanel.nodeCount() > 0) {
                 for (Object nodeObj : leftPanel.elements("item")) {
                     Element node = (Element) nodeObj;
@@ -127,6 +128,29 @@
             }
             if (rightPanel != null && rightPanel.nodeCount() > 0) {
                 for (Object nodeObj : rightPanel.elements("item")) {
+                    Element node = (Element) nodeObj;
+                    Attribute type = node.attribute("type");
+                    Attribute var = node.attribute("var");
+                    Attribute sysprop = node.attribute("sysprop");
+                    if (type == null || var == null || sysprop == null) {
+                        Log.error("Missing variable from options config.");
+                        continue;
+                    }
+                    Attribute def = node.attribute("default");
+                    String defStr = "";
+                    if (def != null) {
+                        defStr = def.getText();
+                    }
+                    if (type.getText().equals("text") && var.getText().equals("host")) {
+                        this.connectHost = JiveGlobals.getProperty(sysprop.getText(), defStr);
+                    }
+                    if (type.getText().equals("text") && var.getText().equals("port")) {
+                        this.connectPort = JiveGlobals.getProperty(sysprop.getText(), defStr);
+                    }
+                }
+            }
+            if (bottomPanel != null && bottomPanel.nodeCount() > 0) {
+                for (Object nodeObj : bottomPanel.elements("item")) {
                     Element node = (Element) nodeObj;
                     Attribute type = node.attribute("type");
                     Attribute var = node.attribute("var");
@@ -263,6 +287,7 @@
             Document optConfig = plugin.getOptionsConfig(gatewayType);
             Element leftPanel = optConfig.getRootElement().element("leftpanel");
             Element rightPanel = optConfig.getRootElement().element("rightpanel");
+            Element bottomPanel = optConfig.getRootElement().element("bottompanel");
             if (leftPanel != null && leftPanel.nodeCount() > 0) {
                 for (Object nodeObj : leftPanel.elements("item")) {
                     Element node = (Element) nodeObj;
@@ -272,6 +297,13 @@
 
             if (rightPanel != null && rightPanel.nodeCount() > 0) {
                 for (Object nodeObj : rightPanel.elements("item")) {
+                    Element node = (Element) nodeObj;
+                    getConfigOptions(node);
+                }
+            }
+
+            if (bottomPanel != null && bottomPanel.nodeCount() > 0) {
+                for (Object nodeObj : bottomPanel.elements("item")) {
                     Element node = (Element) nodeObj;
                     getConfigOptions(node);
                 }
@@ -328,6 +360,7 @@
                 Document optConfig = plugin.getOptionsConfig(gatewayType);
                 Element leftPanel = optConfig.getRootElement().element("leftpanel");
                 Element rightPanel = optConfig.getRootElement().element("rightpanel");
+                Element bottomPanel = optConfig.getRootElement().element("bottompanel");
 %>
 
 	<!-- BEGIN gateway - <%= this.gatewayType.toString().toUpperCase() %> -->
@@ -389,6 +422,23 @@
                         <td align="left" width="50%">
 <%
                 if (rightPanel != null && rightPanel.nodeCount() > 0) {
+                    out.println("<table border='0' cellpadding='1' cellspacing='2'>");
+                    for (Object nodeObj : rightPanel.elements("item")) {
+                        Element node = (Element)nodeObj;
+                        printConfigNode(node);
+                    }
+                    out.println("</table>");
+                }
+                else {
+                    out.println("&nbsp;");
+                }
+%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+<%
+                if (bottomPanel != null && bottomPanel.nodeCount() > 0) {
                     out.println("<table border='0' cellpadding='1' cellspacing='2'>");
                     for (Object nodeObj : rightPanel.elements("item")) {
                         Element node = (Element)nodeObj;
