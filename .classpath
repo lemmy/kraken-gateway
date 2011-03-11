@@ -33,5 +33,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/openfire"/>
 	<classpathentry kind="lib" path="lib/jfacebookiml.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/skype"/>
+	<classpathentry kind="lib" path="/openfire/build/lib/merge/tinder.jar"/>
+	<classpathentry kind="lib" path="lib/jcip-annotations.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
