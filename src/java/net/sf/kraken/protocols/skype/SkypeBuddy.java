@@ -10,17 +10,57 @@
  ******************************************************************************/
 package net.sf.kraken.protocols.skype;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 
+import com.skype.Friend;
+import com.skype.Group;
+
 public class SkypeBuddy extends TransportBuddy {
 	
-    public SkypeBuddy(TransportBuddyManager<SkypeBuddy> manager, String uin, String nickname, String group) {
-        super(manager, uin, nickname, null);
-        if (group != null) {
-            this.setGroups(Arrays.asList(group));
-        }
+    private final Friend friend;
+    private final Map<String, Group> skypeGroups;
+
+    public SkypeBuddy(TransportBuddyManager<SkypeBuddy> manager, Friend aFriend, String nickname, Map<String, Group> aGroups) {
+    	super(manager, aFriend.getId(), nickname, null);
+    	friend = aFriend;
+    	skypeGroups = aGroups;
+    	
+    	// populate roster groups
+    	List<String> list = new ArrayList<String>();
+    	for (String group : skypeGroups.keySet()) {
+			list.add(group);
+		}
+    	this.setGroups(list);
+	}
+
+	/**
+     * @return the friend
+     */
+    public Friend getFriend() {
+        return friend;
     }
+
+	/**
+	 * @return the skypeGroups
+	 */
+	public Map<String, Group> getSkypeGroups() {
+		return skypeGroups;
+	}
+
+	public Group addSkypeGroup(String displayName, Group group) {
+		return skypeGroups.put(displayName, group);
+	}
+
+	public Group getSkypeGroup(String displayName) {
+		return skypeGroups.get(displayName);
+	}
+
+	public Group removeSkypeGroup(String displayName) {
+		return skypeGroups.remove(displayName);
+	}
 }
