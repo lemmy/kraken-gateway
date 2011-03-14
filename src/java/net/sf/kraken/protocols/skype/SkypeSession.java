@@ -11,11 +11,15 @@
 package net.sf.kraken.protocols.skype;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.registration.Registration;
@@ -29,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.xmpp.packet.JID;
 
 import com.skype.Chat;
+import com.skype.ChatMessage;
 import com.skype.ContactList;
 import com.skype.Friend;
 import com.skype.Group;
@@ -148,6 +153,9 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 				
 				// buddies to roster
 				syncFriendsToRosters();
+				
+				// old chats
+				syncMissedChatMessages();
 			} catch (Exception e) {
 				Log.error("Skype: Tried to start up duplicate session for: "
 						+ jid);
@@ -156,7 +164,6 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 			}
         }
 	}
-
 
 	/* (non-Javadoc)
 	 * @see net.sf.kraken.session.TransportSession#logOut()
@@ -309,7 +316,28 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 			e.printStackTrace();
 		}
     }
-    
+
+    private void syncMissedChatMessages() throws SkypeException {
+		final Chat[] chats = Skype.getAllMissedChats();
+		for (Chat chat : chats) {
+
+			// chat messages are unordered, but we want to show 'em in chronological order 
+			final SortedSet<ChatMessage> chatMessages = new TreeSet<ChatMessage>(
+					new SkypeChatMessageComparator());
+			chatMessages.addAll(Arrays.asList(chat.getAllChatMessages()));
+			
+			for (ChatMessage chatMessage : chatMessages) {
+			    final User sender = chatMessage.getSender();
+		        final JID from = getTransport().convertIDToJID(sender.getId());
+			    final Date time = chatMessage.getTime();
+			    final String msg = chatMessage.getContent();
+			    getTransport().sendOfflineMessage(getJID(), from, msg, time, null);
+		    }
+		}
+		//finally purge old chat messages
+		Skype.clearChatHistory();
+	}
+
 	public PresenceType convertSkypeStatusToXMPP(Status status) {
 		PresenceType presenceType;
 		switch (status) {
