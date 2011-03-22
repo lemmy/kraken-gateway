@@ -191,6 +191,8 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	        User.removeAllListener();
 	        Skype.getContactList().removeAllListener();
 	        Skype.removeAllListeners();
+	        //finally purge old chat messages
+	        Skype.clearChatHistory();
 	    } catch (SkypeException e) {
 	        e.printStackTrace();
 	    }
