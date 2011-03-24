@@ -12,6 +12,7 @@ package net.sf.kraken.protocols.skype;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -316,11 +317,17 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 				
 				// Avatar
 				final BufferedImage bi = friend.getAvatar();
-				final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				ImageIO.write(bi, "jpg", bos);
-				final byte[] imageData = bos.toByteArray();
-				final Avatar avatar = new Avatar(buddy.getJID(), imageData);
-				buddy.setAvatar(avatar);
+				if(bi != null) { // be defensive 
+				    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				    try {
+				        ImageIO.write(bi, "jpg", bos);
+				        final byte[] imageData = bos.toByteArray();
+				        final Avatar avatar = new Avatar(buddy.getJID(), imageData);
+				        buddy.setAvatar(avatar);
+				    } catch(IOException e) {
+				        e.printStackTrace();
+				    }
+				}
 				
 				// finally store the buddy
 				getBuddyManager().storeBuddy(buddy);
