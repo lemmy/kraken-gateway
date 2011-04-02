@@ -13,13 +13,11 @@ package net.sf.kraken.protocols.skype;
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
-import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.xmpp.packet.JID;
 
-import com.skype.Skype;
 import com.skype.Profile.Status;
 import com.skype.SkypeException;
 
@@ -32,13 +30,16 @@ public class SkypeTransport extends BaseTransport<SkypeBuddy> {
 	public TransportSession<SkypeBuddy> registrationLoggedIn(
 			Registration registration, JID jid, PresenceType presenceType,
 			String verboseStatus, Integer priority) {
-		TransportSession<SkypeBuddy> session = new SkypeSession(registration, jid, this, priority);
-		if(isSkypeRunning()) {
-		    session.logIn(presenceType, verboseStatus);
-		} else {
-			session.setFailureStatus(ConnectionFailureReason.UNKNOWN);
-			session.sessionDisconnectedNoReconnect("Skype not running");
-		}
+
+	    TransportSession<SkypeBuddy> session = null;
+	    try {
+            session = new SkypeSession(registration, jid, this, priority);
+            session.logIn(presenceType, verboseStatus);
+	    } catch (SkypeException e) {
+//	        session.setFailureStatus(ConnectionFailureReason.UNKNOWN);
+//	        session.sessionDisconnectedNoReconnect("Skype not running");
+	        e.printStackTrace();
+	    }
 		return session;
 	}
 
@@ -50,15 +51,6 @@ public class SkypeTransport extends BaseTransport<SkypeBuddy> {
         session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
         session.logOut();
         session.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
-	}
-
-	private boolean isSkypeRunning() {
-    	try {
-			return Skype.isInstalled() && Skype.isRunning();
-		} catch (SkypeException e) {
-			e.printStackTrace();
-			return false;
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -98,7 +90,7 @@ public class SkypeTransport extends BaseTransport<SkypeBuddy> {
 	 */
 	@Override
 	public Boolean isPasswordRequired() {
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)
