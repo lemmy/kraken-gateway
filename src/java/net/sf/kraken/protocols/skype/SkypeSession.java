@@ -52,10 +52,16 @@ import com.skype.User.Status;
 public class SkypeSession extends TransportSession<SkypeBuddy> {
 
 	static Logger Log = Logger.getLogger(SkypeSession.class);
+	
+	private Skype skype;
 
 	public SkypeSession(Registration registration, JID jid,
 			BaseTransport<SkypeBuddy> transport, Integer priority) {
 		super(registration, jid, transport, priority);
+
+        final String username = registration.getUsername();
+        final String password = registration.getPassword();
+        skype = new Skype(username, password);
 	}
 
 	/* (non-Javadoc)
@@ -68,7 +74,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	
 		try {
 			Profile.Status status = convertXMPPStatusToSkypeStatus(presenceType);
-			Skype.getProfile().setStatus(status);
+			skype.getProfile().setStatus(status);
 		} catch (SkypeException e) {
 			e.printStackTrace();
 		}
@@ -90,7 +96,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	    //TODO sanity check skypeId validity (it's user input after all) 
 	    final String skypeId = getTransport().convertJIDToID(jid);
 	    try {
-	        Skype.getContactList().addFriend(skypeId, "Please allow me to see when you are online");
+	        skype.getContactList().addFriend(skypeId, "Please allow me to see when you are online");
 	    } catch(SkypeException e) {
 	        e.printStackTrace();
 	    }
@@ -102,7 +108,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	@Override
 	public void sendMessage(JID jid, String message) {
 		try {
-			Chat chat = Skype.chat(getTransport().convertJIDToID(jid));
+			Chat chat = skype.chat(getTransport().convertJIDToID(jid));
 			chat.send(message);
 		} catch (SkypeException e) {
 			e.printStackTrace();
@@ -146,13 +152,13 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
         if (!isLoggedIn()) {  
 			try {
 				// startup skype
-				Profile profile = Skype.getProfile();
+				Profile profile = skype.getProfile();
 
 				// status
 				profile.setStatus(convertXMPPStatusToSkypeStatus(presenceType));
 
 				// add listeners to handle chat and exceptions
-				Skype.addChatMessageListener(new SkypeChatMessageListener(this));
+				skype.addChatMessageListener(new SkypeChatMessageListener(this));
 
 				// mark logged in (prior to syncing rosters!
 				setLoginStatus(TransportLoginStatus.LOGGED_IN);
@@ -177,7 +183,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	@Override
 	public void logOut() {
 		try {
-			Profile profile = Skype.getProfile();
+			Profile profile = skype.getProfile();
 			profile.setStatus(Profile.Status.NA);
 		} catch (SkypeException e) {
 			e.printStackTrace();
@@ -195,10 +201,10 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	    // remove all listeners
 	    try {
 	        User.removeAllListener();
-	        Skype.getContactList().removeAllListener();
-	        Skype.removeAllListeners();
+	        skype.getContactList().removeAllListener();
+	        skype.removeAllListeners();
 	        //finally purge old chat messages
-	        Skype.clearChatHistory();
+	        skype.clearChatHistory();
 	    } catch (SkypeException e) {
 	        e.printStackTrace();
 	    }
@@ -211,7 +217,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	@Override
 	public void removeContact(SkypeBuddy contact) {
 	    try {
-	        Skype.getContactList().removeFriend(contact.getFriend());
+	        skype.getContactList().removeFriend(contact.getFriend());
 	    } catch (SkypeException e) {
 	        e.printStackTrace();
 	    }
@@ -225,7 +231,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	@Override
 	public void updateContact(SkypeBuddy skypeBuddy) {
     	try {
-			final ContactList contactList = Skype.getContactList();
+			final ContactList contactList = skype.getContactList();
 			final Map<String, Group> skypeGroups = skypeBuddy.getSkypeGroups();
 			final Collection<String> groups = skypeBuddy.getGroups() == null ? new ArrayList<String>() : skypeBuddy.getGroups();
 			
@@ -265,7 +271,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	// populate rosters
     private void syncFriendsToRosters() {
 		try {
-			final ContactList contactList = Skype.getContactList();
+			final ContactList contactList = skype.getContactList();
 			contactList.addPropertyChangeListener(new SkypeContactListListener(
 					this, contactList));
 
@@ -341,7 +347,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
     }
 
     private void syncMissedChatMessages() throws SkypeException {
-		final Chat[] chats = Skype.getAllMissedChats();
+		final Chat[] chats = skype.getAllMissedChats();
 		for (Chat chat : chats) {
 
 			// chat messages are unordered, but we want to show 'em in chronological order 
@@ -358,7 +364,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 		    }
 		}
 		//finally purge old chat messages
-		Skype.clearChatHistory();
+		skype.clearChatHistory();
 	}
 
 	public PresenceType convertSkypeStatusToXMPP(Status status) {
