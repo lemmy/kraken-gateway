@@ -24,6 +24,10 @@
                       name="${gateway.settings}"
                       url="kraken-settings.jsp"
                       description="${gateway.settings.desc}"/>
+                <item id="kraken-transports"
+                      name="${gateway.transports}"
+                      url="kraken-transports.jsp"
+                      description="${gateway.transports.desc}"/>
                 <item id="kraken-registrations" 
                       name="${gateway.registrations}"
                       url="kraken-registrations.jsp"

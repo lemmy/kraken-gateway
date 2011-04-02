@@ -283,6 +283,35 @@ public class KrakenPlugin implements Plugin {
         return optConfXML;
     }
 
+    /**
+     * Returns the web global options, if it exists.
+     *
+     * @return XML document with the options config.
+     */
+    public Document getOptionsConfig() {
+        // Load any custom-defined servlets.
+        File optConf = new File(this.pluginDirectory, "web" + File.separator + "WEB-INF" +
+            File.separator + "options" + File.separator + "global.xml");
+        Document optConfXML;
+        try {
+            FileReader reader = new FileReader(optConf);
+            SAXReader xmlReader = new SAXReader();
+            xmlReader.setEncoding("UTF-8");
+            optConfXML = xmlReader.read(reader);
+        }
+        catch (FileNotFoundException e) {
+            // Non-existent: Return empty config
+            optConfXML = DocumentHelper.createDocument();
+            optConfXML.addElement("optionsconfig");
+        }
+        catch (DocumentException e) {
+            // Bad config: Return empty config
+            optConfXML = DocumentHelper.createDocument();
+            optConfXML.addElement("optionsconfig");
+        }
+        return optConfXML;
+    }
+
     static final Properties log4jProperties = new Properties();
 
     public static Properties getLoggerProperties() {

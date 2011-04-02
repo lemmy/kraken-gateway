@@ -274,7 +274,7 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
                 else {
                     // Checking for XEP-0022 message events
                     Element eEvent = packet.getChildElement("x", NameSpace.XEVENT);
-                    if (eEvent != null) {
+                    if (eEvent != null && JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
                         if (eEvent.element("composing") != null) {
                             session.sendChatState(to, ChatStateType.composing);
                         }
@@ -1602,10 +1602,12 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         }
         if (type.equals(Message.Type.chat) || type.equals(Message.Type.normal)) {
             chatStateEventSource.isActive(from, to);
-            Element xEvent = m.addChildElement("x", "jabber:x:event");
-//            xEvent.addElement("id");
-            xEvent.addElement("composing");
             m.addChildElement("active", NameSpace.CHATSTATES);
+            if (JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
+                Element xEvent = m.addChildElement("x", "jabber:x:event");
+    //            xEvent.addElement("id");
+                xEvent.addElement("composing");
+            }
         }
         else if (type.equals(Message.Type.error)) {
             // Error responses require error elements, even if we aren't going to do it "right" yet
@@ -1815,9 +1817,11 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
-        Element xEvent = m.addChildElement("x", "jabber:x:event");
-        xEvent.addElement("id");
-        xEvent.addElement("composing");
+        if (JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
+            Element xEvent = m.addChildElement("x", "jabber:x:event");
+            xEvent.addElement("id");
+            xEvent.addElement("composing");
+        }
         m.addChildElement("composing", NameSpace.CHATSTATES);
         sendPacket(m);
     }
@@ -1836,8 +1840,10 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
-        Element xEvent = m.addChildElement("x", "jabber:x:event");
-        xEvent.addElement("id");
+        if (JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
+            Element xEvent = m.addChildElement("x", "jabber:x:event");
+            xEvent.addElement("id");
+        }
         m.addChildElement("paused", NameSpace.CHATSTATES);
         sendPacket(m);
     }
@@ -1856,8 +1862,10 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
-        Element xEvent = m.addChildElement("x", "jabber:x:event");
-        xEvent.addElement("id");
+        if (JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
+            Element xEvent = m.addChildElement("x", "jabber:x:event");
+            xEvent.addElement("id");
+        }
         m.addChildElement("inactive", NameSpace.CHATSTATES);
         sendPacket(m);
     }
@@ -1876,8 +1884,10 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
-        Element xEvent = m.addChildElement("x", "jabber:x:event");
-        xEvent.addElement("id");
+        if (JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
+            Element xEvent = m.addChildElement("x", "jabber:x:event");
+            xEvent.addElement("id");
+        }
         m.addChildElement("gone", NameSpace.CHATSTATES);
         sendPacket(m);
     }
@@ -1903,8 +1913,10 @@ public abstract class BaseTransport<B extends TransportBuddy> implements Compone
         m.setType(Message.Type.chat);
         m.setTo(to);
         m.setFrom(from);
-        final Element xEvent = m.addChildElement("x", "jabber:x:event");
-        xEvent.addElement("id");
+        if (JiveGlobals.getBooleanProperty("plugin.gateway.globsl.messageeventing", true)) {
+            final Element xEvent = m.addChildElement("x", "jabber:x:event");
+            xEvent.addElement("id");
+        }
         m.addChildElement("active", NameSpace.CHATSTATES);
         sendPacket(m);
     }
