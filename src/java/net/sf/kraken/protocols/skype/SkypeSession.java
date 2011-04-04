@@ -31,7 +31,6 @@ import net.sf.kraken.avatars.Avatar;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
 import net.sf.kraken.type.ChatStateType;
-import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
@@ -58,11 +57,16 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	public SkypeSession(Registration registration, JID jid,
 			BaseTransport<SkypeBuddy> transport, Integer priority) {
 		super(registration, jid, transport, priority);
-
-        final String username = registration.getUsername();
-        final String password = registration.getPassword();
-        skype = new Skype(username, password);
 	}
+	
+	void setSkype(final Skype aSkype) {
+		skype = aSkype;
+	}
+	
+	Skype getSkype() {
+		return skype;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, java.lang.String)
@@ -72,12 +76,8 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 		// xmpp status
 		setPresenceAndStatus(presenceType, verboseStatus);
 	
-		try {
-			Profile.Status status = convertXMPPStatusToSkypeStatus(presenceType);
-			skype.getProfile().setStatus(status);
-		} catch (SkypeException e) {
-			e.printStackTrace();
-		}
+		Profile.Status status = convertXMPPStatusToSkypeStatus(presenceType);
+		skype.getProfile().setStatus(status);
 	}
 
 	/* (non-Javadoc)
@@ -95,11 +95,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	public void acceptAddContact(JID jid) {
 	    //TODO sanity check skypeId validity (it's user input after all) 
 	    final String skypeId = getTransport().convertJIDToID(jid);
-	    try {
-	        skype.getContactList().addFriend(skypeId, "Please allow me to see when you are online");
-	    } catch(SkypeException e) {
-	        e.printStackTrace();
-	    }
+	    skype.getContactList().addFriend(skypeId, "Please allow me to see your online status");
 	}
 
 	/* (non-Javadoc)
@@ -107,12 +103,8 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void sendMessage(JID jid, String message) {
-		try {
-			Chat chat = skype.chat(getTransport().convertJIDToID(jid));
-			chat.send(message);
-		} catch (SkypeException e) {
-			e.printStackTrace();
-		}
+		Chat chat = skype.chat(getTransport().convertJIDToID(jid));
+		chat.send(message);
 	}
 
 
@@ -150,30 +142,23 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	public void logIn(PresenceType presenceType, String verboseStatus) {
         setPendingPresenceAndStatus(presenceType, verboseStatus);
         if (!isLoggedIn()) {  
-			try {
-				// startup skype
-				Profile profile = skype.getProfile();
+			// startup skype
+			Profile profile = skype.getProfile();
 
-				// status
-				profile.setStatus(convertXMPPStatusToSkypeStatus(presenceType));
+			// status
+			profile.setStatus(convertXMPPStatusToSkypeStatus(presenceType));
 
-				// add listeners to handle chat and exceptions
-				skype.addChatMessageListener(new SkypeChatMessageListener(this));
+			// add listeners to handle chat and exceptions
+			skype.addChatMessageListener(new SkypeChatMessageListener(this));
 
-				// mark logged in (prior to syncing rosters!
-				setLoginStatus(TransportLoginStatus.LOGGED_IN);
-				
-				// buddies to roster
-				syncFriendsToRosters();
-				
-				// old chats
-				syncMissedChatMessages();
-			} catch (Exception e) {
-				Log.error("Skype: Tried to start up duplicate session for: "
-						+ jid);
-				setFailureStatus(ConnectionFailureReason.UNKNOWN);
-				sessionDisconnected("Duplicate session.");
-			}
+			// mark logged in (prior to syncing rosters!
+			setLoginStatus(TransportLoginStatus.LOGGED_IN);
+
+			// buddies to roster
+			syncFriendsToRosters();
+
+			// old chats
+			syncMissedChatMessages();
         }
 	}
 
@@ -182,13 +167,6 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void logOut() {
-		try {
-			Profile profile = skype.getProfile();
-			profile.setStatus(Profile.Status.NA);
-		} catch (SkypeException e) {
-			e.printStackTrace();
-		}
-        cleanUp();
         sessionDisconnectedNoReconnect(null);
 	}
 
@@ -198,16 +176,18 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void cleanUp() {
-	    // remove all listeners
-	    try {
-	        User.removeAllListener();
-	        skype.getContactList().removeAllListener();
-	        skype.removeAllListeners();
-	        //finally purge old chat messages
-	        skype.clearChatHistory();
-	    } catch (SkypeException e) {
-	        e.printStackTrace();
-	    }
+		if(skype.getStatus() == com.skype.connector.Connector.Status.ATTACHED) {
+			Profile profile = skype.getProfile();
+			profile.setStatus(Profile.Status.NA);
+
+			skype.clearChatHistory();
+		}
+	    
+		// remove all listeners
+		skype.getContactList().removeAllListener();
+        skype.removeAllListeners();
+        
+        skype.dispose();
 	}
 
 
@@ -216,11 +196,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void removeContact(SkypeBuddy contact) {
-	    try {
-	        skype.getContactList().removeFriend(contact.getFriend());
-	    } catch (SkypeException e) {
-	        e.printStackTrace();
-	    }
+        skype.getContactList().removeFriend(contact.getFriend());
 	}
 	
 	
@@ -230,41 +206,38 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void updateContact(SkypeBuddy skypeBuddy) {
-    	try {
-			final ContactList contactList = skype.getContactList();
-			final Map<String, Group> skypeGroups = skypeBuddy.getSkypeGroups();
-			final Collection<String> groups = skypeBuddy.getGroups() == null ? new ArrayList<String>() : skypeBuddy.getGroups();
-			
-			// remove from skype groups
-			for (final Map.Entry<String, Group> skypeGroup : skypeGroups.entrySet()) {
-				final String displayName = skypeGroup.getKey();
-				if(!groups.contains(displayName)) {
-					Group group = skypeGroup.getValue();
-					group.removeFriend(skypeBuddy.getFriend());
-					skypeBuddy.removeSkypeGroup(displayName);
+		final ContactList contactList = skype.getContactList();
+		final Map<String, Group> skypeGroups = skypeBuddy.getSkypeGroups();
+		final Collection<String> groups = skypeBuddy.getGroups() == null ? new ArrayList<String>()
+				: skypeBuddy.getGroups();
+
+		// remove from skype groups
+		for (final Map.Entry<String, Group> skypeGroup : skypeGroups.entrySet()) {
+			final String displayName = skypeGroup.getKey();
+			if (!groups.contains(displayName)) {
+				Group group = skypeGroup.getValue();
+				group.removeFriend(skypeBuddy.getFriend());
+				skypeBuddy.removeSkypeGroup(displayName);
+			}
+		}
+		// add to new groups
+		final Set<String> keySet = skypeGroups.keySet();
+		for (final String groupName : groups) {
+			if (!keySet.contains(groupName)) {
+				Group group = contactList.getGroup(groupName);
+				if (group == null) {
+					group = contactList.addGroup(groupName);
 				}
+				group.addFriend(skypeBuddy.getFriend());
+				skypeBuddy.addSkypeGroup(groupName, group);
 			}
-			// add to new groups
-			final Set<String> keySet = skypeGroups.keySet();
-			for (final String groupName : groups) {
-				if(!keySet.contains(groupName)) {
-					Group group = contactList.getGroup(groupName);
-					if(group == null) {
-						group = contactList.addGroup(groupName);
-					}
-					group.addFriend(skypeBuddy.getFriend());
-					skypeBuddy.addSkypeGroup(groupName, group);
-				}
-			}
-			
-			// nickname => displayname
-			final String nickname = skypeBuddy.getNickname();
-			final String displayName = skypeBuddy.getFriend().getDisplayName();
-			if(!displayName.equals(nickname)) {
-				skypeBuddy.getFriend().setDisplayName(nickname);
-			}
-		} catch (SkypeException e) {
-			e.printStackTrace();
+		}
+
+		// nickname => displayname
+		final String nickname = skypeBuddy.getNickname();
+		final String displayName = skypeBuddy.getFriend().getDisplayName();
+		if (!displayName.equals(nickname)) {
+			skypeBuddy.getFriend().setDisplayName(nickname);
 		}
 	}
 	

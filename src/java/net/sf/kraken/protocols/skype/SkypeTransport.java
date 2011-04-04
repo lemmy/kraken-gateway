@@ -13,16 +13,65 @@ package net.sf.kraken.protocols.skype;
 import net.sf.kraken.BaseTransport;
 import net.sf.kraken.registration.Registration;
 import net.sf.kraken.session.TransportSession;
+import net.sf.kraken.type.ConnectionFailureReason;
 import net.sf.kraken.type.PresenceType;
 import net.sf.kraken.type.TransportLoginStatus;
 
 import org.xmpp.packet.JID;
 
 import com.skype.Profile.Status;
+import com.skype.connector.ConnectorListener;
+import com.skype.connector.ConnectorMessageEvent;
+import com.skype.connector.ConnectorStatusEvent;
+import com.skype.Skype;
 import com.skype.SkypeException;
 
 public class SkypeTransport extends BaseTransport<SkypeBuddy> {
 
+	private class SkypeConnectorListener implements ConnectorListener {
+
+		private final SkypeSession session;
+		private final String verboseStatus;
+		private final PresenceType presenceType;
+
+		public SkypeConnectorListener(SkypeSession session, PresenceType presenceType, String verboseStatus) {
+			this.session = session;
+			this.presenceType = presenceType;
+			this.verboseStatus = verboseStatus;
+		}
+
+		/* (non-Javadoc)
+		 * @see com.skype.connector.ConnectorListener#messageReceived(com.skype.connector.ConnectorMessageEvent)
+		 */
+		public void messageReceived(ConnectorMessageEvent event) {
+		}
+
+		/* (non-Javadoc)
+		 * @see com.skype.connector.ConnectorListener#messageSent(com.skype.connector.ConnectorMessageEvent)
+		 */
+		public void messageSent(ConnectorMessageEvent event) {
+		}
+
+		/* (non-Javadoc)
+		 * @see com.skype.connector.ConnectorListener#statusChanged(com.skype.connector.ConnectorStatusEvent)
+		 */
+		public void statusChanged(ConnectorStatusEvent event) {
+			com.skype.connector.Connector.Status status = event.getStatus();
+			switch (status) {
+				case NOT_RUNNING:
+					if(session.isLoggedIn()) {
+						session.setLoginStatus(TransportLoginStatus.LOGGING_OUT);
+						session.sessionDisconnectedNoReconnect(null);
+						session.setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+					}
+					break;
+				case ATTACHED:
+					session.logIn(presenceType, verboseStatus);
+					break;
+			}
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see net.sf.kraken.BaseTransport#registrationLoggedIn(net.sf.kraken.registration.Registration, org.xmpp.packet.JID, net.sf.kraken.type.PresenceType, java.lang.String, java.lang.Integer)
 	 */
@@ -31,15 +80,21 @@ public class SkypeTransport extends BaseTransport<SkypeBuddy> {
 			Registration registration, JID jid, PresenceType presenceType,
 			String verboseStatus, Integer priority) {
 
-	    TransportSession<SkypeBuddy> session = null;
-	    try {
-            session = new SkypeSession(registration, jid, this, priority);
-            session.logIn(presenceType, verboseStatus);
-	    } catch (SkypeException e) {
-//	        session.setFailureStatus(ConnectionFailureReason.UNKNOWN);
-//	        session.sessionDisconnectedNoReconnect("Skype not running");
-	        e.printStackTrace();
-	    }
+		final String username = registration.getUsername();
+		final String password = registration.getPassword();
+
+		final SkypeSession session = new SkypeSession(registration, jid, this, priority);
+		System.out.println("Created new session " + session);
+		try {
+			final Skype skype = new Skype(username, password);
+			skype.addConnectorListener(new SkypeConnectorListener(session, presenceType, verboseStatus));
+			session.setSkype(skype);
+			skype.connect();
+		} catch (SkypeException e) {
+			session.setFailureStatus(ConnectionFailureReason.UNKNOWN);
+			session.sessionDisconnectedNoReconnect("Skype not running: "
+					+ e.getMessage());
+		}
 		return session;
 	}
 
