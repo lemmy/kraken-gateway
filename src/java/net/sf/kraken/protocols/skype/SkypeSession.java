@@ -40,7 +40,6 @@ import org.xmpp.packet.JID;
 import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.ContactList;
-import com.skype.Friend;
 import com.skype.Group;
 import com.skype.Profile;
 import com.skype.Skype;
@@ -95,7 +94,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	public void acceptAddContact(JID jid) {
 	    //TODO sanity check skypeId validity (it's user input after all) 
 	    final String skypeId = getTransport().convertJIDToID(jid);
-	    skype.getContactList().addFriend(skypeId, "Please allow me to see your online status");
+	    skype.getContactList().addUser(skypeId, "Please allow me to see your online status");
 	}
 
 	/* (non-Javadoc)
@@ -195,7 +194,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void removeContact(SkypeBuddy contact) {
-        skype.getContactList().removeFriend(contact.getFriend());
+        skype.getContactList().removeUser(contact.getUser());
 	}
 	
 	
@@ -215,7 +214,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 			final String displayName = skypeGroup.getKey();
 			if (!groups.contains(displayName)) {
 				Group group = skypeGroup.getValue();
-				group.removeFriend(skypeBuddy.getFriend());
+				group.removeUser(skypeBuddy.getUser());
 				skypeBuddy.removeSkypeGroup(displayName);
 			}
 		}
@@ -227,16 +226,16 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 				if (group == null) {
 					group = contactList.addGroup(groupName);
 				}
-				group.addFriend(skypeBuddy.getFriend());
+				group.addUser(skypeBuddy.getUser());
 				skypeBuddy.addSkypeGroup(groupName, group);
 			}
 		}
 
 		// nickname => displayname
 		final String nickname = skypeBuddy.getNickname();
-		final String displayName = skypeBuddy.getFriend().getDisplayName();
+		final String displayName = skypeBuddy.getUser().getDisplayName();
 		if (!displayName.equals(nickname)) {
-			skypeBuddy.getFriend().setDisplayName(nickname);
+			skypeBuddy.getUser().setDisplayName(nickname);
 		}
 	}
 	
@@ -246,11 +245,11 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 			final ContactList contactList = skype.getContactList();
 
 			// first get all custom groups a user is associated with
-			final Map<Friend, List<Group>> friendWithGroups = new HashMap<Friend, List<Group>>();
+			final Map<User, List<Group>> friendWithGroups = new HashMap<User, List<Group>>();
 			final Group[] allGroups = contactList.getAllGroups();
 			for (Group group : allGroups) {
-				final Friend[] friends = group.getAllFriends();
-				for (Friend friend : friends) {
+				final User[] friends = group.getAllUsers();
+				for (User friend : friends) {
 					List<Group> list = friendWithGroups.get(friend);
 					if(list == null) {
 						list = new ArrayList<Group>();
@@ -263,8 +262,8 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 			}
 
 			// get add contacts independent of their group but reuse group list here
-			final Friend[] friends = contactList.getAllFriends();
-			for (Friend friend : friends) {
+			final User[] friends = contactList.getAllUsers();
+			for (User friend : friends) {
 				
 				// use full name if display name is not set
 				String displayName = friend.getDisplayName();

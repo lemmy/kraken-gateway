@@ -19,15 +19,14 @@ import net.sf.kraken.type.PresenceType;
 
 import org.jivesoftware.util.NotFoundException;
 
-import com.skype.Friend;
 import com.skype.SkypeException;
 import com.skype.User;
 
 public class SkypeUserListener extends SkypeListener implements PropertyChangeListener {
 
-	private final Friend friend;
+	private final User friend;
 
-	public SkypeUserListener(SkypeSession skypeSession, Friend friend) {
+	public SkypeUserListener(SkypeSession skypeSession, User friend) {
 		super(skypeSession);
 		this.friend = friend;
 	}

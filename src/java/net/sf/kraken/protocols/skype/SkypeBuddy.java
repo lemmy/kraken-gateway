@@ -17,17 +17,17 @@ import java.util.Map;
 import net.sf.kraken.roster.TransportBuddy;
 import net.sf.kraken.roster.TransportBuddyManager;
 
-import com.skype.Friend;
 import com.skype.Group;
+import com.skype.User;
 
 public class SkypeBuddy extends TransportBuddy {
 	
-    private final Friend friend;
+    private final User user;
     private final Map<String, Group> skypeGroups;
 
-    public SkypeBuddy(TransportBuddyManager<SkypeBuddy> manager, Friend aFriend, String nickname, Map<String, Group> aGroups) {
-    	super(manager, aFriend.getId(), nickname, null);
-    	friend = aFriend;
+    public SkypeBuddy(TransportBuddyManager<SkypeBuddy> manager, User aUser, String nickname, Map<String, Group> aGroups) {
+    	super(manager, aUser.getId(), nickname, null);
+    	user = aUser;
     	skypeGroups = aGroups;
     	
     	// populate roster groups
@@ -41,8 +41,8 @@ public class SkypeBuddy extends TransportBuddy {
 	/**
      * @return the friend
      */
-    public Friend getFriend() {
-        return friend;
+    public User getUser() {
+        return user;
     }
 
 	/**
