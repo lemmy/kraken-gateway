@@ -14,9 +14,7 @@ import java.lang.ref.WeakReference;
 
 import org.apache.log4j.Logger;
 
-import com.skype.SkypeExceptionHandler;
-
-public abstract class SkypeListener implements SkypeExceptionHandler {
+public abstract class SkypeListener {
     static Logger Log = Logger.getLogger(SkypeListener.class);
     
 	private WeakReference<SkypeSession> skypeSessionRef;
@@ -28,11 +26,4 @@ public abstract class SkypeListener implements SkypeExceptionHandler {
     public SkypeSession getSession() {
         return skypeSessionRef.get();
     }
-
-	/* (non-Javadoc)
-	 * @see com.skype.SkypeExceptionHandler#uncaughtExceptionHappened(java.lang.Throwable)
-	 */
-	public void uncaughtExceptionHappened(Throwable e) {
-        Log.error("Skype exception caught: ", e);
-	}
 }

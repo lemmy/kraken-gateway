@@ -184,7 +184,6 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 		}
 	    
 		// remove all listeners
-		skype.getContactList().removeAllListener();
         skype.removeAllListeners();
         
         skype.dispose();
@@ -245,8 +244,6 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
     private void syncFriendsToRosters() {
 		try {
 			final ContactList contactList = skype.getContactList();
-			contactList.addPropertyChangeListener(new SkypeContactListListener(
-					this, contactList));
 
 			// first get all custom groups a user is associated with
 			final Map<Friend, List<Group>> friendWithGroups = new HashMap<Friend, List<Group>>();
