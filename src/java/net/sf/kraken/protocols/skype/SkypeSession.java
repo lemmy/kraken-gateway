@@ -46,26 +46,31 @@ import com.skype.Skype;
 import com.skype.SkypeException;
 import com.skype.User;
 import com.skype.User.Status;
+import com.skype.connector.ConnectorListener;
+import com.skype.connector.ConnectorMessageEvent;
+import com.skype.connector.ConnectorStatusEvent;
 
-public class SkypeSession extends TransportSession<SkypeBuddy> {
+public class SkypeSession extends TransportSession<SkypeBuddy> implements ConnectorListener {
 
 	static Logger Log = Logger.getLogger(SkypeSession.class);
 	
-	private Skype skype;
+	private final Skype skype;
 
 	public SkypeSession(Registration registration, JID jid,
-			BaseTransport<SkypeBuddy> transport, Integer priority) {
+			BaseTransport<SkypeBuddy> transport, Integer priority, PresenceType presenceType, String verboseStatus) {
 		super(registration, jid, transport, priority);
-	}
-	
-	void setSkype(final Skype aSkype) {
-		skype = aSkype;
-	}
-	
-	Skype getSkype() {
-		return skype;
-	}
+		
+		this.presence = presenceType;
+		this.verboseStatus = verboseStatus == null ? "" : verboseStatus;
+		
+		final String username = registration.getUsername();
+		final String password = registration.getPassword();
 
+		this.skype = new Skype(username, password);
+		System.out.println("Created new session with skype instance: " + skype);
+		skype.addConnectorListener(this);
+		skype.connect();
+	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.kraken.session.TransportSession#updateStatus(net.sf.kraken.type.PresenceType, java.lang.String)
@@ -75,8 +80,10 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 		// xmpp status
 		setPresenceAndStatus(presenceType, verboseStatus);
 	
-		Profile.Status status = convertXMPPStatusToSkypeStatus(presenceType);
-		skype.getProfile().setStatus(status);
+		if(isLoggedIn()) {
+		    Profile.Status status = convertXMPPStatusToSkypeStatus(presenceType);
+		    skype.getProfile().setStatus(status);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -175,6 +182,8 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 	 */
 	@Override
 	public void cleanUp() {
+		skype.removeConnectorListener(this);
+		
 		if(skype.getStatus() == com.skype.connector.Connector.Status.ATTACHED) {
 			Profile profile = skype.getProfile();
 			profile.setStatus(Profile.Status.NA);
@@ -310,6 +319,7 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 			getTransport().syncLegacyRoster(getJID(),
 					getBuddyManager().getBuddies());
 			getBuddyManager().activate();
+			System.out.println("Synced friends to roster for skype isntance: " + skype);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -388,5 +398,47 @@ public class SkypeSession extends TransportSession<SkypeBuddy> {
 				return Profile.Status.NA;
 		}
 		return Profile.Status.UNKNOWN;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see com.skype.connector.ConnectorListener#messageReceived(com.skype.connector.ConnectorMessageEvent)
+	 */
+	public void messageReceived(ConnectorMessageEvent event) {
+	}
+
+	/* (non-Javadoc)
+	 * @see com.skype.connector.ConnectorListener#messageSent(com.skype.connector.ConnectorMessageEvent)
+	 */
+	public void messageSent(ConnectorMessageEvent event) {
+	}
+
+	/* (non-Javadoc)
+	 * @see com.skype.connector.ConnectorListener#statusChanged(com.skype.connector.ConnectorStatusEvent)
+	 */
+	public synchronized void statusChanged(ConnectorStatusEvent event) {
+		if(skype.isDisposed()) {
+			return;
+		}
+		final com.skype.connector.Connector.Status status = event.getStatus();
+		switch (status) {
+			case NOT_RUNNING:
+				if(isLoggedIn()) {
+					System.out.println("Received NOT_RUNNING from skype instance: " + skype);
+					setLoginStatus(TransportLoginStatus.LOGGING_OUT);
+					sessionDisconnectedNoReconnect(null);
+					setLoginStatus(TransportLoginStatus.LOGGED_OUT);
+				} else {
+					System.err.println("Received NOT_RUNNING from skype instance: " + skype + " while not logged in");
+				}
+				break;
+			case ATTACHED:
+				System.out.println("Received ATTACHED from skype instance: " + skype);
+				logIn(presence, verboseStatus);
+				break;
+			default:
+				System.out.println("Received " + status + " from skype instance: " + skype);
+				break;
+		}
 	}
 }
